@@ -1,0 +1,918 @@
+#include "soundstorm.h"
+#include <iostream>
+#include <cmath>
+#include <limits>
+#ifndef NDEBUG
+  #include <cassert>
+#endif
+//#include <boost/thread.hpp>
+#include <thread>
+#include <chrono>
+#include <portaudiocpp/PortAudioCpp.hxx>
+#include <ogg/ogg.h>
+#include <vorbis/vorbisfile.h>
+#include "vmath.h"
+
+soundstorm::soundstorm() try
+  : audio_system_auto(false),             // don't initialise portaudio automatically
+    listener_rotation(Quatd::fromEulerAngles(0.0, 0.0, 0.0)) {
+  /// Default constructor with integrated try/catch
+  // Initialise all global audio setup
+  try {
+    audio_system_auto.initialize();
+    audio_system = &portaudio::System::instance();
+  } catch(portaudio::PaException const &e) {
+    std::cout << "SoundStorm: audio_system: PortAudio exception: " << e.paErrorText() << std::endl;
+    return;
+  } catch(portaudio::PaCppException const &e) {
+    std::cout << "SoundStorm: audio_system: PortAudioCpp exception: " << e.what() << std::endl;
+    return;
+  } catch(std::exception const &e) {
+    std::cout << "SoundStorm: audio_system: Generic exception: " << e.what() << std::endl;
+    return;
+  } catch(...) {
+    std::cout << "SoundStorm: audio_system: Unknown exception!" << std::endl;
+    return;
+  }
+  std::cout << "SoundStorm: " << audio_system->versionText() << " build " << audio_system->version() << std::endl;
+  if(!audio_system->exists()) {
+    std::cout << "SoundStorm: Error: sound engine claims not to exist." << std::endl;
+    return;
+  }
+  // select an appropriate sound device
+  for(portaudio::System::DeviceIterator it = audio_system->devicesBegin(); it != audio_system->devicesEnd(); ++it) {
+    if(*it == audio_system->defaultOutputDevice()) {
+      std::cout << " *";
+    } else {
+      std::cout << "  ";
+    }
+    std::cout << it->index() << " " << it->name();
+    std::cout << " Ch " << it->maxInputChannels() << "in " << it->maxOutputChannels() << "out " << it->defaultSampleRate() << "Hz";
+    //std::cout << " latency in/out " << it->defaultLowInputLatency() << "/" << it->defaultLowOutputLatency() << " to " << it->defaultHighInputLatency() << "/" << it->defaultHighOutputLatency() << " out" << std::endl;
+    if(it->isSystemDefaultInputDevice()) {
+      std::cout << " [sysdef in]";
+    }
+    if(it->isSystemDefaultOutputDevice()) {
+      std::cout << " [sysdef out]";
+    }
+    if(it->isHostApiDefaultInputDevice()) {
+      std::cout << " [apidef in]";
+    }
+    if(it->isHostApiDefaultOutputDevice()) {
+      std::cout << " [apidef out]";
+    }
+    if(it->isInputOnlyDevice()) {
+      std::cout << " [in only]";
+    }
+    if(it->isOutputOnlyDevice()) {
+      std::cout << " [out only]";
+    }
+    if(it->isOutputOnlyDevice()) {
+      std::cout << " [fd]";
+    }
+    std::cout << std::endl;
+  }
+  audio_device = &audio_system->defaultOutputDevice();
+
+  if(channels > static_cast<unsigned int>(audio_device->maxOutputChannels())) {
+    // clamp number of channels in case we're asking for too many
+    channels = audio_device->maxOutputChannels();
+  }
+  ears.resize(channels);
+  decks.resize(numdecks);
+  for(deck &thisdeck : decks) {
+    // initialise deck output buffers to zero
+    thisdeck.buffer_l[0].resize(deck_buffer_size, 0.0);
+    thisdeck.buffer_r[0].resize(deck_buffer_size, 0.0);
+    thisdeck.buffer_l[1].resize(deck_buffer_size, 0.0);
+    thisdeck.buffer_r[1].resize(deck_buffer_size, 0.0);
+    //thisdeck.buffer_read = 1;             // so that buffer 0 will be pre-filled
+    thisdeck.buffer_read = 0;
+    thisdeck.buffer_needs_filled = true;
+  }
+  set_listener_position_and_rotation(Vector3f(0.0, 0.0, 0.0), Quatf::fromEulerAngles(0.0, 0.0, 0.0));   // initial positions for the ears
+
+  // set up the parameters required to open a (Callback)Stream:
+  stream_out_params = new portaudio::DirectionSpecificStreamParameters(
+    *audio_device,                                            // device
+    channels,                                                 // output channels
+    portaudio::FLOAT32,                                       // sample data format http://riot.so/portaudiocpp/a00060.html#a30bc71f065706d41a5d9208ea861e4a6
+    false,                                                    // interleaved
+    audio_device->defaultLowOutputLatency(),                  // latency
+    NULL);                                                    // hostApiSpecificStreamInfo
+  stream_params = new portaudio::StreamParameters(
+    portaudio::DirectionSpecificStreamParameters::null(),     // input stream parameters
+    *stream_out_params,                                       // output stream parameters
+    samplerate,                                               // sample rate
+    frames_per_buffer,                                        // frames per buffer for a CallbackStream, or the preferred buffer granularity for a BlockingStream.
+    paClipOff | paDitherOff);                                 // The flags for the stream, default paNoFlag http://portaudio.com/docs/v19-doxydocs/portaudio_8h.html#ad33384abe3754a39f4773f2561773595
+
+  stream = new portaudio::MemFunCallbackStream<soundstorm>(
+    *stream_params,                                           // stream parameters
+    *this,                                                    // class instance
+    &soundstorm::mixer);                                      // member function to call
+
+  stream->start();                                            // start the stream
+
+} catch(portaudio::PaException const &e) {
+  std::cout << "SoundStorm: PortAudio exception: " << e.paErrorText() << std::endl;
+} catch(portaudio::PaCppException const &e) {
+  std::cout << "SoundStorm: PortAudioCpp exception: " << e.what() << std::endl;
+} catch(std::exception const &e) {
+  std::cout << "SoundStorm: Generic exception: " << e.what() << std::endl;
+} catch(...) {
+  std::cout << "SoundStorm: Unknown exception!" << std::endl;
+}
+
+soundstorm::~soundstorm() {
+  /// Default destructor
+  #ifdef DEBUG_SOUNDSTORM
+    std::cout << "SoundStorm session report: HDR window max: " << session_max_hdr_window_bottom << " - " << session_max_hdr_window_top << std::endl;
+    std::cout << "SoundStorm session report: max simultaneous sounds " << session_max_simultaneous_sounds << std::endl;
+    std::cout << "SoundStorm session report: source distance min " << session_min_distance << " max " << session_max_distance << std::endl;
+  #endif
+  if(streamer_thread) {
+    streamer_run = false;                         // tell the streamer not to run another cycle
+    streamer_thread->interrupt();                 // and send an interrupt signal for quicker cleanup
+    if(streamer_thread->joinable()) {
+      try {
+        streamer_thread->join();                  // wait for the streamer thread to finish
+      } catch(...) {                              // ignore exceptions
+      }
+    }
+    delete streamer_thread;
+    streamer_thread = nullptr;
+  }
+  playing.clear();
+  decks.clear();
+  audio_system->terminate();                    // release audio resources
+}
+
+void soundstorm::start_streamer() {
+  /// Initialise the streamer this must be done after the playlist is initialised
+  #ifdef DEBUG_SOUNDSTORM
+    std::cout << "SoundStorm: DEBUG: starting streamer" << std::endl;
+  #endif
+  if(decks.empty()) {
+    std::cout << "SoundStorm: ERROR: streamer asked to play from non-existant decks." << std::endl;
+    return;
+  }
+  //streamer_run = false;
+  //streamer();
+  //for(deck &thisdeck : decks) {
+  //  thisdeck.buffer_read = 0;             // so the pre-filled buffer will be played first
+  //}
+  streamer_run = true;
+
+  // start the streaming decoder thread
+  streamer_thread = new boost::thread(std::bind(&soundstorm::streamer, this));
+}
+
+int soundstorm::mixer(void const *buffer_in __attribute__((__unused__)),
+                      void *buffer_out,
+                      unsigned long frames,
+                      PaStreamCallbackTimeInfo const *time_info __attribute__((__unused__)),
+                      PaStreamCallbackFlags status_flags __attribute__((__unused__))) {
+  /// The callback that feeds sample data to the sound stream
+  #ifdef DEBUG_SOUNDSTORM
+    assert(buffer_out != NULL);
+    if(playing.size() > session_max_simultaneous_sounds) {
+      session_max_simultaneous_sounds = playing.size();
+    }
+  #endif
+
+  // check and slide the HDR window
+  //hdr_window_top    -= hdr_dropback_rate;       // first droop by the default amount
+  //hdr_window_bottom -= hdr_dropback_rate;
+  hdr_window_top    *= hdr_dropback_rate;       // first droop by the default amount
+  hdr_window_bottom *= hdr_dropback_rate;
+  if(hdr_window_top < hdr_window_top_min) {     // clamp
+    hdr_window_top = hdr_window_top_min;
+  }
+  if(hdr_window_bottom < 0.0) {                 // clamp
+    hdr_window_bottom = 0.0;
+  }
+
+  float **out = static_cast<float**>(buffer_out);
+  for(unsigned int i = 0; i != frames; ++i) {
+    for(unsigned int channel = 0; channel != channels; ++channel) {   // clear all channels
+      out[channel][i] = 0.0;
+    }
+    float max_level = 0.0;                          // keep track of the maximum output level this frame
+
+    // play the sound effects
+    for(auto it = playing.begin(); it != playing.end();) {
+      sound &thissound = **it;
+      // stereo positioning
+      ear const &thisear = ears[thissound.channel];
+      float const distance_sq = (thisear.position - thissound.position).lengthSq();
+      float const distance = sqrt(distance_sq);
+      #ifdef DEBUG_SOUNDSTORM
+        if(distance < session_min_distance) {
+          session_min_distance = distance;
+        }
+        if(distance > session_max_distance) {
+          session_max_distance = distance;
+        }
+      #endif
+      float const seek_delay = distance / speed_of_sound;
+      //std::cout << "DEBUG: " << playing.size() << " pos " << Vector3i(thissound.position) << " dist " << distance << " ch" << thissound.channel << " delay " << seek_delay << "s" << std::endl;
+      float const angle_ratio = acos(thisear.orientation.dotProduct(thissound.position - thisear.position) / distance) / M_PI;
+      float const head_shadow_delay = head_shadow_delay_max * angle_ratio;
+      float apparent_seek = thissound.seek - ((seek_delay + head_shadow_delay) * samplerate);    // rewind to account for time delays
+      if(apparent_seek >= 0.0) {                            // avoid trying to play before the start of the effect
+        if(apparent_seek >= thissound.effect->buffersize ||
+           (thissound.seek_end != 0.0 && apparent_seek >= thissound.seek_end)) {
+          // we've reached the end of this effect or our own seek limit
+          if(thissound.next_sound) {
+            if(thissound.next_sound == &thissound) {
+              // this is a one-sound loop, so just rewind to the beginning
+              thissound.seek = -thissound.seek_speed;         // rewind one step make sure the first sample is really 0
+              apparent_seek = thissound.seek - seek_delay;    // rewind to account for time delay
+              if(apparent_seek < 0.0) {  // avoid trying to play before the start of the effect
+                apparent_seek = 0.0;
+              }
+            } else {
+              // we have something else queued up, so replace us with it and destroy the original
+              sound *oldsound = *it;
+              *it = oldsound->next_sound;
+              delete oldsound;
+            }
+          } else {
+            #ifdef DEBUG_SOUNDSTORM
+              std::cout << "SoundStorm: DEBUG: finished playing sound at seek point " << apparent_seek << " after " << apparent_seek / samplerate << "s" << std::endl;
+            #endif
+            it = playing.erase(it);
+            continue;                               // we have nothing to contribute to the stream
+          }
+        }
+        // directional attenuation
+        float const directional_attenuation = 1.0 - (head_shadow_attenuation * angle_ratio);
+        float const sample = (thissound.effect->buffer[static_cast<unsigned int>(apparent_seek)] *
+                              thissound.effect->hdr_scale *
+                              thissound.volume *
+                              directional_attenuation) / distance_sq;
+        //std::cout << "DEBUG: " << thissound.channel << " ancos " << anglecos << " anPI " << angle / M_PI << " att " << directional_attenuation << " sam " << sample << std::endl;
+        out[thissound.channel][i] += sample;
+        if(out[thissound.channel][i] > max_level) { // keep track of the maximum output level this frame
+          max_level = out[thissound.channel][i];
+        }
+      }
+      thissound.seek += thissound.seek_speed;
+      ++it;                                         // only increment here in case we erase instead
+    }
+
+    // play the music
+    for(deck &thisdeck : decks) {
+      if(thisdeck.volume != thisdeck.volume_target) {     // perform any fades we need to
+        if(thisdeck.volume < thisdeck.volume_target) {
+          thisdeck.volume += thisdeck.volume_fadespeed;
+          if(thisdeck.volume > thisdeck.volume_target) {  // clamp if we climb above
+            thisdeck.volume = thisdeck.volume_target;
+          }
+        } else {
+          thisdeck.volume -= thisdeck.volume_fadespeed;
+          if(thisdeck.volume < thisdeck.volume_target) {  // clamp if we drop below
+            thisdeck.volume = thisdeck.volume_target;
+          }
+        }
+      }
+      out[channel_type::LEFT ][i] += thisdeck.buffer_l[thisdeck.buffer_read][thisdeck.buffer_read_seek] * thisdeck.volume;
+      out[channel_type::RIGHT][i] += thisdeck.buffer_r[thisdeck.buffer_read][thisdeck.buffer_read_seek] * thisdeck.volume;
+      ++thisdeck.buffer_read_seek;
+      if(thisdeck.buffer_read_seek == deck_buffer_size) {           // we've reached the end of this buffer
+        thisdeck.buffer_read = 1 - thisdeck.buffer_read;            // flip the ping-pongs
+        thisdeck.buffer_needs_filled = true;                        // flag it as needing refilled
+        thisdeck.buffer_read_seek = 0;                              // rewind
+        #ifdef DEBUG_SOUNDSTORM
+          //std::cout << "SoundStorm: DEBUG: deck " << &thisdeck << " buffer flipped to " << thisdeck.buffer_read << std::endl;
+        #endif
+      }
+    }
+
+    // scale the HDR windows for this frame
+    if(max_level / hdr_window_top > 1.0) {
+      // scale both the window edges up
+      //hdr_window_bottom += hdr_window_top - max_level;
+      hdr_window_top = max_level;
+      #ifdef DEBUG_SOUNDSTORM
+        std::cout << "SoundStorm: DEBUG: HDR window raised to " << hdr_window_bottom << " - " << hdr_window_top << std::endl;
+        if(hdr_window_top > session_max_hdr_window_top) {
+          session_max_hdr_window_top = hdr_window_top;
+          std::cout << "SoundStorm: DEBUG: HDR window top new session max: " << session_max_hdr_window_top << std::endl;
+        }
+        if(hdr_window_bottom > session_max_hdr_window_bottom) {
+          session_max_hdr_window_bottom = hdr_window_bottom;
+          std::cout << "SoundStorm: DEBUG: HDR window bottom new session max: " << session_max_hdr_window_bottom << std::endl;
+        }
+      #endif
+    }
+    float const final_scale = volume / hdr_window_top;                // final global volume control and HDR window scaling
+    for(unsigned int channel = 0; channel != channels; ++channel) {   // scale all channels
+      out[channel][i] *= final_scale;
+    }
+  }
+  return paContinue;
+}
+
+void soundstorm::streamer() {
+  /// Streaming decoder that checks and fills the deck buffers
+  #ifdef DEBUG_SOUNDSTORM
+    std::cout << "SoundStorm: DEBUG: streamer starting" << std::endl;
+  #endif
+  ov_callbacks callbacks;
+  callbacks.read_func  = &soundstorm::ogg_callback_read;
+  //callbacks.seek_func  = &soundstorm::ogg_callback_seek;          // can be NULL to treat as non-seekable
+  callbacks.seek_func  = NULL;
+  //callbacks.close_func = &soundstorm::ogg_callback_close;         // or can just be NULL for no close
+  callbacks.close_func = NULL;
+  //callbacks.tell_func  = &soundstorm::ogg_callback_tell;          // can be NULL to treat as non-seekable
+  callbacks.tell_func  = NULL;
+
+  do {
+    for(auto &thisdeck : decks) {
+      if(!thisdeck.oggfile) {                                       // initialise the per-deck ogg decoders
+        if(thisdeck.playlist.empty()) {
+          #ifdef DEBUG_SOUNDSTORM
+            std::cout << "SoundStorm: WARNING: deck " << &thisdeck << " given empty playlist" << std::endl;
+          #endif
+          continue;
+        }
+        thisdeck.oggfile = new OggVorbis_File;
+        int result = ov_open_callbacks(&thisdeck, thisdeck.oggfile, NULL, 0, callbacks);
+        if(result != 0) {
+          switch(result) {
+          case OV_EREAD:
+            std::cout << "SoundStorm: ERROR: deck " << &thisdeck << " ov_open_callbacks A read from media returned an error: " << result << std::endl;
+            break;
+          case OV_ENOTVORBIS:
+            std::cout << "SoundStorm: ERROR: deck " << &thisdeck << " ov_open_callbacks: Bitstream does not contain any Vorbis data: " << result << std::endl;
+            break;
+          case OV_EVERSION:
+            std::cout << "SoundStorm: ERROR: deck " << &thisdeck << " ov_open_callbacks: Vorbis version mismatch: " << result << std::endl;
+            break;
+          case OV_EBADHEADER:
+            std::cout << "SoundStorm: ERROR: deck " << &thisdeck << " ov_open_callbacks: Invalid Vorbis bitstream header: " << result << std::endl;
+            break;
+          case OV_EFAULT:
+            std::cout << "SoundStorm: ERROR: deck " << &thisdeck << " ov_open_callbacks: Internal logic fault; indicates a bug or heap/stack corruption: " << result << std::endl;
+            break;
+          default:
+            std::cout << "SoundStorm: ERROR: deck " << &thisdeck << " ov_open_callbacks: unknown error " << result << std::endl;
+            break;
+          }
+          return;
+        }
+        #ifdef DEBUG_SOUNDSTORM
+          char **comment = ov_comment(thisdeck.oggfile, -1)->user_comments;
+          while(*comment) {
+            std::cout << "SoundStorm: deck " << &thisdeck << " Ogg comment: " << comment <<std::endl;
+            ++comment;
+          }
+          vorbis_info *info = ov_info(thisdeck.oggfile, -1);
+          std::cout << "SoundStorm: deck " << &thisdeck << " Bitstream is " << info->channels << " channel, " << info->rate << "Hz" << std::endl;
+          std::cout << "SoundStorm: deck " << &thisdeck << " Decoded length: " << ov_pcm_total(thisdeck.oggfile, -1) << " samples" << std::endl;
+          std::cout << "SoundStorm: deck " << &thisdeck << " Encoded by: " << ov_comment(thisdeck.oggfile, -1)->vendor << std::endl;
+        #endif
+      }
+      if(thisdeck.buffer_needs_filled) {
+        thisdeck.buffer_needs_filled = false;                           // reset the flag first
+        unsigned int const buffer_write = 1 - thisdeck.buffer_read;
+        #ifdef DEBUG_SOUNDSTORM
+          //std::cout << "SoundStorm: DEBUG: deck " << &thisdeck << " buffer " << buffer_write << " refilling..." << std::endl;
+        #endif
+        for(unsigned int i = 0; i != deck_buffer_size; ++i) {
+          //thisdeck.buffer_l[buffer_write][i] = 0.0;                     // placeholder
+          //thisdeck.buffer_r[buffer_write][i] = 0.0;
+
+          int current_section;    // what the hell is this even used for?
+          //unsigned int offset = 0;
+          //char *buffer_start = thisdeck.buffer_r[buffer_write][offset];
+          float **pcm_channels;
+          //long samples_read = ov_read_float(thisdeck.oggfile, &pcm_channels, sizeof(deck_buffer_size), &current_section);
+          long samples_read = 0;
+          do {
+            samples_read = ov_read_float(thisdeck.oggfile, &pcm_channels, 1, &current_section);
+            //if(samples_read < 0) {
+              switch(samples_read) {
+              case 0:               // EOF
+                //std::cout << "SoundStorm: ERROR: streamer: deck " << &thisdeck << " fill got EOF " << samples_read << std::endl;
+                break;
+              case OV_HOLE:         // indicates there was an interruption in the data. (one of: garbage between pages, loss of sync followed by recapture, or a corrupt page)
+                #ifdef DEBUG_SOUNDSTORM
+                  //std::cout << "SoundStorm: ERROR: streamer: deck " << &thisdeck << " fill failed with OV_HOLE " << samples_read << std::endl;
+                #endif  // this is normal when switching tracks
+                break;
+              case OV_EBADLINK:     // indicates that an invalid stream section was supplied to libvorbisfile, or the requested link is corrupt.
+                std::cout << "SoundStorm: ERROR: streamer: deck " << &thisdeck << " fill failed with OV_EBADLINK " << samples_read << std::endl;
+                break;
+              case OV_EINVAL:       // indicates the initial file headers couldn't be read or are corrupt, or that the initial open call for vf failed.
+                std::cout << "SoundStorm: ERROR: streamer: deck " << &thisdeck << " fill failed with OV_EINVAL " << samples_read << std::endl;
+                break;
+              }
+            //}
+          } while(samples_read <= 0);
+          thisdeck.buffer_l[buffer_write][i] = pcm_channels[LEFT ][0];
+          thisdeck.buffer_r[buffer_write][i] = pcm_channels[RIGHT][0];
+          // TODO: optimise this by reading more than one sample at a time
+        }
+        //std::cout << "SUPERDEBUG: read bytes: " << samples_read << std::endl;
+        #ifdef DEBUG_SOUNDSTORM
+          //std::cout << "SoundStorm: DEBUG: deck " << &thisdeck << " buffer " << buffer_write << " refilled" << std::endl;
+        #endif
+      }
+    }
+    // sleep for 1/4 of buffer fill time to avoid spin-waiting
+    std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<unsigned int>(1000.0 * deck_buffer_size / samplerate / 4)));
+  } while(streamer_run);
+
+  for(auto &thisdeck : decks) {     // cleanup
+    ov_clear(thisdeck.oggfile);
+    delete thisdeck.oggfile;
+    thisdeck.oggfile = nullptr;
+  }
+  #ifdef DEBUG_SOUNDSTORM
+    std::cout << "SoundStorm: DEBUG: streamer finished cleanly" << std::endl;
+  #endif
+}
+
+size_t soundstorm::ogg_callback_read(void *ptr, size_t size, size_t count, void *datasource) {
+  /// The interface is identical to that of fread, and identical behaviour is expected
+  #ifdef DEBUG_SOUNDSTORM
+    //std::cout << "SoundStorm: DEBUG: streamer read requested size " << size << " count " << count << std::endl;
+  #endif
+  if(!datasource) {
+    #ifdef DEBUG_SOUNDSTORM
+      std::cout << "SoundStorm: DEBUG: datasource passed as nullptr to " << __PRETTY_FUNCTION__ << std::endl;
+    #endif
+    return 0;                         // nullptr means we've got nothing playing
+  }
+  deck *thisdeck = reinterpret_cast<deck*>(datasource);
+  #ifdef DEBUG_SOUNDSTORM
+    if(thisdeck->playlist.empty()) {
+      std::cout << "SoundStorm: DEBUG: streamer read called on deck with empty playlist, this should be checked for in advance." << std::endl;
+      return 0;
+    }
+  #endif
+  music *thismusic = thisdeck->playlist.front();
+  unsigned char *target = reinterpret_cast<unsigned char*>(ptr);
+  #ifdef DEBUG_SOUNDSTORM
+    if(thisdeck->checkvalue != 123456) {
+      std::cout << "SoundStorm: DEBUG: streamer read: check value incorrect: " << thisdeck->checkvalue << std::endl;
+      return 0;
+    }
+    if(!thismusic->buffer) {
+      std::cout << "SoundStorm: DEBUG: no library music assigned to this playlist entry - this should never happen!" << std::endl;
+      return 0;
+    }
+    if(!thismusic->buffer->buffer) {
+      std::cout << "SoundStorm: DEBUG: no buffer assigned to this music - this should never happen!" << std::endl;
+      return 0;
+    }
+  #endif
+
+  unsigned int const bytes = size * count;
+  unsigned int i = 0;
+  for(; i != bytes; ++i) {
+    target[i] = thismusic->buffer->buffer[thismusic->seek];
+    //memcpy(ptr, thismusic->buffer->buffer, size * count);
+    ++thismusic->seek;
+    if(thismusic->seek == thismusic->buffer->buffersize) {
+      // advance the playlist
+      #ifdef DEBUG_SOUNDSTORM
+        std::cout << "SoundStorm: DEBUG: advancing playlist after " << thismusic->seek / 1024 << "KB played" << std::endl;
+      #endif
+      thismusic->seek = 0;                                          // rewind so that we advance to 0 this frame
+      if(thisdeck->playlist.size() == 1) {
+        // no track queued after this
+        if(!thisdeck->repeat) {
+          delete thismusic;
+          thismusic = nullptr;
+          #ifdef DEBUG_SOUNDSTORM
+            std::cout << "SoundStorm: DEBUG: streamer finished playlist, not repeating after " << i << " bytes" << std::endl;
+          #endif
+          // create a short read
+          return i;
+        }
+        #ifdef DEBUG_SOUNDSTORM
+          std::cout << "SoundStorm: DEBUG: streamer finished playlist, repeating" << std::endl;
+        #endif
+        // otherwise we just play this track from the start
+      } else {
+        #ifdef DEBUG_SOUNDSTORM
+          std::cout << "SoundStorm: DEBUG: streamer replacing music with top of playlist" << std::endl;
+        #endif
+        delete thismusic;
+        thisdeck->playlist.pop();                                     // take the current entry off the playlist
+        thismusic = thisdeck->playlist.front();                       // tell the track to replace itself
+      }
+    }
+    // NOTE: could probably improve this using a block memcpy or std::copy
+  }
+  #ifdef DEBUG_SOUNDSTORM
+    //std::cout << "SoundStorm: DEBUG: streamer read completed with " << i << " bytes" << std::endl;
+  #endif
+  return i;
+}
+
+int soundstorm::ogg_callback_seek(void *datasource, ogg_int64_t offset, int origin) {
+  /// The interface is identical to that of fseek, and identical behaviour is expected
+  if(!datasource) {
+    #ifdef DEBUG_SOUNDSTORM
+      std::cout << "SoundStorm: DEBUG: datasource passed as nullptr to " << __PRETTY_FUNCTION__ << std::endl;
+    #endif
+    return 0;                         // nullptr means we've got nothing playing
+  }
+  deck *thisdeck = reinterpret_cast<deck*>(datasource);
+  music *thismusic = thisdeck->playlist.front();
+
+  switch(origin) {
+  case SEEK_SET:
+    thismusic->seek = offset;
+    break;
+  case SEEK_CUR:
+    thismusic->seek += offset;
+    break;
+  case SEEK_END:
+    #ifdef DEBUG_SOUNDSTORM
+      if(!thismusic->buffer) {
+        std::cout << "SoundStorm: DEBUG: no library music assigned to this playlist entry passed as datasource to ogg_callback_seek - this should never happen!" << std::endl;
+        return -1;
+      }
+    #endif
+    thismusic->seek = thismusic->buffer->buffersize + offset;
+    break;
+  default:
+    return -1;
+  }
+  return 0;
+}
+
+int soundstorm::ogg_callback_close(void *datasource __attribute__((unused))) {
+  /// The interface is identical to that of fclose, and identical behaviour is expected
+  // we do absolutely nothing
+  return 0;
+}
+
+long soundstorm::ogg_callback_tell(void *datasource) {
+  /// The interface is identical to that of ftell, and identical behaviour is expected
+  if(!datasource) {
+    #ifdef DEBUG_SOUNDSTORM
+      std::cout << "SoundStorm: DEBUG: datasource passed as nullptr to " << __PRETTY_FUNCTION__ << std::endl;
+    #endif
+    return 0;                         // nullptr means we've got nothing playing
+  }
+  deck *thisdeck = reinterpret_cast<deck*>(datasource);
+  return thisdeck->playlist.front()->seek;
+}
+
+unsigned int soundstorm::get_device_default() {
+  /// Return the number of the default audio device
+  return audio_system->defaultOutputDevice().index();
+}
+
+unsigned int soundstorm::get_device_current() {
+  /// Return the number of the currently selected audio device
+  return audio_device->index();
+}
+
+void soundstorm::set_device(unsigned int new_device_index) {
+  /// Switch to a different output device
+  for(portaudio::System::DeviceIterator it = audio_system->devicesBegin(); it != audio_system->devicesEnd(); ++it) {
+    if(it->index() == static_cast<int>(new_device_index)) {
+      audio_device = &(*it);
+      std::cout << "SoundStorm: switched to device " << it->name() << std::endl;
+      return;
+    }
+  }
+  std::cout << "SoundStorm: tried to switch to nonexistent device number " << new_device_index << std::endl;
+}
+
+double soundstorm::get_cpu_usage() {
+  /// Value normally from 0 to 1, but may exceed 1
+  return stream->cpuLoad();
+}
+
+double soundstorm::get_sample_rate() {
+  /// Get measured sample rate of this stream so far
+  return stream->sampleRate();
+}
+
+double soundstorm::get_time() {
+  /// Get the time spent playing the stream up to this point
+  return stream->time();
+}
+
+void soundstorm::dump_stats() {
+  /// Output some measured statistics about the stream
+  std::cout << "SoundStorm: Sample rate " << get_sample_rate() << "Hz, CPU " << get_cpu_usage() * 100 << "%, time " << get_time() << std::endl;
+}
+
+Vector3f const &soundstorm::get_listener_position() const {
+  /// Return the current listener world position
+  return listener_position;
+}
+Quatf const &soundstorm::get_listener_rotation() const {
+  /// Return the current listener rotation
+  return listener_rotation;
+}
+Vector3f const &soundstorm::get_listener_velocity() const {
+  /// Return the current listener world position
+  return listener_velocity;
+}
+
+void soundstorm::set_listener_position(Vector3f const &newposition) {
+  /// Update the world position of the listener - also updates the velocity
+  listener_velocity = newposition - listener_position;
+  listener_position = newposition;
+  update_ears();
+}
+void soundstorm::set_listener_rotation(Quatf const &newrotation) {
+  /// Update the facing direction of the listener
+  listener_rotation = newrotation;
+  update_ears();
+}
+void soundstorm::set_listener_velocity(Vector3f const &newvelocity) {
+  /// Update the velocity of the listener through the medium
+  listener_velocity = newvelocity;
+}
+void soundstorm::set_listener_position_and_rotation(Vector3f const &newposition, Quatf const &newrotation) {
+  /// Update both position and orientation in a single call
+  listener_velocity = newposition - listener_position;
+  listener_position = newposition;
+  listener_rotation = newrotation;
+  update_ears();
+}
+
+void soundstorm::update_ears() {
+  /// Update the "ear" positions for each channel
+  ears[channel_type::LEFT].position.assign(-ear_offset, 0.0, 0.0);
+  ears[channel_type::RIGHT].position.assign(ear_offset, 0.0, 0.0);
+  for(auto &thisear : ears) {
+    thisear.position.rotate(listener_rotation);
+    thisear.orientation = thisear.position;
+    thisear.orientation.normalise();
+    thisear.position += listener_position;
+  }
+}
+
+soundstorm::soundeffect *soundstorm::get_effect(unsigned int effect_id) {
+  /// Look up an effect in the library
+  #ifndef NDEBUG
+    if(effect_id >= effect_library.size()) {
+      std::cout << "SoundStorm: Error: Called " << __PRETTY_FUNCTION__ << " with id " << effect_id << " outside library size " << effect_library.size() << "!" << std::endl;
+      return nullptr;
+    }
+    if(!effect_library[effect_id]) {
+      std::cout << "SoundStorm: Error: Called " << __PRETTY_FUNCTION__ << " with id " << effect_id << " returned nullptr!" << std::endl;
+      return nullptr;
+    }
+  #endif
+  return effect_library[effect_id];
+}
+
+soundstorm::music_buffer *soundstorm::get_music(unsigned int music_id) {
+  /// Look up a music track in the library
+  #ifndef NDEBUG
+    if(music_id >= music_library.size()) {
+      std::cout << "SoundStorm: Error: Called " << __PRETTY_FUNCTION__ << " with music_id " << music_id << " exceeding library size!" << std::endl;
+      return nullptr;
+    }
+  #endif
+  return music_library[music_id];
+}
+
+unsigned int soundstorm::load(unsigned char const *buffer, size_t buffersize, float hdr_scale) {
+  /// Load a sound from a buffer into the library, and return its new library id
+  unsigned int const effectnum = effect_library.size();
+  soundeffect *thiseffect = new soundeffect;
+  thiseffect->buffer = reinterpret_cast<float const*>(buffer);    // treat the buffer as one of 32bit floats
+  thiseffect->buffersize = buffersize / sizeof(float);            // convert to our size in samples
+  thiseffect->hdr_scale = hdr_scale;
+  effect_library.push_back(thiseffect);
+  #ifdef DEBUG_SOUNDSTORM
+    // do some analysis
+    float min = 0.0;
+    float max = 0.0;
+    for(size_t i = 0; i != thiseffect->buffersize; ++i) {
+      if(thiseffect->buffer[i] < min) {
+        min = thiseffect->buffer[i];
+      }
+      if(thiseffect->buffer[i] > max) {
+        max = thiseffect->buffer[i];
+      }
+    }
+    std::cout << "SoundStorm: DEBUG: loaded effect " << effectnum << " from buffer, size " << buffersize << ", length " << static_cast<float>(buffersize) / samplerate << "s, min " << min << " max " << max << " (" << std::max(std::abs(min), max) * 100 << "% vol)" << std::endl;
+  #endif
+  return effectnum;
+}
+
+unsigned int soundstorm::music_load(unsigned char const *buffer, size_t buffersize) {
+  unsigned int const tracknum = music_library.size();
+  music_buffer *thismusic = new music_buffer;
+  thismusic->buffer = buffer;
+  thismusic->buffersize = buffersize;
+  music_library.push_back(thismusic);
+  #ifdef DEBUG_SOUNDSTORM
+    std::cout << "SoundStorm: DEBUG: loaded music " << tracknum << " from buffer, size " << buffersize << std::endl;
+  #endif
+  return tracknum;
+}
+
+soundstorm::soundgroup soundstorm::play(unsigned int effect_id,
+                                        Vector3f const &position,
+                                        Vector3f const &velocity,
+                                        float volume,
+                                        float seek_start,
+                                        float seek_end,
+                                        float seek_speed) {
+  /// Add a sound effect by id to the currently playing list with the specified parameters
+  soundeffect *thiseffect = get_effect(effect_id);
+  // if both effect_id and the pointer address aren't printed before calling play, this crashes in release build with lto.  WHY!?
+  std::cout << "WE CONJURE THE SPIRITS OF THE COMPUTER WITH OUR SPELLS " << effect_id << thiseffect << std::endl;
+  return play(position, velocity, thiseffect, volume, seek_start, seek_end, seek_speed);
+}
+
+soundstorm::soundgroup soundstorm::play(Vector3f const &position,
+                                        Vector3f const &velocity,
+                                        soundeffect *effect,
+                                        float volume,
+                                        float seek_start,
+                                        float seek_end,
+                                        float seek_speed) {
+  /// Add a sound effect to the currently playing list with the specified parameters
+  // parameters reordered to avoid call ambiguity
+  #ifndef NDEBUG
+    if(!effect) {   // null check only in debug mode
+      std::cout << "SoundStorm: Error: Called " << __PRETTY_FUNCTION__ << " with null effect!" << std::endl;
+      return soundgroup();
+    }
+  #endif
+  soundgroup thissoundgroup;
+  for(unsigned int channelnum = 0; channelnum != channels; ++channelnum) {
+    sound *thissound = new sound(effect, position, velocity, volume, seek_start, seek_end, seek_speed, nullptr, channelnum);
+    playing.push_back(thissound);
+    thissoundgroup.push_back(thissound);
+  }
+  #ifdef DEBUG_SOUNDSTORM
+    std::cout << "SoundStorm: DEBUG: playing sound at " << position << " volume " << volume << ", " << playing.size() << " sounds total" << std::endl;
+  #endif
+  return thissoundgroup;
+}
+
+soundstorm::soundgroup soundstorm::play_loop(unsigned int effect_id,
+                                             Vector3f const &position,
+                                             Vector3f const &velocity,
+                                             float volume,
+                                             float seek_start,
+                                             float seek_end,
+                                             float seek_speed) {
+  /// Add a sound effect by id set to repeat indefinitely to the currently playing list with the specified parameters
+  return play_loop(position, velocity, get_effect(effect_id), volume, seek_start, seek_end, seek_speed);
+}
+
+soundstorm::soundgroup soundstorm::play_loop(Vector3f const &position,
+                                             Vector3f const &velocity,
+                                             soundeffect *effect,
+                                             float volume,
+                                             float seek_start,
+                                             float seek_end,
+                                             float seek_speed) {
+  /// Add a sound effect set to repeat indefinitely to the currently playing list with the specified parameters
+  // parameters reordered to avoid call ambiguity
+  #ifndef NDEBUG
+    if(!effect) {   // null check only in debug mode
+      std::cout << "SoundStorm: Error: Called " << __PRETTY_FUNCTION__ << " with null effect!" << std::endl;
+      return soundgroup();
+    }
+  #endif
+  soundgroup const &thissoundgroup = play(position, velocity, effect, volume, seek_start, seek_end, seek_speed);
+  // make each their own successor, looping with the same start and end
+  for(auto const &thissound : thissoundgroup) {
+    thissound->next_sound = thissound;
+  }
+  return thissoundgroup;
+}
+
+soundstorm::music *soundstorm::music_queue(unsigned int deck_id, unsigned int music_id) {
+  /// Queue an item from the music library to play next on the specified deck
+  #ifndef NDEBUG
+    if(deck_id >= decks.size()) {   // safety check only in debug mode
+      std::cout << "SoundStorm: Error: Called " << __PRETTY_FUNCTION__ << " with deck_id " << deck_id << " exceeding available decks!" << std::endl;
+      return nullptr;
+    }
+  #endif
+  music *thismusic = new music;
+  thismusic->parent = this;
+  thismusic->parent_deck = &decks[deck_id];
+  thismusic->buffer = get_music(music_id);
+  decks[deck_id].playlist.push(thismusic);
+  return thismusic;
+}
+
+void soundstorm::set_music_volume(unsigned int deck_id, float newvolume) {
+  /// Instantly apply a new volume level to the specified deck
+  #ifndef NDEBUG
+    if(deck_id >= decks.size()) {   // safety check only in debug mode
+      std::cout << "SoundStorm: Error: Called " << __PRETTY_FUNCTION__ << " with deck_id " << deck_id << " exceeding available decks!" << std::endl;
+      return;
+    }
+  #endif
+  decks[deck_id].volume = newvolume;
+  decks[deck_id].volume_target = newvolume;
+  decks[deck_id].volume_fadespeed = 0.0;
+}
+
+void soundstorm::fade_music_volume(unsigned int deck_id, float newvolume, double seconds_to_take) {
+  /// Slowly fade volume from current setting to new setting, over a given number of seconds
+  #ifndef NDEBUG
+    if(deck_id >= decks.size()) {   // safety check only in debug mode
+      std::cout << "SoundStorm: Error: Called " << __PRETTY_FUNCTION__ << " with deck_id " << deck_id << " exceeding available decks!" << std::endl;
+      return;
+    }
+  #endif
+  decks[deck_id].volume_fadespeed = fabsf(newvolume - decks[deck_id].volume) / (seconds_to_take * samplerate);  // this comes first since we're threaded
+  decks[deck_id].volume_target = newvolume;
+}
+
+void soundstorm::crossfade_music(double seconds_to_take, unsigned int deck_from, unsigned int deck_to) {
+  /// Convenience wrapper function to crossfade between a pair of decks
+  float const volume0 = decks[deck_from].volume_target;
+  float const volume1 = decks[deck_to  ].volume_target;
+  fade_music_volume(deck_from, volume1, seconds_to_take);
+  fade_music_volume(deck_to,   volume0, seconds_to_take);
+}
+
+void soundstorm::stop(soundgroup const &thissoundgroup) {
+  /// Make this sound stop immediately
+  for(auto const &thissound : thissoundgroup) {                                       // do this for each channel
+    thissound->seek = thissound->effect->buffersize;
+  }
+}
+
+void soundstorm::stop_loop(soundgroup const &thissoundgroup) {
+  /// Tell this sound not to loop or continue to the next sound
+  for(auto const &thissound : thissoundgroup) {                                       // do this for each channel
+    thissound->next_sound = nullptr;
+  }
+}
+
+void soundstorm::replace(soundgroup const &thissoundgroup, soundeffect *neweffect, float seek_start, float seek_end, float seek_speed) {
+  /// Immediately replace the currently playing sound with a new effect with the specified parameters
+  #ifndef NDEBUG
+    if(!neweffect) {   // null check only in debug mode
+      std::cout << "SoundStorm: Error: Called " << __PRETTY_FUNCTION__ << " with null effect!" << std::endl;
+      return;
+    }
+  #endif
+  for(auto const &thissound : thissoundgroup) {                                       // do this for each channel
+    thissound->effect = neweffect;
+    thissound->seek = seek_start;
+    thissound->seek_end = seek_end;
+    thissound->seek_speed = seek_speed;
+  }
+}
+
+void soundstorm::follow(soundgroup const &thissoundgroup, soundeffect *neweffect, float seek_start, float seek_end, float seek_speed) {
+  /// Append another sound to play immediately once this one completes, with the specified parameters
+  /// (or specify nullptr to cancel a following sound)
+  for(auto const &thissound : thissoundgroup) {                                       // do this for each channel
+    sound *newsound = new sound(neweffect, thissound->position, thissound->velocity, thissound->volume, seek_start, seek_end, seek_speed, nullptr, thissound->channel);
+    thissound->next_sound = newsound;
+  }
+}
+
+void soundstorm::set_volume(soundgroup const &thissoundgroup, float newvolume) {
+  /// Adjust the volume of this sound
+  for(auto const &thissound : thissoundgroup) {
+    thissound->volume = newvolume;
+  }
+}
+
+void soundstorm::set_position(soundgroup const &thissoundgroup, Vector3f const &newposition) {
+  /// Adjust the position of this sound
+  for(auto const &thissound : thissoundgroup) {
+    thissound->position = newposition;
+  }
+}
+
+void soundstorm::set_seek_speed(soundgroup const &thissoundgroup, float newspeed) {
+  /// Adjust the playback speed of this sound
+  for(auto const &thissound : thissoundgroup) {
+    thissound->seek_speed = newspeed;
+  }
+}
+
+void soundstorm::music_clear(unsigned int deck_id) {
+  /// Clear the playlist on the specified deck
+  #ifndef NDEBUG
+    if(deck_id >= decks.size()) {   // safety check only in debug mode
+      std::cout << "SoundStorm: Error: Called " << __PRETTY_FUNCTION__ << " with deck_id " << deck_id << " exceeding available decks!" << std::endl;
+      return;
+    }
+  #endif
+  while(!decks[deck_id].playlist.empty()) {
+    delete decks[deck_id].playlist.front();
+    decks[deck_id].playlist.pop();
+  }
+}
