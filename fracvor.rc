@@ -1,0 +1,34 @@
+#ifndef VOXELSTORM_RC_INCLUDED
+#define VOXELSTORM_RC_INCLUDED
+#include "version.h"
+
+MAINICON ICON "resources/voxelstorm.ico"
+GLFW_ICON ICON "resources/voxelstorm.ico"
+
+1 VERSIONINFO
+FILEVERSION RC_FILEVERSION
+PRODUCTVERSION RC_FILEVERSION
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "080904E4"
+    BEGIN
+      VALUE "CompanyName", "VoxelStorm Ltd"
+      VALUE "LegalCopyright", "VoxelStorm Ltd"
+      VALUE "InternalName", "FracVor"
+      VALUE "FileDescription", "FracVor"
+      VALUE "ProductName", "FracVor"
+      VALUE "FileVersion", RC_FILEVERSION_STRING
+      VALUE "ProductVersion", RC_FILEVERSION_STRING
+      //VALUE "OriginalFilename", "fracvor.exe"
+    END
+  END
+
+  BLOCK "VarFileInfo"
+  BEGIN
+    // see http://msdn.microsoft.com/en-us/library/windows/desktop/aa381058%28v=vs.85%29.aspx
+    VALUE "Translation", 0x809, 1252
+  END
+END
+
+#endif // VOXELSTORM_RC_INCLUDED

@@ -1,0 +1,905 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="FracVor" />
+		<Option pch_mode="2" />
+		<Option default_target="Release" />
+		<Option compiler="gcc" />
+		<MakeCommands>
+			<Build command="" />
+			<CompileFile command="" />
+			<Clean command="" />
+			<DistClean command="" />
+			<AskRebuildNeeded command="" />
+			<SilentBuild command=" &gt; $(CMD_NULL)" />
+		</MakeCommands>
+		<Build>
+			<Target title="Win32_Debug">
+				<Option output="bin/Debug/FracVor_Win32_debug" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Win32_Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-Og" />
+					<Add option="-ggdb" />
+					<Add option="-static" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+					<Add option="-mthreads" />
+					<Add option="-m32" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
+					<Add option="-fexceptions" />
+					<Add option="-Wno-unused-local-typedefs" />
+					<Add option="-Warray-bounds" />
+					<Add option="-Woverloaded-virtual" />
+					<Add option="-DLOGGING" />
+					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
+					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
+				</Compiler>
+				<Linker>
+					<Add option="-static" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+					<Add library="lib\win32\libboost_system-mgw49-mt-sd-1_55.a" />
+					<Add library="lib\win32\libboost_filesystem-mgw49-mt-sd-1_55.a" />
+					<Add library="lib\win32\libboost_thread-mgw49-mt-sd-1_55.a" />
+					<Add library="lib\win32\libglew32.a" />
+					<Add library="lib\win32\libglfw3.a" />
+					<Add library="lib\win32\libftgl_static_D.a" />
+					<Add library="lib\win32\libglu32.a" />
+					<Add library="lib\win32\libopengl32.a" />
+					<Add library="lib\win32\libfreetype.a" />
+					<Add library="lib\win32\libOVR_MinGW_Win32_d.a" />
+					<Add library="lib\win32\libportaudiocpp_static.a" />
+					<Add library="lib\win32\libportaudio_static_x86.a" />
+					<Add library="lib\win32\libvorbisfile.a" />
+					<Add library="lib\win32\libvorbis.a" />
+					<Add library="lib\win32\libogg.a" />
+					<Add library="lib\win32\libws2_32.a" />
+					<Add library="lib\win32\libgdi32.a" />
+					<Add library="lib\win32\libwinmm.a" />
+					<Add library="lib\win32\libole32.a" />
+					<Add library="lib\win32\libsetupapi.a" />
+					<Add library="lib\win32\libz.a" />
+				</Linker>
+			</Target>
+			<Target title="Win32_Release">
+				<Option output="bin/Release/FracVor_Win32" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Win32_Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-fomit-frame-pointer" />
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
+					<Add option="-Ofast" />
+					<Add option="-static" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+					<Add option="-mthreads" />
+					<Add option="-m32" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
+					<Add option="-Wno-unused-local-typedefs" />
+					<Add option="-Wno-array-bounds" />
+					<Add option="-maccumulate-outgoing-args" />
+					<Add option="-fgcse-sm" />
+					<Add option="-fgcse-las" />
+					<Add option="-fgcse-after-reload" />
+					<Add option="-fsched-spec-load" />
+					<Add option="-fsched-spec-load-dangerous" />
+					<Add option="-fmerge-all-constants" />
+					<Add option="-fmodulo-sched" />
+					<Add option="-fmodulo-sched-allow-regmoves" />
+					<Add option="-funsafe-loop-optimizations" />
+					<Add option="-fsched-pressure" />
+					<Add option="-fsched-stalled-insns=0" />
+					<Add option="-fsched-stalled-insns-dep=32" />
+					<Add option="-fsched2-use-superblocks" />
+					<Add option="-fipa-pta" />
+					<Add option="-ftracer" />
+					<Add option="-fno-var-tracking-assignments" />
+					<Add option="-fpeel-loops" />
+					<Add option="-funroll-loops" />
+					<Add option="-funswitch-loops" />
+					<Add option="-ftree-loop-if-convert" />
+					<Add option="-ftree-loop-distribution" />
+					<Add option="-ftree-loop-im" />
+					<Add option="-ftree-loop-ivcanon" />
+					<Add option="-fivopts" />
+					<Add option="-fvariable-expansion-in-unroller" />
+					<Add option="-freorder-blocks-and-partition" />
+					<Add option="-fbranch-target-load-optimize" />
+					<Add option="-fuse-linker-plugin" />
+					<Add option="-flto" />
+					<Add option="-fno-math-errno" />
+					<Add option="-funsafe-math-optimizations" />
+					<Add option="-fassociative-math" />
+					<Add option="-freciprocal-math" />
+					<Add option="-fno-signed-zeros" />
+					<Add option="-fno-trapping-math" />
+					<Add option="--param max-gcse-memory=1000000000" />
+					<Add option="--param max-inline-insns-single=10000" />
+					<Add option="--param max-inline-insns-auto=10000" />
+					<Add option="--param inline-min-speedup=20" />
+					<Add option="--param large-function-insns=10000" />
+					<Add option="--param large-function-growth=2000" />
+					<Add option="--param large-unit-insns=20000" />
+					<Add option="--param inline-unit-growth=200" />
+					<Add option="-DNDEBUG" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-static" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+					<Add option="-fprofile-arcs" />
+					<Add option="-lgcov" />
+					<Add option="-fuse-linker-plugin" />
+					<Add option="-flto" />
+					<Add option="-funsafe-math-optimizations" />
+					<Add library="lib\win32\libboost_system-mgw49-mt-s-1_55.a" />
+					<Add library="lib\win32\libboost_filesystem-mgw49-mt-s-1_55.a" />
+					<Add library="lib\win32\libboost_thread-mgw49-mt-s-1_55.a" />
+					<Add library="lib\win32\libglew32.a" />
+					<Add library="lib\win32\libglfw3.a" />
+					<Add library="lib\win32\libftgl_static.a" />
+					<Add library="lib\win32\libglu32.a" />
+					<Add library="lib\win32\libopengl32.a" />
+					<Add library="lib\win32\libfreetype.a" />
+					<Add library="lib\win32\libOVR_MinGW_Win32.a" />
+					<Add library="lib\win32\libportaudiocpp_static.a" />
+					<Add library="lib\win32\libportaudio_static_x86.a" />
+					<Add library="lib\win32\libvorbisfile.a" />
+					<Add library="lib\win32\libvorbis.a" />
+					<Add library="lib\win32\libogg.a" />
+					<Add library="lib\win32\libws2_32.a" />
+					<Add library="lib\win32\libgdi32.a" />
+					<Add library="lib\win32\libwinmm.a" />
+					<Add library="lib\win32\libole32.a" />
+					<Add library="lib\win32\libsetupapi.a" />
+					<Add library="lib\win32\libz.a" />
+				</Linker>
+				<ExtraCommands>
+					<Add after='strip -spv &quot;$(TARGET_OUTPUT_FILE)&quot;' />
+				</ExtraCommands>
+			</Target>
+			<Target title="Win64_Debug">
+				<Option output="bin/Debug/FracVor_Win64_debug" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Win64_Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-Og" />
+					<Add option="-ggdb" />
+					<Add option="-static" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+					<Add option="-mthreads" />
+					<Add option="-m64" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
+					<Add option="-fexceptions" />
+					<Add option="-Wno-unused-local-typedefs" />
+					<Add option="-Warray-bounds" />
+					<Add option="-Woverloaded-virtual" />
+					<Add option="-DLOGGING" />
+					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
+					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
+				</Compiler>
+				<Linker>
+					<Add option="-static" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+				</Linker>
+			</Target>
+			<Target title="Win64_Release">
+				<Option output="bin/Release/FracVor_Win64" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Win64_Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
+					<Add option="-Ofast" />
+					<Add option="-static" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+					<Add option="-mthreads" />
+					<Add option="-m64" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
+					<Add option="-Wno-unused-local-typedefs" />
+					<Add option="-Wno-array-bounds" />
+					<Add option="-maccumulate-outgoing-args" />
+					<Add option="-fgcse-sm" />
+					<Add option="-fgcse-las" />
+					<Add option="-fgcse-after-reload" />
+					<Add option="-fsched-spec-load" />
+					<Add option="-fsched-spec-load-dangerous" />
+					<Add option="-fmerge-all-constants" />
+					<Add option="-fmodulo-sched" />
+					<Add option="-fmodulo-sched-allow-regmoves" />
+					<Add option="-funsafe-loop-optimizations" />
+					<Add option="-fsched-pressure" />
+					<Add option="-fsched-stalled-insns=0" />
+					<Add option="-fsched-stalled-insns-dep=32" />
+					<Add option="-fsched2-use-superblocks" />
+					<Add option="-fipa-pta" />
+					<Add option="-ftracer" />
+					<Add option="-fno-var-tracking-assignments" />
+					<Add option="-fpeel-loops" />
+					<Add option="-funroll-loops" />
+					<Add option="-funswitch-loops" />
+					<Add option="-ftree-loop-if-convert" />
+					<Add option="-ftree-loop-distribution" />
+					<Add option="-ftree-loop-im" />
+					<Add option="-ftree-loop-ivcanon" />
+					<Add option="-fivopts" />
+					<Add option="-fvariable-expansion-in-unroller" />
+					<Add option="-freorder-blocks-and-partition" />
+					<Add option="-fbranch-target-load-optimize" />
+					<Add option="-fuse-linker-plugin" />
+					<Add option="-flto" />
+					<Add option="-fno-math-errno" />
+					<Add option="-funsafe-math-optimizations" />
+					<Add option="-fassociative-math" />
+					<Add option="-freciprocal-math" />
+					<Add option="-fno-signed-zeros" />
+					<Add option="-fno-trapping-math" />
+					<Add option="--param max-gcse-memory=1000000000" />
+					<Add option="--param max-inline-insns-single=10000" />
+					<Add option="--param max-inline-insns-auto=10000" />
+					<Add option="--param inline-min-speedup=20" />
+					<Add option="--param large-function-insns=10000" />
+					<Add option="--param large-function-growth=2000" />
+					<Add option="--param large-unit-insns=20000" />
+					<Add option="--param inline-unit-growth=200" />
+					<Add option="-DNDEBUG" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-static" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+					<Add option="-fprofile-arcs" />
+					<Add option="-lgcov" />
+					<Add option="-fuse-linker-plugin" />
+					<Add option="-flto" />
+					<Add option="-funsafe-math-optimizations" />
+				</Linker>
+				<ExtraCommands>
+					<Add after='strip -spv &quot;$(TARGET_OUTPUT_FILE)&quot;' />
+				</ExtraCommands>
+			</Target>
+			<Target title="Linux32_Debug">
+				<Option output="bin/Debug/FracVor_Linux32_debug" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Linux32_Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-Og" />
+					<Add option="-ggdb" />
+					<Add option="-static" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+					<Add option="-m64" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
+					<Add option="-fexceptions" />
+					<Add option="-Wno-unused-local-typedefs" />
+					<Add option="-Warray-bounds" />
+					<Add option="-Woverloaded-virtual" />
+					<Add option="-DLOGGING" />
+					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
+					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
+				</Compiler>
+				<Linker>
+					<Add option="-static" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+					<Add library="lib\linux32\libboost_system-gcc48-mt-sd-1_53.a" />
+					<Add library="lib\linux32\libboost_chrono-gcc48-mt-sd-1_53.a" />
+					<Add library="lib\linux32\libGLEW.a" />
+					<Add library="lib\linux32\libglfw3.a" />
+					<Add library="Xrandr" />
+					<Add library="lib\linux32\libftgl.a" />
+					<Add library="lib\linux32\libGLU.a" />
+					<Add library="GL" />
+					<Add library="lib\linux32\libfreetype.a" />
+					<Add library="Xt" />
+					<Add library="Xm" />
+					<Add library="pthread" />
+					<Add library="udev" />
+					<Add library="Xinerama" />
+				</Linker>
+			</Target>
+			<Target title="Linux32_Release">
+				<Option output="bin/Release/FracVor_Linux32" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Linux32_Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
+					<Add option="-Ofast" />
+					<Add option="-static" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+					<Add option="-m64" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
+					<Add option="-Wno-unused-local-typedefs" />
+					<Add option="-Wno-array-bounds" />
+					<Add option="-maccumulate-outgoing-args" />
+					<Add option="-fgcse-sm" />
+					<Add option="-fgcse-las" />
+					<Add option="-fgcse-after-reload" />
+					<Add option="-fsched-spec-load" />
+					<Add option="-fsched-spec-load-dangerous" />
+					<Add option="-fmerge-all-constants" />
+					<Add option="-fmodulo-sched" />
+					<Add option="-fmodulo-sched-allow-regmoves" />
+					<Add option="-funsafe-loop-optimizations" />
+					<Add option="-fsched-pressure" />
+					<Add option="-fsched-stalled-insns=0" />
+					<Add option="-fsched-stalled-insns-dep=32" />
+					<Add option="-fsched2-use-superblocks" />
+					<Add option="-fipa-pta" />
+					<Add option="-ftracer" />
+					<Add option="-fno-var-tracking-assignments" />
+					<Add option="-fpeel-loops" />
+					<Add option="-funroll-loops" />
+					<Add option="-funswitch-loops" />
+					<Add option="-ftree-loop-if-convert" />
+					<Add option="-ftree-loop-distribution" />
+					<Add option="-ftree-loop-im" />
+					<Add option="-ftree-loop-ivcanon" />
+					<Add option="-fivopts" />
+					<Add option="-fvariable-expansion-in-unroller" />
+					<Add option="-freorder-blocks-and-partition" />
+					<Add option="-fbranch-target-load-optimize" />
+					<Add option="-fuse-linker-plugin" />
+					<Add option="-flto" />
+					<Add option="-fno-math-errno" />
+					<Add option="-funsafe-math-optimizations" />
+					<Add option="-fassociative-math" />
+					<Add option="-freciprocal-math" />
+					<Add option="-fno-signed-zeros" />
+					<Add option="-fno-trapping-math" />
+					<Add option="--param max-gcse-memory=1000000000" />
+					<Add option="--param max-inline-insns-single=10000" />
+					<Add option="--param max-inline-insns-auto=10000" />
+					<Add option="--param inline-min-speedup=20" />
+					<Add option="--param large-function-insns=10000" />
+					<Add option="--param large-function-growth=2000" />
+					<Add option="--param large-unit-insns=20000" />
+					<Add option="--param inline-unit-growth=200" />
+					<Add option="-DNDEBUG" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-static" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+					<Add option="-fprofile-arcs" />
+					<Add option="-lgcov" />
+					<Add option="-fuse-linker-plugin" />
+					<Add option="-flto" />
+					<Add option="-funsafe-math-optimizations" />
+					<Add library="lib\linux32\libboost_system-gcc48-mt-s-1_53.a" />
+					<Add library="lib\linux32\libboost_chrono-gcc48-mt-s-1_53.a" />
+					<Add library="lib\linux32\libGLEW.a" />
+					<Add library="lib\linux32\libglfw3.a" />
+					<Add library="Xrandr" />
+					<Add library="lib\linux32\libftgl.a" />
+					<Add library="lib\linux32\libGLU.a" />
+					<Add library="GL" />
+					<Add library="lib\linux32\libfreetype.a" />
+					<Add library="Xt" />
+					<Add library="Xm" />
+					<Add library="pthread" />
+					<Add library="udev" />
+					<Add library="Xinerama" />
+				</Linker>
+				<ExtraCommands>
+					<Add after='strip -spv &quot;$(TARGET_OUTPUT_FILE)&quot;' />
+				</ExtraCommands>
+			</Target>
+			<Target title="Linux64_Debug">
+				<Option output="bin/Debug/FracVor_Linux64_debug" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Linux64_Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-Og" />
+					<Add option="-ggdb" />
+					<Add option="-static" />
+					<Add option="-m64" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
+					<Add option="-fexceptions" />
+					<Add option="-Wno-unused-local-typedefs" />
+					<Add option="-Warray-bounds" />
+					<Add option="-Woverloaded-virtual" />
+					<Add option="-DLOGGING" />
+					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
+					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
+				</Compiler>
+				<Linker>
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+					<Add library="lib\linux64\libboost_system-gcc49-mt-sd-1_55.a" />
+					<Add library="lib\linux64\libboost_filesystem-gcc49-mt-sd-1_55.a" />
+					<Add library="lib\linux64\libboost_thread-gcc49-mt-sd-1_55.a" />
+					<Add library="lib\linux64\libGLEW.a" />
+					<Add library="lib\linux64\libglfw3.a" />
+					<Add library="Xrandr" />
+					<Add library="lib\linux64\libftgl.a" />
+					<Add library="lib\linux64\libGLU.a" />
+					<Add library="GL" />
+					<Add library="lib\linux64\libfreetype.a" />
+					<Add library="lib\linux64\libOVR_MinGW_Linux64_d.a" />
+					<Add library="lib\linux64\libportaudio.a" />
+					<Add library="lib\linux64\libportaudiocpp.a" />
+					<Add library="asound" />
+					<Add library="lib\linux64\libvorbisfile.a" />
+					<Add library="lib\linux64\libvorbis.a" />
+					<Add library="lib\linux64\libogg.a" />
+					<Add library="dl" />
+					<Add library="Xt" />
+					<Add library="Xi" />
+					<Add library="X11" />
+					<Add library="Xxf86vm" />
+					<Add library="pthread" />
+					<Add library="udev" />
+					<Add library="Xinerama" />
+					<Add library="lib\linux64\libz.a" />
+				</Linker>
+			</Target>
+			<Target title="Linux64_Release">
+				<Option output="bin/Release/FracVor_Linux64" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Linux64_Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
+					<Add option="-Ofast" />
+					<Add option="-static" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+					<Add option="-m64" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
+					<Add option="-Wno-unused-local-typedefs" />
+					<Add option="-Wno-array-bounds" />
+					<Add option="-maccumulate-outgoing-args" />
+					<Add option="-fgcse-sm" />
+					<Add option="-fgcse-las" />
+					<Add option="-fgcse-after-reload" />
+					<Add option="-fsched-spec-load" />
+					<Add option="-fsched-spec-load-dangerous" />
+					<Add option="-fmerge-all-constants" />
+					<Add option="-fmodulo-sched" />
+					<Add option="-fmodulo-sched-allow-regmoves" />
+					<Add option="-funsafe-loop-optimizations" />
+					<Add option="-fsched-pressure" />
+					<Add option="-fsched-stalled-insns=0" />
+					<Add option="-fsched-stalled-insns-dep=32" />
+					<Add option="-fsched2-use-superblocks" />
+					<Add option="-fipa-pta" />
+					<Add option="-ftracer" />
+					<Add option="-fno-var-tracking-assignments" />
+					<Add option="-fpeel-loops" />
+					<Add option="-funroll-loops" />
+					<Add option="-funswitch-loops" />
+					<Add option="-ftree-loop-if-convert" />
+					<Add option="-ftree-loop-distribution" />
+					<Add option="-ftree-loop-im" />
+					<Add option="-ftree-loop-ivcanon" />
+					<Add option="-fivopts" />
+					<Add option="-fvariable-expansion-in-unroller" />
+					<Add option="-freorder-blocks-and-partition" />
+					<Add option="-fbranch-target-load-optimize" />
+					<Add option="-fuse-linker-plugin" />
+					<Add option="-flto" />
+					<Add option="-fno-math-errno" />
+					<Add option="-funsafe-math-optimizations" />
+					<Add option="-fassociative-math" />
+					<Add option="-freciprocal-math" />
+					<Add option="-fno-signed-zeros" />
+					<Add option="-fno-trapping-math" />
+					<Add option="--param max-gcse-memory=1000000000" />
+					<Add option="--param max-inline-insns-single=10000" />
+					<Add option="--param max-inline-insns-auto=10000" />
+					<Add option="--param inline-min-speedup=20" />
+					<Add option="--param large-function-insns=10000" />
+					<Add option="--param large-function-growth=2000" />
+					<Add option="--param large-unit-insns=20000" />
+					<Add option="--param inline-unit-growth=200" />
+					<Add option="-DNDEBUG" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+					<Add option="-fprofile-arcs" />
+					<Add option="-lgcov" />
+					<Add option="-fuse-linker-plugin" />
+					<Add option="-flto" />
+					<Add option="-funsafe-math-optimizations" />
+					<Add library="lib\linux64\libboost_system-gcc49-mt-s-1_55.a" />
+					<Add library="lib\linux64\libboost_filesystem-gcc49-mt-s-1_55.a" />
+					<Add library="lib\linux64\libboost_thread-gcc49-mt-s-1_55.a" />
+					<Add library="lib\linux64\libGLEW.a" />
+					<Add library="lib\linux64\libglfw3.a" />
+					<Add library="Xrandr" />
+					<Add library="lib\linux64\libftgl.a" />
+					<Add library="lib\linux64\libGLU.a" />
+					<Add library="GL" />
+					<Add library="lib\linux64\libfreetype.a" />
+					<Add library="lib\linux64\libOVR_MinGW_Linux64_d.a" />
+					<Add library="lib\linux64\libportaudio.a" />
+					<Add library="lib\linux64\libportaudiocpp.a" />
+					<Add library="asound" />
+					<Add library="lib\linux64\libvorbisfile.a" />
+					<Add library="lib\linux64\libvorbis.a" />
+					<Add library="lib\linux64\libogg.a" />
+					<Add library="dl" />
+					<Add library="Xt" />
+					<Add library="Xi" />
+					<Add library="X11" />
+					<Add library="Xxf86vm" />
+					<Add library="pthread" />
+					<Add library="udev" />
+					<Add library="Xinerama" />
+					<Add library="lib\linux64\libz.a" />
+				</Linker>
+				<ExtraCommands>
+					<Add after='strip -spv &quot;$(TARGET_OUTPUT_FILE)&quot;' />
+				</ExtraCommands>
+			</Target>
+			<Target title="Mac32_Debug">
+				<Option output="bin/Debug/FracVor_Mac32_debug" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Mac32_Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-Og" />
+					<Add option="-ggdb" />
+					<Add option="-static" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+					<Add option="-m64" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
+					<Add option="-fexceptions" />
+					<Add option="-Wno-unused-local-typedefs" />
+					<Add option="-Warray-bounds" />
+					<Add option="-Woverloaded-virtual" />
+					<Add option="-DLOGGING" />
+					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
+					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
+				</Compiler>
+				<Linker>
+					<Add option="-static" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+				</Linker>
+			</Target>
+			<Target title="Mac32_Release">
+				<Option output="bin/Release/FracVor_Mac32" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Mac32_Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
+					<Add option="-Ofast" />
+					<Add option="-static" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+					<Add option="-m64" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
+					<Add option="-Wno-unused-local-typedefs" />
+					<Add option="-Wno-array-bounds" />
+					<Add option="-maccumulate-outgoing-args" />
+					<Add option="-fgcse-sm" />
+					<Add option="-fgcse-las" />
+					<Add option="-fgcse-after-reload" />
+					<Add option="-fsched-spec-load" />
+					<Add option="-fsched-spec-load-dangerous" />
+					<Add option="-fmerge-all-constants" />
+					<Add option="-fmodulo-sched" />
+					<Add option="-fmodulo-sched-allow-regmoves" />
+					<Add option="-funsafe-loop-optimizations" />
+					<Add option="-fsched-pressure" />
+					<Add option="-fsched-stalled-insns=0" />
+					<Add option="-fsched-stalled-insns-dep=32" />
+					<Add option="-fsched2-use-superblocks" />
+					<Add option="-fipa-pta" />
+					<Add option="-ftracer" />
+					<Add option="-fno-var-tracking-assignments" />
+					<Add option="-fpeel-loops" />
+					<Add option="-funroll-loops" />
+					<Add option="-funswitch-loops" />
+					<Add option="-ftree-loop-if-convert" />
+					<Add option="-ftree-loop-distribution" />
+					<Add option="-ftree-loop-im" />
+					<Add option="-ftree-loop-ivcanon" />
+					<Add option="-fivopts" />
+					<Add option="-fvariable-expansion-in-unroller" />
+					<Add option="-freorder-blocks-and-partition" />
+					<Add option="-fbranch-target-load-optimize" />
+					<Add option="-fuse-linker-plugin" />
+					<Add option="-flto" />
+					<Add option="-fno-math-errno" />
+					<Add option="-funsafe-math-optimizations" />
+					<Add option="-fassociative-math" />
+					<Add option="-freciprocal-math" />
+					<Add option="-fno-signed-zeros" />
+					<Add option="-fno-trapping-math" />
+					<Add option="--param max-gcse-memory=1000000000" />
+					<Add option="--param max-inline-insns-single=10000" />
+					<Add option="--param max-inline-insns-auto=10000" />
+					<Add option="--param inline-min-speedup=20" />
+					<Add option="--param large-function-insns=10000" />
+					<Add option="--param large-function-growth=2000" />
+					<Add option="--param large-unit-insns=20000" />
+					<Add option="--param inline-unit-growth=200" />
+					<Add option="-DNDEBUG" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-static" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+					<Add option="-fprofile-arcs" />
+					<Add option="-lgcov" />
+					<Add option="-fuse-linker-plugin" />
+					<Add option="-flto" />
+					<Add option="-funsafe-math-optimizations" />
+				</Linker>
+				<ExtraCommands>
+					<Add after='strip -spv &quot;$(TARGET_OUTPUT_FILE)&quot;' />
+				</ExtraCommands>
+			</Target>
+			<Target title="Mac64_Debug">
+				<Option output="bin/Debug/FracVor_Mac32_debug" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Mac64_Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-Og" />
+					<Add option="-ggdb" />
+					<Add option="-static" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+					<Add option="-m64" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
+					<Add option="-fexceptions" />
+					<Add option="-Wno-unused-local-typedefs" />
+					<Add option="-Warray-bounds" />
+					<Add option="-Woverloaded-virtual" />
+					<Add option="-DLOGGING" />
+					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
+					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
+				</Compiler>
+				<Linker>
+					<Add option="-static" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+				</Linker>
+			</Target>
+			<Target title="Mac64_Release">
+				<Option output="bin/Release/FracVor_Mac32" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Mac64_Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
+					<Add option="-Ofast" />
+					<Add option="-static" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+					<Add option="-m64" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
+					<Add option="-Wno-unused-local-typedefs" />
+					<Add option="-Wno-array-bounds" />
+					<Add option="-maccumulate-outgoing-args" />
+					<Add option="-fgcse-sm" />
+					<Add option="-fgcse-las" />
+					<Add option="-fgcse-after-reload" />
+					<Add option="-fsched-spec-load" />
+					<Add option="-fsched-spec-load-dangerous" />
+					<Add option="-fmerge-all-constants" />
+					<Add option="-fmodulo-sched" />
+					<Add option="-fmodulo-sched-allow-regmoves" />
+					<Add option="-funsafe-loop-optimizations" />
+					<Add option="-fsched-pressure" />
+					<Add option="-fsched-stalled-insns=0" />
+					<Add option="-fsched-stalled-insns-dep=32" />
+					<Add option="-fsched2-use-superblocks" />
+					<Add option="-fipa-pta" />
+					<Add option="-ftracer" />
+					<Add option="-fno-var-tracking-assignments" />
+					<Add option="-fpeel-loops" />
+					<Add option="-funroll-loops" />
+					<Add option="-funswitch-loops" />
+					<Add option="-ftree-loop-if-convert" />
+					<Add option="-ftree-loop-distribution" />
+					<Add option="-ftree-loop-im" />
+					<Add option="-ftree-loop-ivcanon" />
+					<Add option="-fivopts" />
+					<Add option="-fvariable-expansion-in-unroller" />
+					<Add option="-freorder-blocks-and-partition" />
+					<Add option="-fbranch-target-load-optimize" />
+					<Add option="-fuse-linker-plugin" />
+					<Add option="-flto" />
+					<Add option="-fno-math-errno" />
+					<Add option="-funsafe-math-optimizations" />
+					<Add option="-fassociative-math" />
+					<Add option="-freciprocal-math" />
+					<Add option="-fno-signed-zeros" />
+					<Add option="-fno-trapping-math" />
+					<Add option="--param max-gcse-memory=1000000000" />
+					<Add option="--param max-inline-insns-single=10000" />
+					<Add option="--param max-inline-insns-auto=10000" />
+					<Add option="--param inline-min-speedup=20" />
+					<Add option="--param large-function-insns=10000" />
+					<Add option="--param large-function-growth=2000" />
+					<Add option="--param large-unit-insns=20000" />
+					<Add option="--param inline-unit-growth=200" />
+					<Add option="-DNDEBUG" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-static" />
+					<Add option="-static-libgcc" />
+					<Add option="-static-libstdc++" />
+					<Add option="-fprofile-arcs" />
+					<Add option="-lgcov" />
+					<Add option="-fuse-linker-plugin" />
+					<Add option="-flto" />
+					<Add option="-funsafe-math-optimizations" />
+				</Linker>
+				<ExtraCommands>
+					<Add after='strip -spv &quot;$(TARGET_OUTPUT_FILE)&quot;' />
+				</ExtraCommands>
+			</Target>
+		</Build>
+		<VirtualTargets>
+			<Add alias="All_Linux" targets="Linux32_Debug;Linux32_Release;Linux64_Debug;Linux64_Release;" />
+			<Add alias="All_Linux32" targets="Linux32_Debug;Linux32_Release;" />
+			<Add alias="All_Linux64" targets="Linux64_Release;Linux64_Debug;" />
+			<Add alias="All_Mac" targets="Mac32_Debug;Mac32_Release;Mac64_Debug;Mac64_Release;" />
+			<Add alias="All_Mac32" targets="Mac32_Debug;Mac32_Release;" />
+			<Add alias="All_Mac64" targets="Mac64_Debug;Mac64_Release;" />
+			<Add alias="All_Win" targets="Win32_Debug;Win32_Release;Win64_Release;Win64_Debug;" />
+			<Add alias="All_Win32" targets="Win32_Release;Win32_Debug;" />
+			<Add alias="All_Win64" targets="Win64_Release;Win64_Debug;" />
+		</VirtualTargets>
+		<Compiler>
+			<Add option="-std=gnu++1y" />
+			<Add option="-DBOOST_THREAD_VERSION=3" />
+			<Add option="-DBOOST_THREAD_USE_LIB" />
+			<Add option="-DBOOST_SYSTEM_NO_DEPRECATED" />
+			<Add option="-DGLEW_STATIC" />
+			<Add directory="." />
+			<Add directory="include" />
+			<Add directory="technology" />
+			<Add directory="corporation" />
+			<Add directory="buffers" />
+			<Add directory="$(#boost.include)" />
+		</Compiler>
+		<Unit filename="blob_loader.h" />
+		<Unit filename="font_load.cpp" />
+		<Unit filename="fracvor.rc">
+			<Option compilerVar="WINDRES" />
+			<Option target="Win32_Debug" />
+			<Option target="Win32_Release" />
+			<Option target="Win64_Debug" />
+			<Option target="Win64_Release" />
+		</Unit>
+		<Unit filename="gameplayer.cpp" />
+		<Unit filename="gameplayer.h" />
+		<Unit filename="get_version.cpp" />
+		<Unit filename="init_graphics.cpp" />
+		<Unit filename="input/callback_key.cpp" />
+		<Unit filename="input/callback_mouse.cpp" />
+		<Unit filename="input/callback_mousebutton.cpp" />
+		<Unit filename="input/callback_scroll.cpp" />
+		<Unit filename="input/callback_textinput.cpp" />
+		<Unit filename="input/callback_windowclose.cpp" />
+		<Unit filename="input/callback_windowfocus.cpp" />
+		<Unit filename="input/callback_windowminimise.cpp" />
+		<Unit filename="input/callback_windowrefresh.cpp" />
+		<Unit filename="input/callback_windowresize.cpp" />
+		<Unit filename="input/controls.cpp" />
+		<Unit filename="main.cpp" />
+		<Unit filename="oculusstorm.cpp" />
+		<Unit filename="oculusstorm.h" />
+		<Unit filename="platform_defines.h" />
+		<Unit filename="shader_load.cpp" />
+		<Unit filename="soundstorm.cpp" />
+		<Unit filename="soundstorm.h" />
+		<Unit filename="universe.cpp" />
+		<Unit filename="universe.h" />
+		<Unit filename="version.h" />
+		<Unit filename="vmath.cpp" />
+		<Unit filename="vmath.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<AutoVersioning>
+				<Scheme minor_max="10" build_max="0" rev_max="0" rev_rand_max="10" build_times_to_increment_minor="100" />
+				<Settings autoincrement="1" date_declarations="1" use_define="0" update_manifest="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="version.h" />
+				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
+				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
+			</AutoVersioning>
+			<editor_config active="1" use_tabs="0" tab_indents="1" tab_width="2" indent="2" eol_mode="0" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
