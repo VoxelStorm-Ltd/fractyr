@@ -854,6 +854,7 @@
 			<Add directory="$(#boost.include)" />
 		</Compiler>
 		<Unit filename="blob_loader.h" />
+		<Unit filename="callback_error.cpp" />
 		<Unit filename="font_load.cpp" />
 		<Unit filename="fracvor.rc">
 			<Option compilerVar="WINDRES" />

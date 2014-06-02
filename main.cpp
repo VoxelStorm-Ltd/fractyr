@@ -1,0 +1,58 @@
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <FTGL/ftgl.h>
+#include "platform_defines.h"
+#include "soundstorm.h"
+#include "oculusstorm.h"
+#include "universe.h"
+#include "gameplayer.h"
+
+// globals
+GLFWwindow *window_main = nullptr;              // the main game window
+oculusstorm *oculus     = nullptr;              // oculus rift controller
+//FTFont *font_label      = nullptr;              // global font definitions
+// initialisation order important here:
+soundstorm sound;                               // audio manager
+gameplayer player;                              // player state and configuration
+universe root;                                  // the container for everything physical
+
+std::string get_version();
+
+int main() {
+  std::cout << "FracVor version " << get_version() << " "
+  #ifdef NDEBUG
+    "Release"
+  #else
+    "Debug"
+  #endif
+  " GCC " __VERSION__ " for "
+  #if defined PLATFORM_WINDOWS
+    "Windows"
+  #elif defined PLATFORM_MACOS
+    "OS X"
+  #elif defined PLATFORM_LINUX
+    "Linux"
+  #else
+    "unknown OS"
+  #endif
+  #if defined PLATFORM_BIGENDIAN
+    ", big endian"
+  #elif defined PLATFORM_LITTLEENDIAN
+    //", little endian"
+  #else
+    ", unspecified endianness"
+  #endif
+  << std::endl;
+
+  try {
+    root.init();
+    root.loop_main();
+    return EXIT_SUCCESS;
+  } catch(std::exception const &e)  {
+    std::cout << "Exception: " << e.what() << std::endl;
+  } catch(...) {
+    std::cout << "Unknown exception!" << std::endl;
+  }
+  glfwTerminate();
+  return EXIT_FAILURE;
+}
