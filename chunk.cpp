@@ -82,7 +82,7 @@ void chunk::setup() {
 
   // menger sponge
   unsigned int iters = 3;
-  unsigned int numblocks = (int)pow(3.0, iters);
+  unsigned int numblocks = static_cast<int>(pow(3.0, static_cast<double>(iters)));
   float blocksize = size/numblocks;
 
   for(unsigned int x = 0; x < numblocks; x++) {
@@ -91,7 +91,7 @@ void chunk::setup() {
         bool skip = false;
         for(unsigned int i = 0; i < iters; i++) {
           int matches = 0;
-          int depth = (int)pow(3, i);
+          int depth = static_cast<int>(pow(3.0, static_cast<double>(i)));
           if((x/depth) % 3 == 1) {
             matches++;
           }
