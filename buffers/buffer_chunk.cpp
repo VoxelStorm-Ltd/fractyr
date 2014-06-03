@@ -41,7 +41,10 @@ void buffer_chunk::load_shader() {
 
 void buffer_chunk::destroy_shader() {
   /// Clean up the terrain shaders
-  glDeleteProgram(shader);
+  if(shader != 0) {
+    glDeleteProgram(shader);
+    shader = 0;
+  }
 }
 
 void buffer_chunk::setup(std::vector<vertex> const &vbodata, std::vector<GLuint> const &ibodata) {

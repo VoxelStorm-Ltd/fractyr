@@ -35,7 +35,8 @@ public:
 
   // drawing
   void render(Vector3i const &view_chunk_coords) const;
-  void refresh();
+  void delete_buffers();
+  void setup_buffers();
   void setup();
 };
 

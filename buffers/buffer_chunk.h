@@ -26,8 +26,8 @@ private:
 public:
   buffer_chunk();
   ~buffer_chunk()       override final;
-  void load_shader()    override final;
-  void destroy_shader() override final;
+  static void load_shader();
+  static void destroy_shader();
   void setup(std::vector<vertex> const &vbodata, std::vector<GLuint> const &ibodata);
   void render() const   override final;
 };

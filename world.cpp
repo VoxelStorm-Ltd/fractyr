@@ -189,6 +189,29 @@ Vector3f world::check_collision(Vector3i const &chunk_coords,
   return normal;
 }
 
+void world::delete_buffers() {
+  for(auto &x : chunks) {
+    for(auto &y : x) {
+      for(auto &z : y) {
+        if(z) {
+          z->delete_buffers();
+        }
+      }
+    }
+  }
+}
+void world::setup_buffers() {
+  for(auto &x : chunks) {
+    for(auto &y : x) {
+      for(auto &z : y) {
+        if(z) {
+          z->setup_buffers();
+        }
+      }
+    }
+  }
+}
+
 void world::update() {
   /// Update every chunk in this world
   /*

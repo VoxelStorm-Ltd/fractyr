@@ -19,8 +19,6 @@ public:
 
   virtual void init();
   virtual void destroy();
-  virtual void load_shader();
-  virtual void destroy_shader();
   virtual void render() const;
 };
 

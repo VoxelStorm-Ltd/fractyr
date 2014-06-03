@@ -33,14 +33,6 @@ void buffer::destroy() {
   initialised = false;
 }
 
-void buffer::load_shader() {
-  /// Load and initialise the shaders for this object
-  std::cout << "ERROR: virtual base function " << __PRETTY_FUNCTION__ << " called; this should never happen" << std::endl;
-}
-void buffer::destroy_shader() {
-  /// Clean up the shaders for this object
-  std::cout << "ERROR: virtual base function " << __PRETTY_FUNCTION__ << " called; this should never happen" << std::endl;
-}
 void buffer::render() const {
   /// Set up the buffers and upload appropriate data
   std::cout << "ERROR: virtual base function " << __PRETTY_FUNCTION__ << " called; this should never happen" << std::endl;

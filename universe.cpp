@@ -118,6 +118,9 @@ void universe::init_buffers() {
   // TODO
   // initialise fonts
   // TODO
+  if(current_world) {
+    current_world->setup_buffers();
+  }
 }
 
 void universe::init_shaders() {
@@ -128,12 +131,14 @@ void universe::init_shaders() {
 void universe::delete_buffers() {
   /// Unallocate all existing buffers in preparation for context switch
   /// Note: this should be safe to call even on null buffers
-  // TODO
+  if(current_world) {
+    current_world->delete_buffers();
+  }
 }
 
 void universe::delete_shaders() {
   /// Clean up all loaded shaders
-  // TODO
+  //buffer_chunk::destroy_shader();
 }
 
 void universe::render() {
@@ -271,7 +276,7 @@ void universe::reinitialise_window() {
   player.update_window(windowsize);
   set_graphicslevel(graphicslevel);
   std::cout << "Re-initialising graphics buffers..." << std::endl;
-  // TODO
+  init_buffers();
 
   glfwSetKeyCallback(window_main, callback_key);
   glfwSetWindowRefreshCallback(window_main, callback_windowrefresh);

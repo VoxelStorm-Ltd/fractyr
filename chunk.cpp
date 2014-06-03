@@ -10,8 +10,7 @@ chunk::chunk(Vector3i const &chunk_coords, world &parent)
   : coords(chunk_coords),
     parent(&parent) {
   /// Default constructor
-  buf.init();
-  buf.load_shader();
+  setup_buffers();
   setup();
 }
 
@@ -66,16 +65,21 @@ void chunk::render(Vector3i const &view_chunk_coords) const {
   glPopMatrix();
 }
 
-void chunk::refresh() {
-  /// Refresh the buffers for this chunk
+void chunk::delete_buffers() {
+  /// Clean up the buffers for this chunk
   buf.destroy();
   buf.destroy_shader();
+}
+
+void chunk::setup_buffers() {
+  /// Create the buffers for this chunk
   buf.init();
   buf.load_shader();
   setup();
 }
 
 void chunk::setup() {
+  /// Refresh the buffer contents for this chunk
   std::vector<buffer_chunk::vertex> vbodata;
   std::vector<GLuint>               ibodata;
 

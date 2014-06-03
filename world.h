@@ -25,6 +25,8 @@ public:
   chunk *get_chunk(Vector3i const &chunk_coords);
   std::vector<chunk*> get_visible_chunks(Vector3i const &chunk_coords, Quatf const &view_direction, int range);
   Vector3f check_collision(Vector3i const &chunk_coords, Vector3f const &coords, float radius);
+  void delete_buffers();
+  void setup_buffers();
 
   // update
   void update();
