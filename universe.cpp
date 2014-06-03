@@ -89,7 +89,7 @@ void universe::restart() {
   delete current_world;
   current_world = new world();
 
-  player.current_ship = new ship(*current_world, current_world->get_chunk(Vector3i(0.0, 0.0, 0.0)), Vector3f(10.0, 20.0, 30.0));
+  player.current_ship = new ship(*current_world, current_world->get_chunk(Vector3i(0.0, 0.0, 0.0)), Vector3f(50.0, 50.0, 50.0));
 
   glfwSetInputMode(            window_main, GLFW_CURSOR, GLFW_CURSOR_NORMAL);     // release the cursor
   glfwSetCursorPosCallback(    window_main, callback_mousepos);
