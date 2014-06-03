@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "vmath.h"
+#include "buffer_chunk.h"
 
 class world;          // forward dec
 class entity;
@@ -18,6 +19,8 @@ public:
 private:
   std::vector<entity*> entities;          // everything that's currently in this chunk
 
+  buffer_chunk buf;                       // this chunk's graphics buffer
+
 public:
   chunk(Vector3i const &chunk_coords);
   ~chunk();
@@ -27,9 +30,13 @@ public:
 
   // update
   void update();
+  void add_entity(entity *thisentity);
+  void remove_entity(entity *thisentity);
 
   // drawing
   void render(Vector3i const &view_chunk_coords) const;
+  void refresh();
+  void setup();
 };
 
 #endif // CHUNK_H_INCLUDED

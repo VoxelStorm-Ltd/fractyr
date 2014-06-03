@@ -21,10 +21,13 @@ world::~world() {
 
 chunk *world::get_chunk(Vector3i const &chunk_coords) {
   /// Find a chunk with the given coordinates, and generate it if it doesn't exist
-  chunk *thischunk = chunks[chunk_coords.x % size][chunk_coords.y % size][chunk_coords.z % size];     // the world wraps, so we just modulo
+  Vector3i const checked_coords((size + chunk_coords.x) % size,
+                                (size + chunk_coords.y) % size,
+                                (size + chunk_coords.z) % size);     // the world wraps, so we just modulo
+  chunk *&thischunk = chunks[checked_coords.x][checked_coords.y][checked_coords.z];
   if(!thischunk) {
-    thischunk = new chunk(chunk_coords);
-    chunks[chunk_coords.x % size][chunk_coords.y % size][chunk_coords.z % size] = thischunk;
+    thischunk = new chunk(checked_coords);
+    std::cout << "DEBUG: Created chunk at " << checked_coords << std::endl;
   }
   return thischunk;
 }

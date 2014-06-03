@@ -38,6 +38,9 @@ extern oculusstorm *oculus;
 //extern FTFont *font_label;
 
 
+std::mt19937 universe::randomgen;
+unsigned int universe::randomseed = 1;
+
 universe::universe()
   : time_fpsupdate(std::chrono::high_resolution_clock::now()),
     timestep_chrono(std::chrono::milliseconds(static_cast<unsigned int>(timestep * 1000) - 1)) { // -1 to go a bit over
@@ -71,6 +74,8 @@ void universe::init() {
   init_buffers();                               // needs to come before progress screen
   render_progressscreen(0.0, "Loading...");
 
+  restart();
+
   std::cout << "Initialisation complete." << std::endl;
   // this must be absolutely last:
   glfwSetTime(0.0);           // reset the timer for the start of the main loop
@@ -78,8 +83,13 @@ void universe::init() {
 
 void universe::restart() {
   /// Set up the universe to an initial state
-  generator.seed(randomseed);
+  randomgen.seed(randomseed);
   srand(randomseed);
+
+  delete current_world;
+  current_world = new world();
+
+  player.ship = new entity(*current_world, current_world->get_chunk(Vector3i(0.0, 0.0, 0.0)), Vector3f(10.0, 20.0, 30.0));
 
   glfwSetInputMode(            window_main, GLFW_CURSOR, GLFW_CURSOR_NORMAL);     // release the cursor
   glfwSetCursorPosCallback(    window_main, callback_mousepos);
@@ -94,13 +104,12 @@ void universe::restart() {
 
   sound.music_clear(0);                         // clear the decks
   sound.music_clear(1);
-  sound.music_queue(0, 0);                      // start the music
-  sound.music_queue(0, 1);
+  //sound.music_queue(0, 0);                      // start the music
+  //sound.music_queue(0, 1);
   //sound.music_queue(1, 2);
   //sound.music_queue(1, 3);
   sound.set_music_volume(0, 1.0);
   sound.set_music_volume(1, 0.0);
-
 }
 
 void universe::init_buffers() {

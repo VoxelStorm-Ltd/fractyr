@@ -20,11 +20,12 @@ protected:
   float drag   = 0.0;                     // how much drag this entity experiences (coefficient of drag)
 
 public:
-  entity(world &parent_world, chunk *parent_chunk);
+  entity(world &parent_world, chunk *parent_chunk, Vector3f const &position);
   virtual ~entity();
 
   void update();
   void move(Vector3f const &direction);
+  static void correct_point(Vector3f &coords, chunk *&thischunk);
   Vector3f check_collision(Vector3f const &other_coords, float other_radius) const;
 
   void render() const;

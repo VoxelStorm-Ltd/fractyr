@@ -849,10 +849,15 @@
 			<Add directory="." />
 			<Add directory="include" />
 			<Add directory="input" />
+			<Add directory="buffers" />
 			<Add directory="entity" />
 			<Add directory="$(#boost.include)" />
 		</Compiler>
 		<Unit filename="blob_loader.h" />
+		<Unit filename="buffers/buffer.cpp" />
+		<Unit filename="buffers/buffer.h" />
+		<Unit filename="buffers/buffer_chunk.cpp" />
+		<Unit filename="buffers/buffer_chunk.h" />
 		<Unit filename="callback_error.cpp" />
 		<Unit filename="chunk.cpp" />
 		<Unit filename="chunk.h" />
@@ -885,6 +890,8 @@
 		<Unit filename="oculusstorm.cpp" />
 		<Unit filename="oculusstorm.h" />
 		<Unit filename="platform_defines.h" />
+		<Unit filename="resources/shaders/chunk_frag.glsl" />
+		<Unit filename="resources/shaders/chunk_vert.glsl" />
 		<Unit filename="shader_load.cpp" />
 		<Unit filename="soundstorm.cpp" />
 		<Unit filename="soundstorm.h" />

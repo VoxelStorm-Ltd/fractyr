@@ -4,11 +4,15 @@
 #include "world.h"
 #include "chunk.h"
 
-entity::entity(world &parent_world, chunk *parent_chunk)
+entity::entity(world &parent_world, chunk *parent_chunk, Vector3f const &position)
   : parent_world(parent_world),
     parent(parent_chunk),
+    position(position),
     orientation(Quatd::fromEulerAngles(0.0, 0.0, 0.0)) {
   /// Default constructor
+  if(parent_chunk) {
+    parent_chunk->add_entity(this);
+  }
 }
 
 entity::~entity() {
@@ -27,30 +31,8 @@ void entity::update() {
 void entity::move(Vector3f const &direction) {
   Vector3f newposition(position + direction);
   chunk *newparent = parent;
-  if(__builtin_expect(newposition.x > chunk::size, 0)) {      // branch prediction hint: unlikely (the usual case will not be chunk changes)
-    newposition.x -= chunk::size;
-    newparent = parent_world.get_chunk(parent->coords + Vector3i(1, 0, 0));
-  }
-  if(__builtin_expect(newposition.x < 0.0, 0)) {
-    newposition.x += chunk::size;
-    newparent = parent_world.get_chunk(parent->coords + Vector3i(-1, 0, 0));
-  }
-  if(__builtin_expect(newposition.y > chunk::size, 0)) {
-    newposition.y -= chunk::size;
-    newparent = parent_world.get_chunk(parent->coords + Vector3i(0, 1, 0));
-  }
-  if(__builtin_expect(newposition.y < 0.0, 0)) {
-    newposition.y += chunk::size;
-    newparent = parent_world.get_chunk(parent->coords + Vector3i(0, -1, 0));
-  }
-  if(__builtin_expect(newposition.z > chunk::size, 0)) {
-    newposition.z -= chunk::size;
-    newparent = parent_world.get_chunk(parent->coords + Vector3i(0, 0, 1));
-  }
-  if(__builtin_expect(newposition.z < 0.0, 0)) {
-    newposition.z += chunk::size;
-    newparent = parent_world.get_chunk(parent->coords + Vector3i(0, 0, -1));
-  }
+
+  correct_point(newposition, newparent);
 
   Vector3f const &collision_vector(parent_world.check_collision(newparent->coords, newposition, radius));
   if(__builtin_expect(collision_vector != Vector3f(0.0, 0.0, 0.0), 0)) {     // branch prediction hint: unlikely (the usual case will be no collision)
@@ -58,8 +40,42 @@ void entity::move(Vector3f const &direction) {
     // TODO
     // apply damping
     // TODO
+
+    correct_point(newposition, newparent);
+  }
+
+  position = newposition;
+  parent = newparent;
+}
+
+void entity::correct_point(Vector3f &coords, chunk *&thischunk) {
+  /// Take a coord in a chunk, that may be out of bounds, and return a valid pair of coords and chunk coords
+  if(__builtin_expect(coords.x > chunk::size, 0)) {      // branch prediction hint: unlikely (the usual case will not be chunk changes)
+    coords.x -= chunk::size;
+    thischunk = thischunk->parent->get_chunk(thischunk->coords + Vector3i(1, 0, 0));
+  }
+  if(__builtin_expect(coords.x < 0.0, 0)) {
+    coords.x += chunk::size;
+    thischunk = thischunk->parent->get_chunk(thischunk->coords + Vector3i(-1, 0, 0));
+  }
+  if(__builtin_expect(coords.y > chunk::size, 0)) {
+    coords.y -= chunk::size;
+    thischunk = thischunk->parent->get_chunk(thischunk->coords + Vector3i(0, 1, 0));
+  }
+  if(__builtin_expect(coords.y < 0.0, 0)) {
+    coords.y += chunk::size;
+    thischunk = thischunk->parent->get_chunk(thischunk->coords + Vector3i(0, -1, 0));
+  }
+  if(__builtin_expect(coords.z > chunk::size, 0)) {
+    coords.z -= chunk::size;
+    thischunk = thischunk->parent->get_chunk(thischunk->coords + Vector3i(0, 0, 1));
+  }
+  if(__builtin_expect(coords.z < 0.0, 0)) {
+    coords.z += chunk::size;
+    thischunk = thischunk->parent->get_chunk(thischunk->coords + Vector3i(0, 0, -1));
   }
 }
+
 
 Vector3f entity::check_collision(Vector3f const &other_coords, float other_radius) const {
   /// Check if the point is colliding with this entity, and if so, return the surface normal vector

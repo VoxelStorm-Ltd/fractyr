@@ -1,0 +1,88 @@
+#include "buffer_chunk.h"
+#include "blob_loader.h"
+
+// loader
+GLuint shader_load(std::string const &shader_vertex_source, std::string const &shader_fragment_source);
+
+// linked binary resource blob symbols using blob_loader.h
+BLOB_LOAD(shaders_chunk_vert_glsl);
+BLOB_LOAD(shaders_chunk_frag_glsl);
+
+GLuint buffer_chunk::shader = 0;
+
+buffer_chunk::buffer_chunk() {
+  /// Default constructor
+}
+
+buffer_chunk::~buffer_chunk() {
+  /// Default destructor
+  destroy_shader();
+}
+
+void buffer_chunk::load_shader() {
+  /// Load and initialise the terrain shaders
+  if(shader != 0) {
+    return;         // only load the shader once
+  }
+  shader = shader_load(std::string(reinterpret_cast<char const*>(BLOB(shaders_chunk_vert_glsl)),
+                                   BLOB_SIZE(                         shaders_chunk_vert_glsl)),
+                       std::string(reinterpret_cast<char const*>(BLOB(shaders_chunk_frag_glsl)),
+                                   BLOB_SIZE(                         shaders_chunk_frag_glsl)));
+  if(shader == GL_FALSE) {
+    std::cout << "ERROR: " << __PRETTY_FUNCTION__ << ": Failed to load shaders, exiting." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  // cache attribute and uniform indices
+  attrib_coords = glGetAttribLocation(shader, "coords");
+  attrib_normal = glGetAttribLocation(shader, "normal");
+}
+
+void buffer_chunk::destroy_shader() {
+  /// Clean up the terrain shaders
+  glDeleteProgram(shader);
+}
+
+void buffer_chunk::setup(std::vector<vertex> const &vbodata, std::vector<GLuint> const &ibodata) {
+  /// Set up the buffers and upload appropriate data
+  #ifndef NDEBUG
+    if(vbo == 0 || ibo == 0) {
+      std::cout << "WARNING: " << __PRETTY_FUNCTION__ << ": buffer not previously initialised, initialising now - fix this for release!" << std::endl;
+      init();
+    }
+    if(shader == 0) {
+      std::cout << "WARNING: " << __PRETTY_FUNCTION__ << ": shader not previously loaded, loading now - fix this for release!" << std::endl;
+      load_shader();
+    }
+    std::cout << "Uploading " << vbodata.size() << " verts, " << ibodata.size() << " indices to chunk vbo ("
+              << (vbodata.size() * sizeof(vertex)) / 1024 << "KB, "
+              << (ibodata.size() * sizeof(vertex)) / 1024 << "KB)" << std::endl;
+  #endif
+  numverts = ibodata.size();
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBufferData(GL_ARRAY_BUFFER, vbodata.size() * sizeof(vertex), &vbodata[0], GL_STATIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, ibodata.size() * sizeof(GLuint), &ibodata[0], GL_STATIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+  initialised = true;
+}
+
+void buffer_chunk::render() const {
+  /// Render the buffers for this object in the appropriate way
+  glUseProgram(shader);
+  glBindBuffer(GL_ARRAY_BUFFER,         vbo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+  glEnableVertexAttribArray(attrib_coords);
+  glEnableVertexAttribArray(attrib_normal);
+  glVertexAttribPointer(attrib_coords, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::coords)));
+  glVertexAttribPointer(attrib_normal, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::normal)));
+
+  glDrawElements(GL_TRIANGLES, numverts, GL_UNSIGNED_INT, 0);
+
+  glUseProgram(0);
+  glDisableVertexAttribArray(attrib_coords);
+  glDisableVertexAttribArray(attrib_normal);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}

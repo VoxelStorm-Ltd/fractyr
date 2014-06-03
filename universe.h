@@ -63,8 +63,8 @@ public:
     bool fullscreen = true;                             // fullscreen default for release build
   #endif
 
-  std::default_random_engine generator;                 // global random number generator used for events (but not citygen)
-  unsigned int randomseed = 1;                          // global random seed for this session
+  static std::mt19937 randomgen;                        // global random number generator
+  static unsigned int randomseed;                       // global random seed for this session
 
   world *current_world = nullptr;                       // the current level
 
