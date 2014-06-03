@@ -90,7 +90,7 @@ soundstorm::soundstorm() try
     thisdeck.buffer_read = 0;
     thisdeck.buffer_needs_filled = true;
   }
-  set_listener_position_and_rotation(Vector3f(0.0, 0.0, 0.0), Quatf::fromEulerAngles(0.0, 0.0, 0.0));   // initial positions for the ears
+  set_listener_position_and_rotation(Vector3f(0.0f, 0.0f, 0.0f), Quatf::fromEulerAngles(0.0f, 0.0f, 0.0f));   // initial positions for the ears
 
   // set up the parameters required to open a (Callback)Stream:
   stream_out_params = new portaudio::DirectionSpecificStreamParameters(
@@ -189,8 +189,8 @@ int soundstorm::mixer(void const *buffer_in __attribute__((__unused__)),
   if(hdr_window_top < hdr_window_top_min) {     // clamp
     hdr_window_top = hdr_window_top_min;
   }
-  if(hdr_window_bottom < 0.0) {                 // clamp
-    hdr_window_bottom = 0.0;
+  if(hdr_window_bottom < 0.0f) {                // clamp
+    hdr_window_bottom = 0.0f;
   }
 
   float **out = static_cast<float**>(buffer_out);
@@ -217,20 +217,20 @@ int soundstorm::mixer(void const *buffer_in __attribute__((__unused__)),
       #endif
       float const seek_delay = distance / speed_of_sound;
       //std::cout << "DEBUG: " << playing.size() << " pos " << Vector3i(thissound.position) << " dist " << distance << " ch" << thissound.channel << " delay " << seek_delay << "s" << std::endl;
-      float const angle_ratio = acos(thisear.orientation.dotProduct(thissound.position - thisear.position) / distance) / M_PI;
+      float const angle_ratio = acosf(thisear.orientation.dotProduct(thissound.position - thisear.position) / distance) / static_cast<float>(M_PI);
       float const head_shadow_delay = head_shadow_delay_max * angle_ratio;
       float apparent_seek = thissound.seek - ((seek_delay + head_shadow_delay) * samplerate);    // rewind to account for time delays
-      if(apparent_seek >= 0.0) {                            // avoid trying to play before the start of the effect
+      if(apparent_seek >= 0.0f) {                            // avoid trying to play before the start of the effect
         if(apparent_seek >= thissound.effect->buffersize ||
-           (thissound.seek_end != 0.0 && apparent_seek >= thissound.seek_end)) {
+           (thissound.seek_end != 0.0f && apparent_seek >= thissound.seek_end)) {
           // we've reached the end of this effect or our own seek limit
           if(thissound.next_sound) {
             if(thissound.next_sound == &thissound) {
               // this is a one-sound loop, so just rewind to the beginning
               thissound.seek = -thissound.seek_speed;         // rewind one step make sure the first sample is really 0
               apparent_seek = thissound.seek - seek_delay;    // rewind to account for time delay
-              if(apparent_seek < 0.0) {  // avoid trying to play before the start of the effect
-                apparent_seek = 0.0;
+              if(apparent_seek < 0.0f) {  // avoid trying to play before the start of the effect
+                apparent_seek = 0.0f;
               }
             } else {
               // we have something else queued up, so replace us with it and destroy the original
@@ -247,7 +247,7 @@ int soundstorm::mixer(void const *buffer_in __attribute__((__unused__)),
           }
         }
         // directional attenuation
-        float const directional_attenuation = 1.0 - (head_shadow_attenuation * angle_ratio);
+        float const directional_attenuation = 1.0f - (head_shadow_attenuation * angle_ratio);
         float const sample = (thissound.effect->buffer[static_cast<unsigned int>(apparent_seek)] *
                               thissound.effect->hdr_scale *
                               thissound.volume *
@@ -291,7 +291,7 @@ int soundstorm::mixer(void const *buffer_in __attribute__((__unused__)),
     }
 
     // scale the HDR windows for this frame
-    if(max_level / hdr_window_top > 1.0) {
+    if(max_level / hdr_window_top > 1.0f) {
       // scale both the window edges up
       //hdr_window_bottom += hdr_window_top - max_level;
       hdr_window_top = max_level;
@@ -423,7 +423,7 @@ void soundstorm::streamer() {
       }
     }
     // sleep for 1/4 of buffer fill time to avoid spin-waiting
-    std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<unsigned int>(1000.0 * deck_buffer_size / samplerate / 4)));
+    std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<unsigned int>(1000.0f * deck_buffer_size / samplerate / 4)));
   } while(streamer_run);
 
   for(auto &thisdeck : decks) {     // cleanup
@@ -823,7 +823,7 @@ void soundstorm::set_music_volume(unsigned int deck_id, float newvolume) {
   decks[deck_id].volume_fadespeed = 0.0;
 }
 
-void soundstorm::fade_music_volume(unsigned int deck_id, float newvolume, double seconds_to_take) {
+void soundstorm::fade_music_volume(unsigned int deck_id, float newvolume, float seconds_to_take) {
   /// Slowly fade volume from current setting to new setting, over a given number of seconds
   #ifndef NDEBUG
     if(deck_id >= decks.size()) {   // safety check only in debug mode
@@ -835,7 +835,7 @@ void soundstorm::fade_music_volume(unsigned int deck_id, float newvolume, double
   decks[deck_id].volume_target = newvolume;
 }
 
-void soundstorm::crossfade_music(double seconds_to_take, unsigned int deck_from, unsigned int deck_to) {
+void soundstorm::crossfade_music(float seconds_to_take, unsigned int deck_from, unsigned int deck_to) {
   /// Convenience wrapper function to crossfade between a pair of decks
   float const volume0 = decks[deck_from].volume_target;
   float const volume1 = decks[deck_to  ].volume_target;

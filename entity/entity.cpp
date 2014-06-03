@@ -36,7 +36,7 @@ void entity::move(Vector3f const &direction) {
   correct_point(newposition, newparent);
 
   Vector3f const &collision_vector(parent_world.check_collision(newparent->coords, newposition, radius));
-  if(__builtin_expect(collision_vector != Vector3f(0.0, 0.0, 0.0), 0)) {     // branch prediction hint: unlikely (the usual case will be no collision)
+  if(__builtin_expect(collision_vector != Vector3f(0.0f, 0.0f, 0.0f), 0)) {     // branch prediction hint: unlikely (the usual case will be no collision)
     // reflect our velocity by the collision vector
     // TODO
     // apply damping
@@ -60,7 +60,7 @@ void entity::correct_point(Vector3f &coords, chunk *&thischunk) {
     coords.x -= chunk::size;
     thischunk = thischunk->parent->get_chunk(thischunk->coords + Vector3i(1, 0, 0));
   }
-  if(__builtin_expect(coords.x < 0.0, 0)) {
+  if(__builtin_expect(coords.x < 0.0f, 0)) {
     coords.x += chunk::size;
     thischunk = thischunk->parent->get_chunk(thischunk->coords + Vector3i(-1, 0, 0));
   }
@@ -68,7 +68,7 @@ void entity::correct_point(Vector3f &coords, chunk *&thischunk) {
     coords.y -= chunk::size;
     thischunk = thischunk->parent->get_chunk(thischunk->coords + Vector3i(0, 1, 0));
   }
-  if(__builtin_expect(coords.y < 0.0, 0)) {
+  if(__builtin_expect(coords.y < 0.0f, 0)) {
     coords.y += chunk::size;
     thischunk = thischunk->parent->get_chunk(thischunk->coords + Vector3i(0, -1, 0));
   }
@@ -76,7 +76,7 @@ void entity::correct_point(Vector3f &coords, chunk *&thischunk) {
     coords.z -= chunk::size;
     thischunk = thischunk->parent->get_chunk(thischunk->coords + Vector3i(0, 0, 1));
   }
-  if(__builtin_expect(coords.z < 0.0, 0)) {
+  if(__builtin_expect(coords.z < 0.0f, 0)) {
     coords.z += chunk::size;
     thischunk = thischunk->parent->get_chunk(thischunk->coords + Vector3i(0, 0, -1));
   }

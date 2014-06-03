@@ -199,7 +199,7 @@ void gameplayer::update_aspect_ratio() {
 
 void gameplayer::clamp_pitch() {
   /// Clamp view pitch angle
-  double constexpr pitchmax = 90.0;
+  float constexpr pitchmax = 90.0f;
   if(rotation_pitch > pitchmax) {
     rotation_pitch = pitchmax;
   } else if(rotation_pitch < -pitchmax) {
