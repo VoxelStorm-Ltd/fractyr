@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include "entity.h"
 #include "universe.h"
+#include "math.h"
 
 chunk::chunk(Vector3i const &chunk_coords, world &parent)
   : coords(chunk_coords),
@@ -79,34 +80,128 @@ void chunk::setup() {
   std::vector<buffer_chunk::vertex> vbodata;
   std::vector<GLuint>               ibodata;
 
-  std::uniform_real_distribution<float> dist_chunkwide(size * 0.25, size * 0.75);
-  std::uniform_real_distribution<float> dist_tri(-1.0, 1.0);
+  // menger sponge
+  unsigned int iters = 3;
+  unsigned int numblocks = (int)pow(3.0, iters);
+  unsigned int blocksize = size/numblocks;
 
-  // placeholder: spam random triangles
-  for(unsigned int i = 0; i != 10000; ++i) {
-    Vector3f const coord0(dist_chunkwide(universe::randomgen), dist_chunkwide(universe::randomgen), dist_chunkwide(universe::randomgen));
-    Vector3f const coord1(coord0 + Vector3f(dist_tri(universe::randomgen), dist_tri(universe::randomgen), dist_tri(universe::randomgen)));
-    Vector3f const coord2(coord0 + Vector3f(dist_tri(universe::randomgen), dist_tri(universe::randomgen), dist_tri(universe::randomgen)));
+  for(unsigned int x = 0; x < numblocks; x++) {
+    for(unsigned int y = 0; y < numblocks; y++) {
+      for(unsigned int z = 0; z < numblocks; z++) {
+        bool skip = false;
+        for(unsigned int i = 0; i < iters; i++) {
+          int matches = 0;
+          int depth = (int)pow(3, i);
+          if((x/depth) % 3 == 1) {
+            matches++;
+          }
+          if((y/depth) % 3 == 1) {
+            matches++;
+          }
+          if((z/depth) % 3 == 1) {
+            matches++;
+          }
+          if(matches >= 2) {
+            skip = true;
+            break;
+          }
+        }
+        if(skip) {
+          continue;
+        }
+        Vector3f const coord000(blocksize*x, blocksize*y, blocksize*z);
+        Vector3f const coord100(coord000 + Vector3f(blocksize, 0.0f, 0.0f));
+        Vector3f const coord010(coord000 + Vector3f(0.0f, blocksize, 0.0f));
+        Vector3f const coord110(coord000 + Vector3f(blocksize, blocksize, 0.0f));
 
-    Vector3f const normal = (coord1 - coord0).crossProduct(coord2 - coord0);
+        Vector3f const coord001(blocksize*x, blocksize*y, blocksize*z+blocksize);
+        Vector3f const coord101(coord001 + Vector3f(blocksize, 0.0f, 0.0f));
+        Vector3f const coord011(coord001 + Vector3f(0.0f, blocksize, 0.0f));
+        Vector3f const coord111(coord001 + Vector3f(blocksize, blocksize, 0.0f));
 
-    // front face
-    unsigned int offset = vbodata.size();
-    vbodata.emplace_back(coord0, normal);
-    vbodata.emplace_back(coord1, normal);
-    vbodata.emplace_back(coord2, normal);
-    ibodata.emplace_back(offset + 0);
-    ibodata.emplace_back(offset + 1);
-    ibodata.emplace_back(offset + 2);
+        Vector3f const normal0 = (coord100 - coord000).crossProduct(coord010 - coord000);
+        Vector3f const normal1 = (coord011 - coord000).crossProduct(coord001 - coord000);
+        Vector3f const normal2 = (coord111 - coord010).crossProduct(coord011 - coord010);
 
-    // back face
-    offset = vbodata.size();
-    vbodata.emplace_back(coord0, -normal);
-    vbodata.emplace_back(coord2, -normal);
-    vbodata.emplace_back(coord1, -normal);
-    ibodata.emplace_back(offset + 0);
-    ibodata.emplace_back(offset + 1);
-    ibodata.emplace_back(offset + 2);
+        // front face
+        unsigned int offset = vbodata.size();
+        vbodata.emplace_back(coord000, normal0);
+        vbodata.emplace_back(coord010, normal0);
+        vbodata.emplace_back(coord110, normal0);
+        vbodata.emplace_back(coord100, normal0);
+        ibodata.emplace_back(offset + 0);
+        ibodata.emplace_back(offset + 1);
+        ibodata.emplace_back(offset + 2);
+        ibodata.emplace_back(offset + 2);
+        ibodata.emplace_back(offset + 3);
+        ibodata.emplace_back(offset + 0);
+
+        // back face
+        offset = vbodata.size();
+        vbodata.emplace_back(coord001, -normal0);
+        vbodata.emplace_back(coord011, -normal0);
+        vbodata.emplace_back(coord111, -normal0);
+        vbodata.emplace_back(coord101, -normal0);
+        ibodata.emplace_back(offset + 0);
+        ibodata.emplace_back(offset + 3);
+        ibodata.emplace_back(offset + 2);
+        ibodata.emplace_back(offset + 2);
+        ibodata.emplace_back(offset + 1);
+        ibodata.emplace_back(offset + 0);
+
+        // Side face 1
+        offset = vbodata.size();
+        vbodata.emplace_back(coord000, normal1);
+        vbodata.emplace_back(coord001, normal1);
+        vbodata.emplace_back(coord011, normal1);
+        vbodata.emplace_back(coord010, normal1);
+        ibodata.emplace_back(offset + 0);
+        ibodata.emplace_back(offset + 1);
+        ibodata.emplace_back(offset + 2);
+        ibodata.emplace_back(offset + 2);
+        ibodata.emplace_back(offset + 3);
+        ibodata.emplace_back(offset + 0);
+
+        // Side face 2
+        offset = vbodata.size();
+        vbodata.emplace_back(coord100, -normal1);
+        vbodata.emplace_back(coord101, -normal1);
+        vbodata.emplace_back(coord111, -normal1);
+        vbodata.emplace_back(coord110, -normal1);
+        ibodata.emplace_back(offset + 0);
+        ibodata.emplace_back(offset + 3);
+        ibodata.emplace_back(offset + 2);
+        ibodata.emplace_back(offset + 2);
+        ibodata.emplace_back(offset + 1);
+        ibodata.emplace_back(offset + 0);
+
+        // top face
+        offset = vbodata.size();
+        vbodata.emplace_back(coord010, normal2);
+        vbodata.emplace_back(coord011, normal2);
+        vbodata.emplace_back(coord111, normal2);
+        vbodata.emplace_back(coord110, normal2);
+        ibodata.emplace_back(offset + 0);
+        ibodata.emplace_back(offset + 1);
+        ibodata.emplace_back(offset + 2);
+        ibodata.emplace_back(offset + 2);
+        ibodata.emplace_back(offset + 3);
+        ibodata.emplace_back(offset + 0);
+
+        // bottom face
+        offset = vbodata.size();
+        vbodata.emplace_back(coord000, -normal2);
+        vbodata.emplace_back(coord001, -normal2);
+        vbodata.emplace_back(coord101, -normal2);
+        vbodata.emplace_back(coord100, -normal2);
+        ibodata.emplace_back(offset + 0);
+        ibodata.emplace_back(offset + 3);
+        ibodata.emplace_back(offset + 2);
+        ibodata.emplace_back(offset + 2);
+        ibodata.emplace_back(offset + 1);
+        ibodata.emplace_back(offset + 0);
+      }
+    }
   }
 
   buf.setup(vbodata, ibodata);
