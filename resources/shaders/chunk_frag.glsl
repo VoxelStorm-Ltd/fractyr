@@ -7,7 +7,7 @@ varying vec3 reflectdir_frag;
 varying vec3 coords_camlocal_frag;
 
 void main() {
-  const vec3 lightdir = vec3(0.0, 0.0, -1.0);
+  const vec3 lightdir = vec3(0.0, -0.8414709848, -0.54030230586);
 
   float lambertian = dot(lightdir, normalize(normal_frag));
 
