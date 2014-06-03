@@ -21,8 +21,8 @@ public:
   };
 private:
   // per-vertex attribute indices
-  GLuint attrib_coords = 0;
-  GLuint attrib_normal = 0;
+  static GLuint attrib_coords;
+  static GLuint attrib_normal;
 public:
   buffer_chunk();
   ~buffer_chunk()       override final;

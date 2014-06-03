@@ -9,6 +9,8 @@ BLOB_LOAD(shaders_chunk_vert_glsl);
 BLOB_LOAD(shaders_chunk_frag_glsl);
 
 GLuint buffer_chunk::shader = 0;
+GLuint buffer_chunk::attrib_coords = 0;
+GLuint buffer_chunk::attrib_normal = 0;
 
 buffer_chunk::buffer_chunk() {
   /// Default constructor
