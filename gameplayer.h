@@ -7,6 +7,8 @@
 #include <GLFW/glfw3.h>
 #include "vmath.h"
 
+class entity;                     // forward dec
+
 class gameplayer {
 private:
   Vector2f mouse_sensitivity;     // degrees per pixel moved for both horizontal and vertical mouse movement
@@ -40,6 +42,9 @@ private:
 
 public:
   Vector2f cursorpos;             // on-screen cursor position
+
+  // state
+  entity *ship = nullptr;         // what entity we're currently controlling
 
   // input
   struct controlbinding {

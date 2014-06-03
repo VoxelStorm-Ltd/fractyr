@@ -1,0 +1,34 @@
+#ifndef WORLD_H_INCLUDED
+#define WORLD_H_INCLUDED
+
+#include <vector>
+#include "vmath.h"
+
+class chunk;
+
+class world {
+  /// Container class for chunks, objects and their relevant functions
+public:
+  static int constexpr size = 1000;                         // how many chunks in each direction
+  float const drag = 1.0;                                   // equal to 0.5 * mass-density of the fluid
+
+private:
+  std::vector<std::vector<std::vector<chunk*>>> chunks;     // 3D vector of chunk pointers, initially null
+
+public:
+  world();
+  ~world();
+
+  // chunk operations and queries
+  chunk *get_chunk(Vector3i const &chunk_coords);
+  std::vector<chunk*> get_visible_chunks(Vector3i const &chunk_coords, Quatf const &view_direction, int range);
+  Vector3f check_collision(Vector3i const &chunk_coords, Vector3f const &coords, float radius);
+
+  // update
+  void update();
+
+  // rendering
+  void render(Vector3i const &chunk_coords, Quatf const &view_direction);
+};
+
+#endif // WORLD_H_INCLUDED

@@ -10,6 +10,9 @@
 #include <GLFW/glfw3.h>
 #include "vmath.h"
 
+class world;
+class chunk;
+
 class universe {
 private:
   // fps counter setup
@@ -63,6 +66,8 @@ public:
   std::default_random_engine generator;                 // global random number generator used for events (but not citygen)
   unsigned int randomseed = 1;                          // global random seed for this session
 
+  world *current_world = nullptr;                       // the current level
+
   universe();
   ~universe();
 
@@ -95,7 +100,9 @@ public:
 
   // game cycle & physics
   void update();
-  void check_collisions();
+
+  // chunk operations and queries
+  chunk *get_chunk(Vector3i const &chunk_coords);
 };
 
 #endif // UNIVERSE_H_INCLUDED

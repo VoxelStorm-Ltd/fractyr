@@ -1,0 +1,35 @@
+#ifndef CHUNK_H_INCLUDED
+#define CHUNK_H_INCLUDED
+
+#include <vector>
+#include "vmath.h"
+
+class world;          // forward dec
+class entity;
+
+class chunk {
+  /// A renderable and collidable area of space
+public:
+  static float constexpr size = 100.0;    // chunk size per side
+
+  world *parent;                          // what world it belongs to
+  Vector3i coords;                        // where this chunk is
+
+private:
+  std::vector<entity*> entities;          // everything that's currently in this chunk
+
+public:
+  chunk(Vector3i const &chunk_coords);
+  ~chunk();
+
+  // collisions
+  Vector3f check_collision(Vector3f const &coords, float radius) const;
+
+  // update
+  void update();
+
+  // drawing
+  void render(Vector3i const &view_chunk_coords) const;
+};
+
+#endif // CHUNK_H_INCLUDED

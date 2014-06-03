@@ -1,0 +1,139 @@
+#include "world.h"
+#include "chunk.h"
+
+world::world() {
+  /// Default constructor
+  // ugly but efficient way to initialise a 3D vector
+  chunks = std::vector<std::vector<std::vector<chunk*>>>(size, std::vector<std::vector<chunk*>>(size, std::vector<chunk*>(size, nullptr)));
+}
+
+world::~world() {
+  /// Default destructor
+}
+
+chunk *world::get_chunk(Vector3i const &chunk_coords) {
+  /// Find a chunk with the given coordinates, and generate it if it doesn't exist
+  chunk *thischunk = chunks[chunk_coords.x % size][chunk_coords.y % size][chunk_coords.z % size];     // the world wraps, so we just modulo
+  if(!thischunk) {
+    thischunk = new chunk(chunk_coords);
+    chunks[chunk_coords.x % size][chunk_coords.y % size][chunk_coords.z % size] = thischunk;
+  }
+  return thischunk;
+}
+
+std::vector<chunk*> world::get_visible_chunks(Vector3i const &chunk_coords,
+                                              Quatf const &view_direction,
+                                              int range) {
+  /// Return a list of chunks visible in this direction from a given chunk, in optimal rendering order
+  std::vector<chunk*> chunk_list;
+  // the central chunk always comes first - the order here makes for optimal occlusion testing later
+  chunk_list.emplace_back(get_chunk(chunk_coords));
+  // then the cardinal columns, working outwards - they will always overlap the corners
+  for(int x =  1; x !=  range; ++x) {
+    chunk_list.emplace_back(get_chunk(Vector3i(x, 0, 0)));
+  }
+  for(int x = -1; x != -range; --x) {
+    chunk_list.emplace_back(get_chunk(Vector3i(x, 0, 0)));
+  }
+  for(int y =  1; y !=  range; ++y) {
+    chunk_list.emplace_back(get_chunk(Vector3i(0, y, 0)));
+  }
+  for(int y = -1; y != -range; --y) {
+    chunk_list.emplace_back(get_chunk(Vector3i(0, y, 0)));
+  }
+  for(int z =  1; z !=  range; ++z) {
+    chunk_list.emplace_back(get_chunk(Vector3i(0, 0, z)));
+  }
+  for(int z = -1; z != -range; --z) {
+    chunk_list.emplace_back(get_chunk(Vector3i(0, 0, z)));
+  }
+  // finally add the corners, working outwards
+  for(int x =  1; x !=  range; ++x) {
+    for(int y =  1; y !=  range; ++y) {
+      for(int z =  1; z !=  range; ++z) {
+        chunk_list.emplace_back(get_chunk(Vector3i(x, y, z)));
+      }
+      for(int z = -1; z != -range; --z) {
+        chunk_list.emplace_back(get_chunk(Vector3i(x, y, z)));
+      }
+    }
+    for(int y = -1; y != -range; --y) {
+      for(int z =  1; z !=  range; ++z) {
+        chunk_list.emplace_back(get_chunk(Vector3i(x, y, z)));
+      }
+      for(int z = -1; z != -range; --z) {
+        chunk_list.emplace_back(get_chunk(Vector3i(x, y, z)));
+      }
+    }
+  }
+  for(int x = -1; x != -range; --x) {
+    for(int y =  1; y !=  range; ++y) {
+      for(int z =  1; z !=  range; ++z) {
+        chunk_list.emplace_back(get_chunk(Vector3i(x, y, z)));
+      }
+      for(int z = -1; z != -range; --z) {
+        chunk_list.emplace_back(get_chunk(Vector3i(x, y, z)));
+      }
+    }
+    for(int y = -1; y != -range; --y) {
+      for(int z =  1; z !=  range; ++z) {
+        chunk_list.emplace_back(get_chunk(Vector3i(x, y, z)));
+      }
+      for(int z = -1; z != -range; --z) {
+        chunk_list.emplace_back(get_chunk(Vector3i(x, y, z)));
+      }
+    }
+  }
+
+  return chunk_list;
+}
+
+Vector3f world::check_collision(Vector3i const &chunk_coords,
+                                Vector3f const &coords,
+                                float radius) {
+  /// Check if a given point is colliding, and if so, return a normal vector to the collision surface
+  Vector3f normal = get_chunk(chunk_coords)->check_collision(coords, radius);
+  if(__builtin_expect(normal != Vector3f(0.0, 0.0, 0.0), 0)) {      // branch prediction hint: unlikely (the usual case will be no collision)
+    return normal;
+  }
+  // if we haven't collided, check any other chunks our radius overlaps onto
+  if(coords.x + radius > chunk::size) {
+    normal = get_chunk(chunk_coords + Vector3i(1, 0, 0))->check_collision(coords - chunk::size, radius);
+  } else if(coords.x - radius < 0.0) {
+    normal = get_chunk(chunk_coords + Vector3i(-1, 0, 0))->check_collision(coords + chunk::size, radius);
+  }
+  if(coords.y + radius > chunk::size) {
+    normal = get_chunk(chunk_coords + Vector3i(0, 1, 0))->check_collision(coords - chunk::size, radius);
+  } else if(coords.y - radius < 0.0) {
+    normal = get_chunk(chunk_coords + Vector3i(0, -1, 0))->check_collision(coords + chunk::size, radius);
+  }
+  if(coords.z + radius > chunk::size) {
+    normal = get_chunk(chunk_coords + Vector3i(0, 0, 1))->check_collision(coords - chunk::size, radius);
+  } else if(coords.z - radius < 0.0) {
+    normal = get_chunk(chunk_coords + Vector3i(0, 0, -1))->check_collision(coords + chunk::size, radius);
+  }
+  return normal;
+}
+
+void world::update() {
+  /// Update every chunk in this world
+  for(unsigned int x = 0; x != size; ++x) {
+    for(unsigned int y = 0; y != size; ++y) {
+      for(unsigned int z = 0; z != size; ++z) {
+        chunk *thischunk = chunks[x][y][z];
+        if(thischunk) {
+          thischunk->update();
+        }
+      }
+    }
+  }
+}
+
+void world::render(Vector3i const &chunk_coords,
+                   Quatf const &view_direction) {
+  /// Draw the relevant portions of this world
+  std::vector<chunk*> const &chunks_to_render = get_visible_chunks(chunk_coords, view_direction, 2);
+  for(auto const &c : chunks_to_render) {
+    c->render(chunk_coords);
+  }
+}

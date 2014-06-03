@@ -7,6 +7,8 @@
 #include "gameplayer.h"
 #include "oculusstorm.h"
 #include "soundstorm.h"
+#include "world.h"
+#include "entity.h"
 
 // loaders
 FTFont *font_load(  std::string const &filename, unsigned int size = 16);
@@ -130,7 +132,10 @@ void universe::render() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   // TODO: don't bother clearing colour buffer
 
-  // TODO
+  if(__builtin_expect(!player.ship, 0)) {     // branch prediction: unlikely that the player will have no ship
+    return;
+  }
+  player.ship->render_from();
 }
 
 void universe::render_progressscreen(float progress, std::string const &message) {
@@ -387,12 +392,21 @@ void universe::loop_pause() {
 
 void universe::update() {
   /// Update the physics of everything in this universe
-  check_collisions();
-
-  // update player position last - this way control inputs are as recent as possible
+  if(__builtin_expect(!!(current_world), 0)) {     // branch prediction: unlikely that there will be no current world
+    // cast needed because not negating the pointer breaks branch prediction, see http://ideone.com/T6oy78
+    current_world->update();
+  }
+  // update player position last - this way control inputs are as recent as possible for the next frame
   player.update();
 }
 
-void universe::check_collisions() {
-  /// Process collision detection
+chunk *universe::get_chunk(Vector3i const &chunk_coords) {
+  /// Wrapper function
+  #ifndef NDEBUG
+    if(!current_world) {
+      std::cout << "ERROR: " << __PRETTY_FUNCTION__ << " called on null current_world!  Clean this up for release." << std::endl;
+      return nullptr;
+    }
+  #endif
+  return current_world->get_chunk(chunk_coords);
 }
