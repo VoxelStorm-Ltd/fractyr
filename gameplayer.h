@@ -7,7 +7,7 @@
 #include <GLFW/glfw3.h>
 #include "vmath.h"
 
-class entity;                     // forward dec
+class ship;                       // forward dec
 
 class gameplayer {
 private:
@@ -24,15 +24,6 @@ private:
   float rotation_yaw = 0.0;       // euler angles for head rotation - we want gimbal limitation here
   float rotation_pitch = 0.0;     //   these are in degrees per pixel
 
-  // TODO: move to ship
-  Vector3f position;              // where the viewer is currently located
-  Vector3f velocity;              // where we're going
-  float move_speed = 10.0;        // camera movement speed, metres per frame
-  float move_speed_v = 5.0;       // camera vertical movement speed, metres per frame
-  float damping = 0.8;            // multiplier for movement damping
-  float acceleration = move_speed * ((1 / damping) - 1);   // the required acceleration to reach our desired max speed with our set damping
-  float acceleration_v = move_speed_v * ((1 / damping) - 1);
-
   bool show_help = false;
   bool show_hud  = true;
 
@@ -44,7 +35,7 @@ public:
   Vector2f cursorpos;             // on-screen cursor position
 
   // state
-  entity *ship = nullptr;         // what entity we're currently controlling
+  ship *current_ship = nullptr; // what entity we're currently controlling
 
   // input
   struct controlbinding {

@@ -10,6 +10,7 @@ entity::entity(world &parent_world, chunk *parent_chunk, Vector3f const &positio
     position(position),
     orientation(Quatd::fromEulerAngles(0.0, 0.0, 0.0)) {
   /// Default constructor
+  parent_world.add_entity(this);
   if(parent_chunk) {
     parent_chunk->add_entity(this);
   }
@@ -98,7 +99,9 @@ void entity::render_from() const {
   /// Render the world from this entity's point of view
   glPushMatrix();
   glMultMatrixf(orientation.transform());
-  glTranslatef(position.x, position.y, position.z);
+  glTranslatef(-position.x,
+               -position.y,
+               -position.z);
 
   parent_world.render(parent->coords, orientation);
 

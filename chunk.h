@@ -13,7 +13,7 @@ class chunk {
 public:
   static float constexpr size = 100.0;    // chunk size per side
 
-  world *parent;                          // what world it belongs to
+  world *parent = nullptr;                // what world it belongs to
   Vector3i coords;                        // where this chunk is
 
 private:
@@ -22,7 +22,7 @@ private:
   buffer_chunk buf;                       // this chunk's graphics buffer
 
 public:
-  chunk(Vector3i const &chunk_coords);
+  chunk(Vector3i const &chunk_coords, world &parent);
   ~chunk();
 
   // collisions

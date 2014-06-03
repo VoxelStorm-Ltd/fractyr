@@ -1,4 +1,5 @@
 #include "world.h"
+#include <algorithm>
 #include "chunk.h"
 #include "entity.h"
 
@@ -26,7 +27,7 @@ chunk *world::get_chunk(Vector3i const &chunk_coords) {
                                 (size + chunk_coords.z) % size);     // the world wraps, so we just modulo
   chunk *&thischunk = chunks[checked_coords.x][checked_coords.y][checked_coords.z];
   if(!thischunk) {
-    thischunk = new chunk(checked_coords);
+    thischunk = new chunk(checked_coords, *this);
     std::cout << "DEBUG: Created chunk at " << checked_coords << std::endl;
   }
   return thischunk;
@@ -165,6 +166,7 @@ Vector3f world::check_collision(Vector3i const &chunk_coords,
 
 void world::update() {
   /// Update every chunk in this world
+  /*
   for(unsigned int x = 0; x != size; ++x) {
     for(unsigned int y = 0; y != size; ++y) {
       for(unsigned int z = 0; z != size; ++z) {
@@ -175,6 +177,24 @@ void world::update() {
       }
     }
   }
+  */
+  // the above is waaaaay too slow!
+  for(auto &e : entities) {
+    e->update();
+  }
+}
+
+void world::add_entity(entity *thisentity) {
+  /// Add this entity to our list
+  entities.push_back(thisentity);
+}
+
+void world::remove_entity(entity *thisentity) {
+  /// Take this entity out of our list
+  //entities.erase(std::remove(entities.begin(), entities.end(), thisentity), entities.end());
+  // should be faster:
+  entities.erase(std::find(entities.begin(), entities.end(), thisentity));
+  // TODO: for larger entity lists, instead sort and use std::binary_search
 }
 
 void world::render(Vector3i const &chunk_coords,

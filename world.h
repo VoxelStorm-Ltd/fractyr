@@ -15,6 +15,7 @@ public:
 
 private:
   std::vector<std::vector<std::vector<chunk*>>> chunks;     // 3D vector of chunk pointers, initially null
+  std::vector<entity*> entities;                            // every entity that exists in the world
 
 public:
   world();
@@ -27,6 +28,8 @@ public:
 
   // update
   void update();
+  void add_entity(entity *thisentity);
+  void remove_entity(entity *thisentity);
 
   // rendering
   void render(Vector3i const &chunk_coords, Quatf const &view_direction);

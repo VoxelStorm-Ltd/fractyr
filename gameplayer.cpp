@@ -6,6 +6,7 @@
 #include "soundstorm.h"
 #include "oculusstorm.h"
 #include "universe.h"
+#include "ship.h"
 
 extern GLFWwindow *window_main;
 extern oculusstorm *oculus;
@@ -60,7 +61,6 @@ void gameplayer::setup_render_perspective() {
   glRotatef(rotation_pitch, 1.0, 0.0, 0.0);                         // head rotation
   glRotatef(rotation_yaw + pre_rotation, 0.0, 1.0, 0.0);
   //sound.set_listener_rotation(Quatf::fromAxisRot(Vector3f(0.0, -1.0, 0.0), rotation_yaw + pre_rotation));   // we don't care about pitch here
-  glTranslatef(-position.x, -position.y, -position.z);
 }
 
 void gameplayer::setup_render_oculus_left() {
@@ -70,7 +70,6 @@ void gameplayer::setup_render_oculus_left() {
   glMultMatrixf(oculus->getmatrix().inverse());
   glRotated(pre_rotation, 0.0, 1.0, 0.0);
   //sound.set_listener_rotation(oculus->getquat());                   // only do this in one eye's setup to avoid duplication
-  glTranslatef(-position.x, -position.y, -position.z);
 }
 
 void gameplayer::setup_render_oculus_right() {
@@ -79,7 +78,6 @@ void gameplayer::setup_render_oculus_right() {
   glTranslatef(0.0, -0.25, 0.13);                                   // neck model (see above)
   glMultMatrixf(oculus->getmatrix().inverse());
   glRotated(pre_rotation, 0.0, 1.0, 0.0);
-  glTranslatef(-position.x, -position.y, -position.z);
 }
 
 void gameplayer::setup_render_oculus_left_locked() {
@@ -87,7 +85,6 @@ void gameplayer::setup_render_oculus_left_locked() {
   oculus->setup_left();
   glTranslatef(0.0, -0.25, 0.13);                                   // neck model (see above)
   glRotated(pre_rotation, 0.0, 1.0, 0.0);
-  glTranslatef(-position.x, -position.y, -position.z);
 }
 
 void gameplayer::setup_render_oculus_right_locked() {
@@ -95,7 +92,6 @@ void gameplayer::setup_render_oculus_right_locked() {
   oculus->setup_right();
   glTranslatef(0.0, -0.25, 0.13);                                   // neck model (see above)
   glRotated(pre_rotation, 0.0, 1.0, 0.0);
-  glTranslatef(-position.x, -position.y, -position.z);
 }
 
 void gameplayer::setup_render_ortho() {
@@ -324,30 +320,22 @@ void gameplayer::update() {
 }
 
 void gameplayer::input_move_forward(float amount) {
-  float const angle_rad = DEG2RAD(fmodf(rotation_yaw + pre_rotation, 360.0));
-  velocity.x +=  acceleration * amount * sinf(angle_rad);
-  velocity.z += -acceleration * amount * cosf(angle_rad);
+  current_ship->accelerate(Vector3f(0.0, 0.0, amount));
 }
 void gameplayer::input_move_back(float amount) {
-  float const angle_rad = DEG2RAD(fmodf(rotation_yaw + pre_rotation, 360.0));
-  velocity.x += -acceleration * amount * sinf(angle_rad);
-  velocity.z +=  acceleration * amount * cosf(angle_rad);
+  current_ship->accelerate(Vector3f(0.0, 0.0, -amount));
 }
 void gameplayer::input_move_left(float amount) {
-  float const angle_rad = DEG2RAD(fmodf(rotation_yaw + pre_rotation, 360.0));
-  velocity.x += -acceleration * amount * cosf(angle_rad);
-  velocity.z += -acceleration * amount * sinf(angle_rad);
+  current_ship->accelerate(Vector3f(amount, 0.0, 0.0));
 }
 void gameplayer::input_move_right(float amount) {
-  float const angle_rad = DEG2RAD(fmodf(rotation_yaw + pre_rotation, 360.0));
-  velocity.x +=  acceleration * amount * cosf(angle_rad);
-  velocity.z +=  acceleration * amount * sinf(angle_rad);
+  current_ship->accelerate(Vector3f(-amount, 0.0, 0.0));
 }
 void gameplayer::input_move_up(float amount) {
-  velocity.y += acceleration_v * amount;
+  current_ship->accelerate(Vector3f(0.0, amount, 0.0));
 }
 void gameplayer::input_move_down(float amount) {
-  velocity.y -= acceleration_v * amount;
+  current_ship->accelerate(Vector3f(0.0, -amount, 0.0));
 }
 void gameplayer::input_turn_left(float amount) {
   pre_rotation = fmodf(pre_rotation - (2.0 * amount), 360.0);

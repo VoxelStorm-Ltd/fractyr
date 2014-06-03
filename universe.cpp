@@ -8,7 +8,7 @@
 #include "oculusstorm.h"
 #include "soundstorm.h"
 #include "world.h"
-#include "entity.h"
+#include "ship.h"
 
 // loaders
 FTFont *font_load(  std::string const &filename, unsigned int size = 16);
@@ -89,7 +89,7 @@ void universe::restart() {
   delete current_world;
   current_world = new world();
 
-  player.ship = new entity(*current_world, current_world->get_chunk(Vector3i(0.0, 0.0, 0.0)), Vector3f(10.0, 20.0, 30.0));
+  player.current_ship = new ship(*current_world, current_world->get_chunk(Vector3i(0.0, 0.0, 0.0)), Vector3f(10.0, 20.0, 30.0));
 
   glfwSetInputMode(            window_main, GLFW_CURSOR, GLFW_CURSOR_NORMAL);     // release the cursor
   glfwSetCursorPosCallback(    window_main, callback_mousepos);
@@ -101,6 +101,7 @@ void universe::restart() {
   glfwSetWindowCloseCallback(  window_main, callback_windowclose);
   glfwSetWindowFocusCallback(  window_main, callback_windowfocus);
   glfwSetWindowIconifyCallback(window_main, callback_windowminimise);
+  glfwSetInputMode(window_main, GLFW_CURSOR, GLFW_CURSOR_DISABLED);     // for mouselook
 
   sound.music_clear(0);                         // clear the decks
   sound.music_clear(1);
@@ -141,10 +142,10 @@ void universe::render() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   // TODO: don't bother clearing colour buffer
 
-  if(__builtin_expect(!player.ship, 0)) {     // branch prediction: unlikely that the player will have no ship
+  if(__builtin_expect(!player.current_ship, 0)) {     // branch prediction: unlikely that the player will have no ship
     return;
   }
-  player.ship->render_from();
+  player.current_ship->render_from();
 }
 
 void universe::render_progressscreen(float progress, std::string const &message) {

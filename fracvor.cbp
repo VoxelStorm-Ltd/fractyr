@@ -863,6 +863,8 @@
 		<Unit filename="chunk.h" />
 		<Unit filename="entity/entity.cpp" />
 		<Unit filename="entity/entity.h" />
+		<Unit filename="entity/ship.cpp" />
+		<Unit filename="entity/ship.h" />
 		<Unit filename="font_load.cpp" />
 		<Unit filename="fracvor.rc">
 			<Option compilerVar="WINDRES" />
@@ -890,8 +892,14 @@
 		<Unit filename="oculusstorm.cpp" />
 		<Unit filename="oculusstorm.h" />
 		<Unit filename="platform_defines.h" />
-		<Unit filename="resources/shaders/chunk_frag.glsl" />
-		<Unit filename="resources/shaders/chunk_vert.glsl" />
+		<Unit filename="resources/shaders/chunk_frag.glsl">
+			<Option compile="1" />
+			<Option link="1" />
+		</Unit>
+		<Unit filename="resources/shaders/chunk_vert.glsl">
+			<Option compile="1" />
+			<Option link="1" />
+		</Unit>
 		<Unit filename="shader_load.cpp" />
 		<Unit filename="soundstorm.cpp" />
 		<Unit filename="soundstorm.h" />
