@@ -110,7 +110,7 @@ public:
 
 private:
   unsigned int channels = 2;                          // output channels
-  double samplerate = 44100.0;                        // output sample rate
+  float samplerate = 44100.0;                         // output sample rate
   unsigned long frames_per_buffer = 64;               // frames per buffer
   static float constexpr speed_of_sound = 343.0;      // speed of sound in air, m/s
   static float constexpr ear_offset = 0.115;          // distance of ear from the centre of the head, metres
@@ -209,8 +209,8 @@ public:
   soundgroup play_loop(Vector3f const &position, Vector3f const &velocity, soundeffect *effect,    float volume = 1.0, float seek_start = 0.0, float seek_end = 0.0, float seek_speed = 1.0);
   music *music_queue(unsigned int deck_id, unsigned int music_id);
   void set_music_volume(unsigned int deck_id, float newvolume);
-  void fade_music_volume(unsigned int deck_id, float newvolume, double seconds_to_take);
-  void crossfade_music(double seconds_to_take, unsigned int deck_from = 0, unsigned int deck_to = 1);
+  void fade_music_volume(unsigned int deck_id, float newvolume, float seconds_to_take);
+  void crossfade_music(float seconds_to_take, unsigned int deck_from = 0, unsigned int deck_to = 1);
   void stop(          soundgroup const &thissoundgroup);
   void stop_loop(     soundgroup const &thissoundgroup);
   void replace(       soundgroup const &thissoundgroup, soundeffect *neweffect, float seek_start = 0.0, float seek_end = 0.0, float seek_speed = 1.0);

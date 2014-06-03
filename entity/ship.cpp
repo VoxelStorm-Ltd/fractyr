@@ -19,8 +19,8 @@ void ship::accelerate(Vector3f accel) {
 
 void ship::rotate(float yaw, float pitch) {
   /// Rotate this ship by yaw and pitch angles relative to its orientation
-  Vector3f axis_yaw(0.0, 1.0, 0.0);
-  Vector3f axis_pitch(1.0, 0.0, 0.0);
+  Vector3f axis_yaw(0.0f, 1.0f, 0.0f);
+  Vector3f axis_pitch(1.0f, 0.0f, 0.0f);
   axis_yaw.rotate(  orientation_conjugate);
   axis_pitch.rotate(orientation_conjugate);
   orientation *= Quatf::fromAxisRot(axis_yaw,   yaw);
