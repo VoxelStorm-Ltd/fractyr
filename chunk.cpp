@@ -8,8 +8,8 @@
 #include "math.h"
 
 chunk::chunk(Vector3i const &chunk_coords, world &parent)
-  : coords(chunk_coords),
-    parent(&parent) {
+  : parent(&parent),
+    coords(chunk_coords) {
   /// Default constructor
   setup_buffers();
   setup();
@@ -85,26 +85,29 @@ void chunk::setup() {
   std::vector<GLuint>               ibodata;
 
   // menger sponge
-  unsigned int iters = 3;
-  unsigned int numblocks = static_cast<int>(pow(3.0, static_cast<double>(iters)));
-  float blocksize = size/numblocks;
+  unsigned int constexpr iters = 3;
+  unsigned int constexpr numblocks = static_cast<int>(pow(3.0, static_cast<double>(iters)));
+  float constexpr blocksize = size / numblocks;
 
-  for(unsigned int x = 0; x < numblocks; x++) {
-    for(unsigned int y = 0; y < numblocks; y++) {
-      for(unsigned int z = 0; z < numblocks; z++) {
+  vbodata.reserve(6 * 4 * numblocks * numblocks * numblocks);   // make sure to reserve the correct size to avoid re-allocations during construction
+  ibodata.reserve(6 * 6 * numblocks * numblocks * numblocks);
+
+  for(unsigned int x = 0; x != numblocks; ++x) {
+    for(unsigned int y = 0; y != numblocks; ++y) {
+      for(unsigned int z = 0; z != numblocks; ++z) {
         //blocksize *= 0.999;
         bool skip = false;
         int depth = 1;
-        for(unsigned int i = 0; i < iters; i++) {
+        for(unsigned int i = 0; i < iters; ++i) {
           int matches = 0;
-          if((x/depth) % 3 == 1) {
-            matches++;
+          if((x / depth) % 3 == 1) {
+            ++matches;
           }
-          if((y/depth) % 3 == 1) {
-            matches++;
+          if((y / depth) % 3 == 1) {
+            ++matches;
           }
-          if((z/depth) % 3 == 1) {
-            matches++;
+          if((z / depth) % 3 == 1) {
+            ++matches;
           }
           if(matches >= 2) {
             skip = true;
@@ -210,5 +213,7 @@ void chunk::setup() {
     }
   }
 
+  vbodata.shrink_to_fit();
+  ibodata.shrink_to_fit();
   buf.setup(vbodata, ibodata);
 }
