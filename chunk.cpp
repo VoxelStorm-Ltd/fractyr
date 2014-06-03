@@ -98,7 +98,7 @@ void chunk::setup() {
         //blocksize = static_cast<int>(pow(3.0, static_cast<double>(iters))) * x/static_cast<float>(numblocks) * y/static_cast<float>(numblocks) * z/static_cast<float>(numblocks);
         bool skip = false;
         int depth = 1;
-        for(unsigned int i = 0; i < iters; ++i) {
+        for(unsigned int i = 0; i != iters; ++i) {
           int matches = 0;
           if((x / depth) % 3 == 1) {
             ++matches;
