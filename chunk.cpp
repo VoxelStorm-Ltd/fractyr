@@ -83,7 +83,7 @@ void chunk::setup() {
   // menger sponge
   unsigned int iters = 3;
   unsigned int numblocks = (int)pow(3.0, iters);
-  unsigned int blocksize = size/numblocks;
+  float blocksize = size/numblocks;
 
   for(unsigned int x = 0; x < numblocks; x++) {
     for(unsigned int y = 0; y < numblocks; y++) {
