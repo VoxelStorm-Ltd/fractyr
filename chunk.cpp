@@ -88,10 +88,11 @@ void chunk::setup() {
   for(unsigned int x = 0; x < numblocks; x++) {
     for(unsigned int y = 0; y < numblocks; y++) {
       for(unsigned int z = 0; z < numblocks; z++) {
+        //blocksize *= 0.999;
         bool skip = false;
+        int depth = 1;
         for(unsigned int i = 0; i < iters; i++) {
           int matches = 0;
-          int depth = static_cast<int>(pow(3.0, static_cast<double>(i)));
           if((x/depth) % 3 == 1) {
             matches++;
           }
@@ -105,6 +106,7 @@ void chunk::setup() {
             skip = true;
             break;
           }
+          depth *= 3;
         }
         if(skip) {
           continue;
