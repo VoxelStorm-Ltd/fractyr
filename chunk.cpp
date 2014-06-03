@@ -85,7 +85,7 @@ void chunk::setup() {
   std::vector<GLuint>               ibodata;
 
   // menger sponge
-  unsigned int constexpr iters = 3;
+  unsigned int constexpr iters = 2;
   unsigned int constexpr numblocks = static_cast<int>(pow(3.0, static_cast<double>(iters)));
   float constexpr blocksize = size / numblocks;
 
