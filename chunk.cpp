@@ -55,7 +55,7 @@ void chunk::render(Vector3i const &view_chunk_coords) const {
   /// Draw the contents of this chunk as viewed from coords
   Vector3i offset(coords - view_chunk_coords);
   glPushMatrix();
-  glTranslatef(offset.x * size, offset.y * size, offset.z * size);
+  //glTranslatef(-offset.x * size, -offset.y * size, -offset.z * size);
 
   buf.render();
 
@@ -79,7 +79,7 @@ void chunk::setup() {
   std::vector<buffer_chunk::vertex> vbodata;
   std::vector<GLuint>               ibodata;
 
-  std::uniform_real_distribution<float> dist_chunkwide(0.0, size);
+  std::uniform_real_distribution<float> dist_chunkwide(size * 0.25, size * 0.75);
   std::uniform_real_distribution<float> dist_tri(-1.0, 1.0);
 
   // placeholder: spam random triangles

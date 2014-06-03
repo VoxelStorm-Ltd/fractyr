@@ -77,7 +77,6 @@ void entity::correct_point(Vector3f &coords, chunk *&thischunk) {
   }
 }
 
-
 Vector3f entity::check_collision(Vector3f const &other_coords, float other_radius) const {
   /// Check if the point is colliding with this entity, and if so, return the surface normal vector
   Vector3f vec(other_coords - position);
