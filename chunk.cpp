@@ -53,9 +53,9 @@ void chunk::remove_entity(entity *thisentity) {
 
 void chunk::render(Vector3i const &view_chunk_coords) const {
   /// Draw the contents of this chunk as viewed from coords
-  Vector3i offset(coords - view_chunk_coords);
+  Vector3i offset((coords - view_chunk_coords) * size);
   glPushMatrix();
-  //glTranslatef(-offset.x * size, -offset.y * size, -offset.z * size);
+  glTranslatef(-offset.x, -offset.y, -offset.z);
 
   buf.render();
 
@@ -83,7 +83,7 @@ void chunk::setup() {
   std::uniform_real_distribution<float> dist_tri(-1.0, 1.0);
 
   // placeholder: spam random triangles
-  for(unsigned int i = 0; i != 10000; ++i) {
+  for(unsigned int i = 0; i != 1000; ++i) {
     Vector3f const coord0(dist_chunkwide(universe::randomgen), dist_chunkwide(universe::randomgen), dist_chunkwide(universe::randomgen));
     Vector3f const coord1(coord0 + Vector3f(dist_tri(universe::randomgen), dist_tri(universe::randomgen), dist_tri(universe::randomgen)));
     Vector3f const coord2(coord0 + Vector3f(dist_tri(universe::randomgen), dist_tri(universe::randomgen), dist_tri(universe::randomgen)));

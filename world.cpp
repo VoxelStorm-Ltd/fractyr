@@ -27,7 +27,8 @@ chunk *world::get_chunk(Vector3i const &chunk_coords) {
                                 (size + chunk_coords.z) % size);     // the world wraps, so we just modulo
   chunk *&thischunk = chunks[checked_coords.x][checked_coords.y][checked_coords.z];
   if(!thischunk) {
-    thischunk = new chunk(checked_coords, *this);
+    thischunk = new chunk(chunk_coords, *this);
+    //thischunk = new chunk(checked_coords, *this);
     std::cout << "DEBUG: Created chunk at " << checked_coords << std::endl;
   }
   return thischunk;
@@ -38,6 +39,29 @@ std::vector<chunk*> world::get_visible_chunks(Vector3i const &chunk_coords,
                                               int range) {
   /// Return a list of chunks visible in this direction from a given chunk, in optimal rendering order
   std::vector<chunk*> chunk_list;
+  chunk_list.reserve(pow((range * 2) + 1, 3));
+  // DEBUG ONLY
+  /*
+  for(int x = -range; x <= range; ++x) {
+    for(int y = -range; y <= range; ++y) {
+      for(int z = -range; z <= range; ++z) {
+        chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, z)));
+      }
+    }
+  }
+  */
+  for(int x = -1; x <= 1; ++x) {
+    for(int y = -1; y <= 1; ++y) {
+      for(int z = -1; z <= 1; ++z) {
+        chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, z)));
+      }
+    }
+  }
+
+
+  return chunk_list;
+  // /DEBUG ONLY
+
   Vector3f view_vector(0.0, 0.0, 1.0);
   view_vector.rotate(view_direction);
   float constexpr view_cull_threshold = 0.0;    // tweak this depending on FOV angle
@@ -201,7 +225,7 @@ void world::remove_entity(entity *thisentity) {
 void world::render(Vector3i const &chunk_coords,
                    Quatf const &view_direction) {
   /// Draw the relevant portions of this world
-  std::vector<chunk*> const &chunks_to_render = get_visible_chunks(chunk_coords, view_direction, 2);
+  std::vector<chunk*> const &chunks_to_render = get_visible_chunks(chunk_coords, view_direction, 1);
   for(auto const &c : chunks_to_render) {
     c->render(chunk_coords);
   }

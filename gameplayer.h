@@ -20,7 +20,7 @@ private:
   float fov_angle_rad = 0.0;      // cached field of view, rads
   float fov_ratio = 1.0;          // updated by update_fov_ratio() from degrees
   float aspect_ratio = 1.0;       // updated by update_aspect_ratio() from windowsize
-  float pre_rotation = 135.0;     // fixed rotation applied before head rotation or mouselook, degrees
+  float pre_rotation = 0.0;       // fixed rotation applied before head rotation or mouselook, degrees
   float rotation_yaw = 0.0;       // euler angles for head rotation - we want gimbal limitation here
   float rotation_pitch = 0.0;     //   these are in degrees per pixel
 

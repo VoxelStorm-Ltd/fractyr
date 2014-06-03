@@ -274,9 +274,16 @@ void gameplayer::move_mouse(Vector2f const &mouse_pos) {
   // Quake mouselook code is here for reference: https://github.com/id-Software/Quake/blob/bf4ac424ce754894ac8f1dae6a3981954bc9852d/WinQuake/in_win.c
   Vector2f mouse_diff(mouse_pos - mouse_last);
   mouse_diff *= mouse_sensitivity * fov_angle;      // apply sensitivity
-  rotation_yaw = fmodf(rotation_yaw + mouse_diff.x, 360.0);
-  rotation_pitch += mouse_diff.y;
-  clamp_pitch();
+  //rotation_yaw = fmodf(rotation_yaw + mouse_diff.x, 360.0);
+  //rotation_pitch += mouse_diff.y;
+  //clamp_pitch();
+  rotation_yaw   = 0.0;
+  rotation_pitch = 0.0;
+
+  if(__builtin_expect(!current_ship, 0)) {        // branch prediction: unlikely to not have a ship
+    return;
+  }
+  current_ship->rotate(mouse_diff.x, mouse_diff.y);
 
   mouse_last = mouse_pos;
 }
@@ -320,16 +327,16 @@ void gameplayer::update() {
 }
 
 void gameplayer::input_move_forward(float amount) {
-  current_ship->accelerate(Vector3f(0.0, 0.0, amount));
-}
-void gameplayer::input_move_back(float amount) {
   current_ship->accelerate(Vector3f(0.0, 0.0, -amount));
 }
+void gameplayer::input_move_back(float amount) {
+  current_ship->accelerate(Vector3f(0.0, 0.0, amount));
+}
 void gameplayer::input_move_left(float amount) {
-  current_ship->accelerate(Vector3f(amount, 0.0, 0.0));
+  current_ship->accelerate(Vector3f(-amount, 0.0, 0.0));
 }
 void gameplayer::input_move_right(float amount) {
-  current_ship->accelerate(Vector3f(-amount, 0.0, 0.0));
+  current_ship->accelerate(Vector3f(amount, 0.0, 0.0));
 }
 void gameplayer::input_move_up(float amount) {
   current_ship->accelerate(Vector3f(0.0, amount, 0.0));
