@@ -118,12 +118,12 @@ void chunk::setup() {
         if(skip) {
           continue;
         }
-        Vector3f const coord000(blocksize*x, blocksize*y, blocksize*z);
+        Vector3f const coord000(blocksize * x, blocksize * y, blocksize * z);
         Vector3f const coord100(coord000 + Vector3f(blocksize, 0.0f, 0.0f));
         Vector3f const coord010(coord000 + Vector3f(0.0f, blocksize, 0.0f));
         Vector3f const coord110(coord000 + Vector3f(blocksize, blocksize, 0.0f));
 
-        Vector3f const coord001(blocksize*x, blocksize*y, blocksize*z+blocksize);
+        Vector3f const coord001(blocksize * x, blocksize * y, blocksize * z + blocksize);
         Vector3f const coord101(coord001 + Vector3f(blocksize, 0.0f, 0.0f));
         Vector3f const coord011(coord001 + Vector3f(0.0f, blocksize, 0.0f));
         Vector3f const coord111(coord001 + Vector3f(blocksize, blocksize, 0.0f));
