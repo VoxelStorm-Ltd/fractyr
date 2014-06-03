@@ -10,6 +10,9 @@ chunk::chunk(Vector3i const &chunk_coords)
 
 chunk::~chunk() {
   /// Default destructor
+  for(auto &e : entities) {
+    delete e;
+  }
 }
 
 Vector3f chunk::check_collision(Vector3f const &coords, float radius) const {

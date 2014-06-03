@@ -1,5 +1,6 @@
 #include "world.h"
 #include "chunk.h"
+#include "entity.h"
 
 world::world() {
   /// Default constructor
@@ -9,6 +10,13 @@ world::world() {
 
 world::~world() {
   /// Default destructor
+  for(auto &x : chunks) {
+    for(auto &y : x) {
+      for(auto &z : y) {
+        delete z;
+      }
+    }
+  }
 }
 
 chunk *world::get_chunk(Vector3i const &chunk_coords) {

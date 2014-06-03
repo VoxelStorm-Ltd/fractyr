@@ -5,6 +5,7 @@
 #include "vmath.h"
 
 class chunk;
+class entity;
 
 class world {
   /// Container class for chunks, objects and their relevant functions
