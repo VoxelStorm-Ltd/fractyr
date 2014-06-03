@@ -41,7 +41,6 @@ std::vector<chunk*> world::get_visible_chunks(Vector3i const &chunk_coords,
   std::vector<chunk*> chunk_list;
   chunk_list.reserve(pow((range * 2) + 1, 3));
   // DEBUG ONLY
-  /*
   for(int x = -range; x <= range; ++x) {
     for(int y = -range; y <= range; ++y) {
       for(int z = -range; z <= range; ++z) {
@@ -49,16 +48,6 @@ std::vector<chunk*> world::get_visible_chunks(Vector3i const &chunk_coords,
       }
     }
   }
-  */
-  for(int x = -1; x <= 1; ++x) {
-    for(int y = -1; y <= 1; ++y) {
-      for(int z = -1; z <= 1; ++z) {
-        chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, z)));
-      }
-    }
-  }
-
-
   return chunk_list;
   // /DEBUG ONLY
 
@@ -69,36 +58,36 @@ std::vector<chunk*> world::get_visible_chunks(Vector3i const &chunk_coords,
   // the central chunk always comes first - the order here makes for optimal occlusion testing later
   chunk_list.emplace_back(get_chunk(chunk_coords));
   // then the cardinal columns, working outwards - they will always overlap the corners
-  for(int x =  1; x !=  range; ++x) {
+  for(int x =  1; x <=  range; ++x) {
     chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, 0, 0)));
   }
-  for(int x = -1; x != -range; --x) {
+  for(int x = -1; x >= -range; --x) {
     chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, 0, 0)));
   }
-  for(int y =  1; y !=  range; ++y) {
+  for(int y =  1; y <=  range; ++y) {
     chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(0, y, 0)));
   }
-  for(int y = -1; y != -range; --y) {
+  for(int y = -1; y >= -range; --y) {
     chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(0, y, 0)));
   }
-  for(int z =  1; z !=  range; ++z) {
+  for(int z =  1; z <=  range; ++z) {
     chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(0, 0, z)));
   }
-  for(int z = -1; z != -range; --z) {
+  for(int z = -1; z >= -range; --z) {
     chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(0, 0, z)));
   }
 
   // finally add the corners, working outwards
-  for(int x =  1; x !=  range; ++x) {
-    for(int y =  1; y !=  range; ++y) {
-      for(int z =  1; z !=  range; ++z) {
+  for(int x =  1; x <=  range; ++x) {
+    for(int y =  1; y <=  range; ++y) {
+      for(int z =  1; z <=  range; ++z) {
         if(view_vector.x >  view_cull_threshold ||
            view_vector.y >  view_cull_threshold ||
            view_vector.z >  view_cull_threshold) {       // primitive view culling scheme
           chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, z)));
         }
       }
-      for(int z = -1; z != -range; --z) {
+      for(int z = -1; z >= -range; --z) {
         if(view_vector.x >  view_cull_threshold ||
            view_vector.y >  view_cull_threshold ||
            view_vector.z < -view_cull_threshold) {
@@ -106,15 +95,15 @@ std::vector<chunk*> world::get_visible_chunks(Vector3i const &chunk_coords,
         }
       }
     }
-    for(int y = -1; y != -range; --y) {
-      for(int z =  1; z !=  range; ++z) {
+    for(int y = -1; y >= -range; --y) {
+      for(int z =  1; z <=  range; ++z) {
         if(view_vector.x >  view_cull_threshold ||
            view_vector.y < -view_cull_threshold ||
            view_vector.z >  view_cull_threshold) {
           chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, z)));
         }
       }
-      for(int z = -1; z != -range; --z) {
+      for(int z = -1; z >= -range; --z) {
         if(view_vector.x >  view_cull_threshold ||
            view_vector.y < -view_cull_threshold ||
            view_vector.z < -view_cull_threshold) {
@@ -123,16 +112,16 @@ std::vector<chunk*> world::get_visible_chunks(Vector3i const &chunk_coords,
       }
     }
   }
-  for(int x = -1; x != -range; --x) {
-    for(int y =  1; y !=  range; ++y) {
-      for(int z =  1; z !=  range; ++z) {
+  for(int x = -1; x >= -range; --x) {
+    for(int y =  1; y <=  range; ++y) {
+      for(int z =  1; z <=  range; ++z) {
         if(view_vector.x < -view_cull_threshold ||
            view_vector.y >  view_cull_threshold ||
            view_vector.z >  view_cull_threshold) {
           chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, z)));
         }
       }
-      for(int z = -1; z != -range; --z) {
+      for(int z = -1; z >= -range; --z) {
         if(view_vector.x < -view_cull_threshold ||
            view_vector.y >  view_cull_threshold ||
            view_vector.z < -view_cull_threshold) {
@@ -140,15 +129,15 @@ std::vector<chunk*> world::get_visible_chunks(Vector3i const &chunk_coords,
         }
       }
     }
-    for(int y = -1; y != -range; --y) {
-      for(int z =  1; z !=  range; ++z) {
+    for(int y = -1; y >= -range; --y) {
+      for(int z =  1; z <=  range; ++z) {
         if(view_vector.x < -view_cull_threshold ||
            view_vector.y < -view_cull_threshold ||
            view_vector.z >  view_cull_threshold) {
           chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, z)));
         }
       }
-      for(int z = -1; z != -range; --z) {
+      for(int z = -1; z >= -range; --z) {
         if(view_vector.x < -view_cull_threshold ||
            view_vector.y < -view_cull_threshold ||
            view_vector.z < -view_cull_threshold) {
@@ -248,7 +237,7 @@ void world::remove_entity(entity *thisentity) {
 void world::render(Vector3i const &chunk_coords,
                    Quatf const &view_direction) {
   /// Draw the relevant portions of this world
-  std::vector<chunk*> const &chunks_to_render = get_visible_chunks(chunk_coords, view_direction, 1);
+  std::vector<chunk*> const &chunks_to_render = get_visible_chunks(chunk_coords, view_direction, 2);
   for(auto const &c : chunks_to_render) {
     c->render(chunk_coords);
   }
