@@ -46,7 +46,11 @@ void entity::move(Vector3f const &direction) {
   }
 
   position = newposition;
-  parent = newparent;
+  if(parent != newparent) {
+    parent->remove_entity(this);
+    newparent->add_entity(this);
+    parent = newparent;
+  }
 }
 
 void entity::correct_point(Vector3f &coords, chunk *&thischunk) {
