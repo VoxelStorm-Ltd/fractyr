@@ -49,6 +49,7 @@ void entity::move(Vector3f const &direction) {
   if(parent != newparent) {
     parent->remove_entity(this);
     newparent->add_entity(this);
+    std::cout << "DEBUG: entity moved chunks from " << parent->coords << " to " << newparent->coords << std::endl;
     parent = newparent;
   }
 }
