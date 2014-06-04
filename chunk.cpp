@@ -87,7 +87,7 @@ void chunk::setup() {
   // menger sponge
   unsigned int constexpr iters = 2;
   unsigned int constexpr numblocks = static_cast<int>(pow(3.0, static_cast<double>(iters)));
-  float constexpr blocksize = size / numblocks;
+  float constexpr blocksize = size / static_cast<float>(numblocks) / 2.0;
 
   vbodata.reserve(6 * 4 * numblocks * numblocks * numblocks);   // make sure to reserve the correct size to avoid re-allocations during construction
   ibodata.reserve(6 * 6 * numblocks * numblocks * numblocks);
