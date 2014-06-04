@@ -1,10 +1,8 @@
 #include "ship.h"
 
 ship::ship(world &parent_world, chunk *parent_chunk, Vector3f const &position)
-  : entity(parent_world, parent_chunk, position),
-    orientation_conjugate(orientation) {
+  : entity(parent_world, parent_chunk, position) {
   /// Default constructor
-  orientation_conjugate.conjugate();
   mass = 10000.0;
   drag = 3.0 * 5.0 * 5.0;
 }

@@ -9,12 +9,14 @@ entity::entity(world &parent_world, chunk *parent_chunk, Vector3f const &positio
   : parent_world(parent_world),
     parent(parent_chunk),
     position(position),
-    orientation(Quatd::fromEulerAngles(0.0, 0.0, 0.0)) {
+    orientation(Quatd::fromEulerAngles(0.0, 0.0, 0.0)),
+    orientation_conjugate(orientation) {
   /// Default constructor
   parent_world.add_entity(this);
   if(parent_chunk) {
     parent_chunk->add_entity(this);
   }
+  orientation_conjugate.conjugate();
 }
 
 entity::~entity() {
@@ -111,7 +113,7 @@ void entity::render_from() const {
                -position.y,
                -position.z);
 
-  parent_world.render(parent->coords, orientation);
+  parent_world.render(parent->coords, orientation_conjugate);
 
   glPopMatrix();
 }

@@ -1,5 +1,6 @@
 #include "world.h"
 #include <algorithm>
+#include "vmath.h"
 #include "chunk.h"
 #include "entity.h"
 
@@ -39,81 +40,164 @@ std::vector<chunk*> world::get_visible_chunks(Vector3i const &chunk_coords,
   /// Return a list of chunks visible in this direction from a given chunk, in optimal rendering order
   std::vector<chunk*> chunk_list;
   chunk_list.reserve(pow((range * 2) + 1, 3));
-  // DEBUG ONLY
-  chunk_list.emplace_back(get_chunk(chunk_coords));
-  for(int x = -range; x <= range; ++x) {
-    for(int y = -range; y <= range; ++y) {
-      for(int z = -range; z <= range; ++z) {
-        if(!(x == 0 && y == 0 && z == 0)) {
-          chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, z)));
-        }
-      }
-    }
-  }
-  /*
-  for(int x = -range; x <= range; ++x) {
-    chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, 0.0, 0.0)));
-  }
-  */
-  return chunk_list;
-  // /DEBUG ONLY
 
-  Vector3f view_vector(0.0, 0.0, 1.0);
+  Vector3f view_vector(0.0, 0.0, -1.0);
   view_vector.rotate(view_direction);
-  float constexpr view_cull_threshold = 0.0;    // tweak this depending on FOV angle
+  float constexpr view_cull_threshold1 = -0.5;    // columns - tweak this depending on FOV angle
+  float constexpr view_cull_threshold2 = -0.5;    // planes  - tweak this depending on FOV angle
+  float constexpr view_cull_threshold3 = -0.5;    // corners - tweak this depending on FOV angle
 
   // the central chunk always comes first - the order here makes for optimal occlusion testing later
   chunk_list.emplace_back(get_chunk(chunk_coords));
+
   // then the cardinal columns, working outwards - they will always overlap the corners
   for(int x =  1; x <=  range; ++x) {
-    chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, 0, 0)));
+    if(view_vector.x >  view_cull_threshold1) {       // primitive view culling scheme
+      chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, 0, 0)));
+    }
   }
   for(int x = -1; x >= -range; --x) {
-    chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, 0, 0)));
+    if(view_vector.x < -view_cull_threshold1) {
+      chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, 0, 0)));
+    }
   }
   for(int y =  1; y <=  range; ++y) {
-    chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(0, y, 0)));
+    if(view_vector.y >  view_cull_threshold1) {
+      chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(0, y, 0)));
+    }
   }
   for(int y = -1; y >= -range; --y) {
-    chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(0, y, 0)));
+    if(view_vector.y < -view_cull_threshold1) {
+      chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(0, y, 0)));
+    }
   }
   for(int z =  1; z <=  range; ++z) {
-    chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(0, 0, z)));
+    if(view_vector.z >  view_cull_threshold1) {
+      chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(0, 0, z)));
+    }
   }
   for(int z = -1; z >= -range; --z) {
-    chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(0, 0, z)));
+    if(view_vector.z < -view_cull_threshold1) {
+      chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(0, 0, z)));
+    }
+  }
+
+  // then add the rest of the cardinal planes
+  for(int y =  1; y <=  range; ++y) {     // x plane
+    for(int z =  1; z <=  range; ++z) {
+      if(view_vector.y >  view_cull_threshold2 &&
+         view_vector.z >  view_cull_threshold2) {       // primitive view culling scheme
+        chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(0, y, z)));
+      }
+    }
+    for(int z = -1; z >= -range; --z) {
+      if(view_vector.y >  view_cull_threshold2 &&
+         view_vector.z < -view_cull_threshold2) {
+        chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(0, y, z)));
+      }
+    }
+  }
+  for(int y = -1; y >= -range; --y) {
+    for(int z =  1; z <=  range; ++z) {
+      if(view_vector.y < -view_cull_threshold2 &&
+         view_vector.z >  view_cull_threshold2) {
+        chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(0, y, z)));
+      }
+    }
+    for(int z = -1; z >= -range; --z) {
+      if(view_vector.y < -view_cull_threshold2 &&
+         view_vector.z < -view_cull_threshold2) {
+        chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(0, y, z)));
+      }
+    }
+  }
+  for(int x =  1; x <=  range; ++x) {     // z plane
+    for(int y =  1; y <=  range; ++y) {
+      if(view_vector.x >  view_cull_threshold2 &&
+         view_vector.y >  view_cull_threshold2) {
+        chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, 0)));
+      }
+    }
+    for(int y = -1; y >= -range; --y) {
+      if(view_vector.x >  view_cull_threshold2 &&
+         view_vector.y < -view_cull_threshold2) {
+        chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, 0)));
+      }
+    }
+  }
+  for(int x = -1; x >= -range; --x) {
+    for(int y =  1; y <=  range; ++y) {
+      if(view_vector.x < -view_cull_threshold2 &&
+         view_vector.y >  view_cull_threshold2) {
+        chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, 0)));
+      }
+    }
+    for(int y = -1; y >= -range; --y) {
+      if(view_vector.x < -view_cull_threshold2 &&
+         view_vector.y < -view_cull_threshold2) {
+        chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, 0)));
+      }
+    }
+  }
+  for(int x =  1; x <=  range; ++x) {     // y plane
+    for(int z =  1; z <=  range; ++z) {
+      if(view_vector.x >  view_cull_threshold2 &&
+         view_vector.z >  view_cull_threshold2) {
+        chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, 0, z)));
+      }
+    }
+    for(int z = -1; z >= -range; --z) {
+      if(view_vector.x >  view_cull_threshold2 &&
+         view_vector.z < -view_cull_threshold2) {
+        chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, 0, z)));
+      }
+    }
+  }
+  for(int x = -1; x >= -range; --x) {
+    for(int z =  1; z <=  range; ++z) {
+      if(view_vector.x < -view_cull_threshold2 &&
+         view_vector.z >  view_cull_threshold2) {
+        chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, 0, z)));
+      }
+    }
+    for(int z = -1; z >= -range; --z) {
+      if(view_vector.x < -view_cull_threshold2 &&
+         view_vector.z < -view_cull_threshold2) {
+        chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, 0, z)));
+      }
+    }
   }
 
   // finally add the corners, working outwards
   for(int x =  1; x <=  range; ++x) {
     for(int y =  1; y <=  range; ++y) {
       for(int z =  1; z <=  range; ++z) {
-        if(view_vector.x >  view_cull_threshold ||
-           view_vector.y >  view_cull_threshold ||
-           view_vector.z >  view_cull_threshold) {       // primitive view culling scheme
+        if(view_vector.x >  view_cull_threshold3 &&
+           view_vector.y >  view_cull_threshold3 &&
+           view_vector.z >  view_cull_threshold3) {       // primitive view culling scheme
           chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, z)));
         }
       }
       for(int z = -1; z >= -range; --z) {
-        if(view_vector.x >  view_cull_threshold ||
-           view_vector.y >  view_cull_threshold ||
-           view_vector.z < -view_cull_threshold) {
+        if(view_vector.x >  view_cull_threshold3 &&
+           view_vector.y >  view_cull_threshold3 &&
+           view_vector.z < -view_cull_threshold3) {
           chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, z)));
         }
       }
     }
     for(int y = -1; y >= -range; --y) {
       for(int z =  1; z <=  range; ++z) {
-        if(view_vector.x >  view_cull_threshold ||
-           view_vector.y < -view_cull_threshold ||
-           view_vector.z >  view_cull_threshold) {
+        if(view_vector.x >  view_cull_threshold3 &&
+           view_vector.y < -view_cull_threshold3 &&
+           view_vector.z >  view_cull_threshold3) {
           chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, z)));
         }
       }
       for(int z = -1; z >= -range; --z) {
-        if(view_vector.x >  view_cull_threshold ||
-           view_vector.y < -view_cull_threshold ||
-           view_vector.z < -view_cull_threshold) {
+        if(view_vector.x >  view_cull_threshold3 &&
+           view_vector.y < -view_cull_threshold3 &&
+           view_vector.z < -view_cull_threshold3) {
           chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, z)));
         }
       }
@@ -122,39 +206,39 @@ std::vector<chunk*> world::get_visible_chunks(Vector3i const &chunk_coords,
   for(int x = -1; x >= -range; --x) {
     for(int y =  1; y <=  range; ++y) {
       for(int z =  1; z <=  range; ++z) {
-        if(view_vector.x < -view_cull_threshold ||
-           view_vector.y >  view_cull_threshold ||
-           view_vector.z >  view_cull_threshold) {
+        if(view_vector.x < -view_cull_threshold3 &&
+           view_vector.y >  view_cull_threshold3 &&
+           view_vector.z >  view_cull_threshold3) {
           chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, z)));
         }
       }
       for(int z = -1; z >= -range; --z) {
-        if(view_vector.x < -view_cull_threshold ||
-           view_vector.y >  view_cull_threshold ||
-           view_vector.z < -view_cull_threshold) {
+        if(view_vector.x < -view_cull_threshold3 &&
+           view_vector.y >  view_cull_threshold3 &&
+           view_vector.z < -view_cull_threshold3) {
           chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, z)));
         }
       }
     }
     for(int y = -1; y >= -range; --y) {
       for(int z =  1; z <=  range; ++z) {
-        if(view_vector.x < -view_cull_threshold ||
-           view_vector.y < -view_cull_threshold ||
-           view_vector.z >  view_cull_threshold) {
+        if(view_vector.x < -view_cull_threshold3 &&
+           view_vector.y < -view_cull_threshold3 &&
+           view_vector.z >  view_cull_threshold3) {
           chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, z)));
         }
       }
       for(int z = -1; z >= -range; --z) {
-        if(view_vector.x < -view_cull_threshold ||
-           view_vector.y < -view_cull_threshold ||
-           view_vector.z < -view_cull_threshold) {
+        if(view_vector.x < -view_cull_threshold3 &&
+           view_vector.y < -view_cull_threshold3 &&
+           view_vector.z < -view_cull_threshold3) {
           chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, z)));
         }
       }
     }
   }
 
-  //std::cout << "DEBUG: chunk_list.size() " << chunk_list.size() << std::endl;
+  //std::cout << "DEBUG: chunk_list.size() " << chunk_list.size() << " / " << pow((range * 2) + 1, 3) << " (" << chunk_list.size() * 100 / pow((range * 2) + 1, 3) << "% drawn)" << std::endl;
   return chunk_list;
 }
 
@@ -244,7 +328,7 @@ void world::remove_entity(entity *thisentity) {
 void world::render(Vector3i const &chunk_coords,
                    Quatf const &view_direction) {
   /// Draw the relevant portions of this world
-  std::vector<chunk*> const &chunks_to_render = get_visible_chunks(chunk_coords, view_direction, 1);    // view range
+  std::vector<chunk*> const &chunks_to_render = get_visible_chunks(chunk_coords, view_direction, 2);    // view range
   for(auto const &c : chunks_to_render) {
     c->render(chunk_coords);
   }

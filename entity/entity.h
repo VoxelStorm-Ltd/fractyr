@@ -14,6 +14,7 @@ protected:
   Vector3f position;                      // coords within a chunk, metres
   Vector3f velocity;                      // where it's moving, metres per second
   Quatf orientation;                      // which way we're pointing
+  Quatf orientation_conjugate;            // conjugation of entity::orientation, cached
 
   float mass   = 1.0;                     // how much this weighs, kilograms
   float radius = 0.0;                     // bounding sphere, metres

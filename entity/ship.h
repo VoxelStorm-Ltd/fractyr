@@ -7,8 +7,6 @@ class ship : public entity {
 protected:
   float acceleration = 0.02;      // engine acceleration, m/frame^2
 
-  Quatf orientation_conjugate;    // conjugation of entity::orientation, cached
-
 public:
   ship(world &parent_world, chunk *parent_chunk, Vector3f const &position);
   ~ship();
