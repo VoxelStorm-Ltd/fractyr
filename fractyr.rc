@@ -15,12 +15,12 @@ BEGIN
     BEGIN
       VALUE "CompanyName", "VoxelStorm Ltd"
       VALUE "LegalCopyright", "VoxelStorm Ltd"
-      VALUE "InternalName", "FracVor"
-      VALUE "FileDescription", "FracVor"
-      VALUE "ProductName", "FracVor"
+      VALUE "InternalName", "Fractyr"
+      VALUE "FileDescription", "Fractyr"
+      VALUE "ProductName", "Fractyr"
       VALUE "FileVersion", RC_FILEVERSION_STRING
       VALUE "ProductVersion", RC_FILEVERSION_STRING
-      //VALUE "OriginalFilename", "fracvor.exe"
+      //VALUE "OriginalFilename", "Fractyr.exe"
     END
   END
 

@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="FracVor" />
+		<Option title="Fractyr" />
 		<Option pch_mode="2" />
 		<Option default_target="Release" />
 		<Option compiler="gcc" />
@@ -16,7 +16,7 @@
 		</MakeCommands>
 		<Build>
 			<Target title="Win32_Debug">
-				<Option output="bin/Debug/FracVor_Win32_debug" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Debug/Fractyr_Win32_debug" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Win32_Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -71,7 +71,7 @@
 				</Linker>
 			</Target>
 			<Target title="Win32_Release">
-				<Option output="bin/Release/FracVor_Win32" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Release/Fractyr_Win32" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Win32_Release/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
@@ -176,7 +176,7 @@
 				</ExtraCommands>
 			</Target>
 			<Target title="Win64_Debug">
-				<Option output="bin/Debug/FracVor_Win64_debug" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Debug/Fractyr_Win64_debug" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Win64_Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -210,7 +210,7 @@
 				</Linker>
 			</Target>
 			<Target title="Win64_Release">
-				<Option output="bin/Release/FracVor_Win64" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Release/Fractyr_Win64" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Win64_Release/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
@@ -293,7 +293,7 @@
 				</ExtraCommands>
 			</Target>
 			<Target title="Linux32_Debug">
-				<Option output="bin/Debug/FracVor_Linux32_debug" prefix_auto="1" extension_auto="0" />
+				<Option output="bin/Debug/Fractyr_Linux32_debug" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj/Linux32_Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -340,7 +340,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux32_Release">
-				<Option output="bin/Release/FracVor_Linux32" prefix_auto="1" extension_auto="0" />
+				<Option output="bin/Release/Fractyr_Linux32" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj/Linux32_Release/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
@@ -436,7 +436,7 @@
 				</ExtraCommands>
 			</Target>
 			<Target title="Linux64_Debug">
-				<Option output="bin/Debug/FracVor_Linux64_debug" prefix_auto="1" extension_auto="0" />
+				<Option output="bin/Debug/Fractyr_Linux64_debug" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj/Linux64_Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -492,7 +492,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux64_Release">
-				<Option output="bin/Release/FracVor_Linux64" prefix_auto="1" extension_auto="0" />
+				<Option output="bin/Release/Fractyr_Linux64" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj/Linux64_Release/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
@@ -599,7 +599,7 @@
 				</ExtraCommands>
 			</Target>
 			<Target title="Mac32_Debug">
-				<Option output="bin/Debug/FracVor_Mac32_debug" prefix_auto="1" extension_auto="0" />
+				<Option output="bin/Debug/Fractyr_Mac32_debug" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj/Mac32_Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -632,7 +632,7 @@
 				</Linker>
 			</Target>
 			<Target title="Mac32_Release">
-				<Option output="bin/Release/FracVor_Mac32" prefix_auto="1" extension_auto="0" />
+				<Option output="bin/Release/Fractyr_Mac32" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj/Mac32_Release/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
@@ -714,7 +714,7 @@
 				</ExtraCommands>
 			</Target>
 			<Target title="Mac64_Debug">
-				<Option output="bin/Debug/FracVor_Mac32_debug" prefix_auto="1" extension_auto="0" />
+				<Option output="bin/Debug/Fractyr_Mac32_debug" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj/Mac64_Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -747,7 +747,7 @@
 				</Linker>
 			</Target>
 			<Target title="Mac64_Release">
-				<Option output="bin/Release/FracVor_Mac32" prefix_auto="1" extension_auto="0" />
+				<Option output="bin/Release/Fractyr_Mac32" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj/Mac64_Release/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
@@ -874,7 +874,7 @@
 		<Unit filename="entity/ship.cpp" />
 		<Unit filename="entity/ship.h" />
 		<Unit filename="font_load.cpp" />
-		<Unit filename="fracvor.rc">
+		<Unit filename="fractyr.rc">
 			<Option compilerVar="WINDRES" />
 			<Option target="Win32_Debug" />
 			<Option target="Win32_Release" />

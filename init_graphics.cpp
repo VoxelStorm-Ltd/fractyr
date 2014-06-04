@@ -119,7 +119,7 @@ void universe::init_graphics(Vector2i &windowsize) {
   glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
   window_main = glfwCreateWindow(windowsize.x,
                                  windowsize.y,
-                                 "FracVor",
+                                 "Fractyr",
                                  oculusmonitor,       // NULL here means run windowed
                                  NULL);
   if(!window_main) {
@@ -140,7 +140,7 @@ void universe::init_graphics(Vector2i &windowsize) {
   glfwMakeContextCurrent(window_main);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glfwShowWindow(window_main);  // only display the window once in position
-  glfwSetWindowTitle(window_main, "FracVor: Loading...");
+  glfwSetWindowTitle(window_main, "Fractyr: Loading...");
 
   // callbacks
   glfwSetCursorPosCallback(    window_main, callback_mousepos);
@@ -228,7 +228,7 @@ void universe::init_graphics(Vector2i &windowsize) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   std::stringstream newtitle;
-  newtitle << "FracVor " << get_version();
+  newtitle << "Fractyr " << get_version();
   glfwSetWindowTitle(window_main, newtitle.str().c_str());
 
   std::cout << "Graphics initialised." << std::endl;

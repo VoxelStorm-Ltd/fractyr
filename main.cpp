@@ -19,7 +19,7 @@ universe root;                                  // the container for everything 
 std::string get_version();
 
 int main() {
-  std::cout << "FracVor version " << get_version() << " "
+  std::cout << "Fractyr version " << get_version() << " "
   #ifdef NDEBUG
     "Release"
   #else
