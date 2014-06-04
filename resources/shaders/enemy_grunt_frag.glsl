@@ -4,9 +4,6 @@
 
 varying vec3 normal_frag;
 varying vec4 colour_frag;
-
-varying vec3 normal_frag;
-varying vec4 colour_frag;
 varying vec3 reflectdir_frag;
 varying vec3 coords_camlocal_frag;
 
@@ -24,7 +21,7 @@ void main() {
     specular = pow(specangle, 10.0);
   }
 
-  gl_FragColor.rgb = (colour_frag * lambertian) +
-                     (colour_spec * specular);
+  gl_FragColor.rgb = (colour_frag.rgb * lambertian) +
+                     (colour_spec     * specular);
   gl_FragColor.a = colour_frag.a;
 }

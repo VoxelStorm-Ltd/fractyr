@@ -6,9 +6,10 @@
 class buffer_enemy_grunt;      // forward dec
 
 class grunt : public enemy {
+public:
+  static buffer_enemy_grunt buf;                  // this object's graphics buffer
 protected:
   float health = 10.0;                            // how much of a beating it can take
-  static buffer_enemy_grunt buf;                  // this object's graphics buffer
 
 public:
   grunt(world &parent_world,
@@ -17,6 +18,7 @@ public:
         Quatf const &orientation = Quatf::fromEulerAngles(0.0, 0.0, 0.0));
   ~grunt();
 
+  void render() const override final;
   void update() override final;
 };
 

@@ -124,7 +124,7 @@ Vector3f entity::check_collision(Vector3f const &other_coords, float other_radiu
 
 void entity::render() const {
   /// Render this entity
-  // TODO
+  // polymorphic placeholder
 }
 
 void entity::render_from() const {

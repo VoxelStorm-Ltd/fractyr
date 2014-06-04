@@ -9,10 +9,21 @@ grunt::grunt(world &parent_world,
              Quatf const &orientation)
   : enemy(parent_world, parent_chunk, position, orientation) {
   /// Default constructor
+  radius = 3.0;
+  mass = 1000.0;
 }
 
 grunt::~grunt() {
   /// Default destructor
+}
+
+void grunt::render() const {
+  /// Render this entity
+  glPushMatrix();
+  glTranslatef(position.x, position.y, position.z);
+  glMultMatrixf(orientation_conjugate.transform());
+  buf.render();
+  glPopMatrix();
 }
 
 void grunt::update() {

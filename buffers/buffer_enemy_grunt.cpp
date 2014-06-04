@@ -64,20 +64,104 @@ void buffer_enemy_grunt::setup() {
   std::vector<vertex> vbodata;
   std::vector<GLuint> ibodata;
 
-  vbodata.reserve(4);
-  ibodata.reserve(6);
+  vbodata.reserve(4 * 6);
+  ibodata.reserve(6 * 6);
 
+  float constexpr size = 3.0;
+  float constexpr size_half = size / 2.0;
+
+  Vector3f const coord000(-size_half, -size_half, -size_half);
+  Vector3f const coord100(coord000 + Vector3f(size, 0.0f, 0.0f));
+  Vector3f const coord010(coord000 + Vector3f(0.0f, size, 0.0f));
+  Vector3f const coord110(coord000 + Vector3f(size, size, 0.0f));
+
+  Vector3f const coord001(-size_half, -size_half, size_half);
+  Vector3f const coord101(coord001 + Vector3f(size, 0.0f, 0.0f));
+  Vector3f const coord011(coord001 + Vector3f(0.0f, size, 0.0f));
+  Vector3f const coord111(coord001 + Vector3f(size, size, 0.0f));
+
+  Vector3f const normal0( 0.0, 0.0, -1.0);
+  Vector3f const normal1(-1.0, 0.0,  0.0);
+  Vector3f const normal2( 0.0, 1.0,  0.0);
+
+  Vector4f const colour(0.8, 0.0, 0.0, 1.0);
+
+  // front face
   unsigned int offset = vbodata.size();
-  // placeholder:
-  vbodata.emplace_back(Vector3f(0.0, 0.0, 0.0), Vector3f(0.0, 1.0, 0.0), Vector4f(1.0, 1.0, 0.0, 0.8));
-  vbodata.emplace_back(Vector3f(1.0, 0.0, 0.0), Vector3f(0.0, 1.0, 0.0), Vector4f(1.0, 1.0, 0.0, 1.0));
-  vbodata.emplace_back(Vector3f(1.0, 0.0, 1.0), Vector3f(0.0, 1.0, 0.0), Vector4f(1.0, 1.0, 0.0, 0.8));
-  vbodata.emplace_back(Vector3f(0.0, 0.0, 1.0), Vector3f(0.0, 1.0, 0.0), Vector4f(1.0, 1.0, 0.0, 0.2));
+  vbodata.emplace_back(coord000, normal0, colour);
+  vbodata.emplace_back(coord010, normal0, colour);
+  vbodata.emplace_back(coord110, normal0, colour);
+  vbodata.emplace_back(coord100, normal0, colour);
   ibodata.emplace_back(offset + 0);
   ibodata.emplace_back(offset + 1);
   ibodata.emplace_back(offset + 2);
   ibodata.emplace_back(offset + 2);
   ibodata.emplace_back(offset + 3);
+  ibodata.emplace_back(offset + 0);
+
+  // back face
+  offset = vbodata.size();
+  vbodata.emplace_back(coord001, -normal0, colour);
+  vbodata.emplace_back(coord011, -normal0, colour);
+  vbodata.emplace_back(coord111, -normal0, colour);
+  vbodata.emplace_back(coord101, -normal0, colour);
+  ibodata.emplace_back(offset + 0);
+  ibodata.emplace_back(offset + 3);
+  ibodata.emplace_back(offset + 2);
+  ibodata.emplace_back(offset + 2);
+  ibodata.emplace_back(offset + 1);
+  ibodata.emplace_back(offset + 0);
+
+  // Side face 1
+  offset = vbodata.size();
+  vbodata.emplace_back(coord000, normal1, colour);
+  vbodata.emplace_back(coord001, normal1, colour);
+  vbodata.emplace_back(coord011, normal1, colour);
+  vbodata.emplace_back(coord010, normal1, colour);
+  ibodata.emplace_back(offset + 0);
+  ibodata.emplace_back(offset + 1);
+  ibodata.emplace_back(offset + 2);
+  ibodata.emplace_back(offset + 2);
+  ibodata.emplace_back(offset + 3);
+  ibodata.emplace_back(offset + 0);
+
+  // Side face 2
+  offset = vbodata.size();
+  vbodata.emplace_back(coord100, -normal1, colour);
+  vbodata.emplace_back(coord101, -normal1, colour);
+  vbodata.emplace_back(coord111, -normal1, colour);
+  vbodata.emplace_back(coord110, -normal1, colour);
+  ibodata.emplace_back(offset + 0);
+  ibodata.emplace_back(offset + 3);
+  ibodata.emplace_back(offset + 2);
+  ibodata.emplace_back(offset + 2);
+  ibodata.emplace_back(offset + 1);
+  ibodata.emplace_back(offset + 0);
+
+  // top face
+  offset = vbodata.size();
+  vbodata.emplace_back(coord010, normal2, colour);
+  vbodata.emplace_back(coord011, normal2, colour);
+  vbodata.emplace_back(coord111, normal2, colour);
+  vbodata.emplace_back(coord110, normal2, colour);
+  ibodata.emplace_back(offset + 0);
+  ibodata.emplace_back(offset + 1);
+  ibodata.emplace_back(offset + 2);
+  ibodata.emplace_back(offset + 2);
+  ibodata.emplace_back(offset + 3);
+  ibodata.emplace_back(offset + 0);
+
+  // bottom face
+  offset = vbodata.size();
+  vbodata.emplace_back(coord000, -normal2, colour);
+  vbodata.emplace_back(coord001, -normal2, colour);
+  vbodata.emplace_back(coord101, -normal2, colour);
+  vbodata.emplace_back(coord100, -normal2, colour);
+  ibodata.emplace_back(offset + 0);
+  ibodata.emplace_back(offset + 3);
+  ibodata.emplace_back(offset + 2);
+  ibodata.emplace_back(offset + 2);
+  ibodata.emplace_back(offset + 1);
   ibodata.emplace_back(offset + 0);
 
   vbodata.shrink_to_fit();

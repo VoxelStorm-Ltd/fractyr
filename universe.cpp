@@ -9,9 +9,12 @@
 #include "soundstorm.h"
 #include "world.h"
 #include "buffer_chunk.h"
+#include "buffer_plasma.h"
+#include "buffer_enemy_grunt.h"
 #include "ship.h"
 #include "blaster.h"
 #include "plasma.h"
+#include "grunt.h"
 
 // loaders
 FTFont *font_load(  std::string const &filename, unsigned int size = 16);
@@ -91,8 +94,12 @@ void universe::restart() {
   delete current_world;
   current_world = new world();
 
-  player.current_ship = new ship(*current_world, current_world->get_chunk(Vector3i(0.0, 0.0, 0.0)), Vector3f(50.0, 50.0, 50.0));
+  // world content setup
+  player.current_ship = new ship(*current_world, current_world->get_chunk(Vector3i(0.0, 0.0, 0.0)), Vector3f(70.0, 10.0, 10.0));
   player.current_ship->add_weapon(new blaster(player.current_ship));
+
+  grunt *grunt1 = new grunt(*current_world, current_world->get_chunk(Vector3i(0.0, 0.0, 0.0)), Vector3f(70.0, 10.0, 50.0));
+  grunt1->add_weapon(new blaster(grunt1));
 
   glfwSetInputMode(            window_main, GLFW_CURSOR, GLFW_CURSOR_NORMAL);     // release the cursor
   glfwSetCursorPosCallback(    window_main, callback_mousepos);
@@ -123,6 +130,8 @@ void universe::init_buffers() {
   }
   plasma::buf.init();
   plasma::buf.setup();
+  grunt::buf.init();
+  grunt::buf.setup();
 
   // initialise fonts
   // TODO
@@ -131,6 +140,7 @@ void universe::init_buffers() {
 void universe::init_shaders() {
   /// Load and initialise shader programs
   plasma::buf.load_shader();
+  grunt::buf.load_shader();
 }
 
 void universe::delete_buffers() {
@@ -140,12 +150,14 @@ void universe::delete_buffers() {
     current_world->delete_buffers();
   }
   plasma::buf.destroy();
+  grunt::buf.destroy();
 }
 
 void universe::delete_shaders() {
   /// Clean up all loaded shaders
   buffer_chunk::destroy_shader();
   plasma::buf.destroy_shader();
+  grunt::buf.destroy_shader();
 }
 
 void universe::render() {
