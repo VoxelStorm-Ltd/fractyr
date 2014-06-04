@@ -52,10 +52,9 @@ void chunk::remove_entity(entity *thisentity) {
 
 void chunk::render(Vector3i const &view_chunk_coords) const {
   /// Draw the contents of this chunk as viewed from coords
-  //Vector3i offset((coords - view_chunk_coords) * size);
-  Vector3i offset((view_chunk_coords - coords) * size);
+  Vector3i offset((coords - view_chunk_coords) * size);
   glPushMatrix();
-  glTranslatef(-offset.x, -offset.y, -offset.z);
+  glTranslatef(offset.x, offset.y, offset.z);
 
   buf.render();
 
