@@ -27,8 +27,7 @@ chunk *world::get_chunk(Vector3i const &chunk_coords) {
                                 (size + chunk_coords.z) % size);     // the world wraps, so we just modulo
   chunk *&thischunk = chunks[checked_coords.x][checked_coords.y][checked_coords.z];
   if(!thischunk) {
-    thischunk = new chunk(chunk_coords, *this);
-    //thischunk = new chunk(checked_coords, *this);
+    thischunk = new chunk(checked_coords, *this);
     std::cout << "DEBUG: Created chunk at " << checked_coords << std::endl;
   }
   return thischunk;
@@ -48,6 +47,11 @@ std::vector<chunk*> world::get_visible_chunks(Vector3i const &chunk_coords,
       }
     }
   }
+  /*
+  for(int x = -range; x <= range; ++x) {
+    chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, 0.0, 0.0)));
+  }
+  */
   return chunk_list;
   // /DEBUG ONLY
 

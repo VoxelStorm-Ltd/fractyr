@@ -10,7 +10,7 @@ varying vec3 reflectdir_frag;
 varying vec3 coords_camlocal_frag;
 
 void main() {
-  const vec3 lightdir = vec3(0.0, -0.8414709848, -0.54030230586);
+  const vec3 lightdir = vec3(0.0, 0.8414709848, -0.54030230586);
   reflectdir_frag = gl_NormalMatrix * reflect(lightdir, normal);
   normal_frag = normal;
 
