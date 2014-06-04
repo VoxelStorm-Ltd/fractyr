@@ -30,6 +30,7 @@ void ship::update() {
   for(auto const &w : weapons) {
     w->update();
   }
+  orientation.normalise();
 }
 
 void ship::add_weapon(weapon *new_weapon) {

@@ -15,6 +15,7 @@
 #include "blaster.h"
 #include "plasma.h"
 #include "grunt.h"
+#include "chunk.h"
 
 // loaders
 FTFont *font_load(  std::string const &filename, unsigned int size = 16);
@@ -97,9 +98,6 @@ void universe::restart() {
   // world content setup
   player.current_ship = new ship(*current_world, current_world->get_chunk(Vector3i(0.0, 0.0, 0.0)), Vector3f(70.0, 10.0, 10.0));
   player.current_ship->add_weapon(new blaster(player.current_ship));
-
-  grunt *grunt1 = new grunt(*current_world, current_world->get_chunk(Vector3i(0.0, 0.0, 0.0)), Vector3f(70.0, 10.0, 50.0));
-  grunt1->add_weapon(new blaster(grunt1));
 
   glfwSetInputMode(            window_main, GLFW_CURSOR, GLFW_CURSOR_NORMAL);     // release the cursor
   glfwSetCursorPosCallback(    window_main, callback_mousepos);

@@ -32,5 +32,5 @@ void blaster::fire() {
 
   new plasma(*parent->get_parent_world(), thischunk, barrel_coords_left,  barrel_orientation, parent->get_velocity());
   new plasma(*parent->get_parent_world(), thischunk, barrel_coords_right, barrel_orientation, parent->get_velocity());
-  cooldown = 60 / 2;
+  cooldown = 60 / 10;
 }

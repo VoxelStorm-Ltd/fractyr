@@ -29,6 +29,9 @@ void grunt::render() const {
 void grunt::update() {
   /// Update this enemy's AI actions
   // TODO
+  velocity.x += (rand() / static_cast<float>(RAND_MAX) - 0.5) / 100.0;
+  velocity.y += (rand() / static_cast<float>(RAND_MAX) - 0.5) / 100.0;
+  velocity.z += (rand()  /static_cast<float>(RAND_MAX) - 0.5) / 100.0;
 
   enemy::update();
 }
