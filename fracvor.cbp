@@ -851,6 +851,8 @@
 			<Add directory="input" />
 			<Add directory="buffers" />
 			<Add directory="entity" />
+			<Add directory="entity/bullet" />
+			<Add directory="weapon" />
 			<Add directory="$(#boost.include)" />
 		</Compiler>
 		<Unit filename="blob_loader.h" />
@@ -858,9 +860,15 @@
 		<Unit filename="buffers/buffer.h" />
 		<Unit filename="buffers/buffer_chunk.cpp" />
 		<Unit filename="buffers/buffer_chunk.h" />
+		<Unit filename="buffers/buffer_plasma.cpp" />
+		<Unit filename="buffers/buffer_plasma.h" />
 		<Unit filename="callback_error.cpp" />
 		<Unit filename="chunk.cpp" />
 		<Unit filename="chunk.h" />
+		<Unit filename="entity/bullet/bullet.cpp" />
+		<Unit filename="entity/bullet/bullet.h" />
+		<Unit filename="entity/bullet/plasma.cpp" />
+		<Unit filename="entity/bullet/plasma.h" />
 		<Unit filename="entity/entity.cpp" />
 		<Unit filename="entity/entity.h" />
 		<Unit filename="entity/ship.cpp" />
@@ -900,6 +908,14 @@
 			<Option compile="1" />
 			<Option link="1" />
 		</Unit>
+		<Unit filename="resources/shaders/plasma_frag.glsl">
+			<Option compile="1" />
+			<Option link="1" />
+		</Unit>
+		<Unit filename="resources/shaders/plasma_vert.glsl">
+			<Option compile="1" />
+			<Option link="1" />
+		</Unit>
 		<Unit filename="shader_load.cpp" />
 		<Unit filename="soundstorm.cpp" />
 		<Unit filename="soundstorm.h" />
@@ -908,6 +924,10 @@
 		<Unit filename="version.h" />
 		<Unit filename="vmath.cpp" />
 		<Unit filename="vmath.h" />
+		<Unit filename="weapon/blaster.cpp" />
+		<Unit filename="weapon/blaster.h" />
+		<Unit filename="weapon/weapon.cpp" />
+		<Unit filename="weapon/weapon.h" />
 		<Unit filename="world.cpp" />
 		<Unit filename="world.h" />
 		<Extensions>

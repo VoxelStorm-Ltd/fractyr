@@ -1,7 +1,10 @@
 #include "ship.h"
+#include "weapon.h"
 
-ship::ship(world &parent_world, chunk *parent_chunk, Vector3f const &position)
-  : entity(parent_world, parent_chunk, position) {
+ship::ship(world &parent_world, chunk *parent_chunk,
+           Vector3f const &position,
+           Quatf const &orientation)
+  : entity(parent_world, parent_chunk, position, orientation) {
   /// Default constructor
   mass = 10000.0;
   drag = 3.0 * 5.0 * 5.0;
@@ -9,6 +12,29 @@ ship::ship(world &parent_world, chunk *parent_chunk, Vector3f const &position)
 
 ship::~ship() {
   /// Default destructor
+  for(auto const &w : weapons) {
+    delete w;
+  }
+}
+
+Vector3f ship::get_weapon_position() {
+  /// Return the vector position of the weapon's mount point
+  Vector3f offset(0.0, -1.0, 1.0);
+  offset.rotate(orientation);
+  offset += position;
+  return offset;
+}
+
+void ship::update() {
+  entity::update();
+  for(auto const &w : weapons) {
+    w->update();
+  }
+}
+
+void ship::add_weapon(weapon *new_weapon) {
+  /// Mount a weapon on this ship
+  weapons.push_back(new_weapon);
 }
 
 void ship::accelerate(Vector3f accel) {
@@ -38,4 +64,15 @@ void ship::roll(float roll) {
 
   orientation_conjugate = orientation;    // update the cached conjugate
   orientation_conjugate.conjugate();
+}
+
+void ship::fire(unsigned int weapon_id) {
+  /// Fire the selected weapon
+  #ifndef NDEBUG
+    if(weapon_id >= weapons.size()) {
+      std::cout << "ERROR: " << __PRETTY_FUNCTION__ << " tried to access index " << weapon_id << " of " << weapons.size() << std::endl;
+      return;
+    }
+  #endif
+  weapons[weapon_id]->fire();
 }

@@ -247,6 +247,8 @@ void gameplayer::setup_input() {
   bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_F6,           &gameplayer::input_graphics_compromise, false);
   bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_F7,           &gameplayer::input_graphics_fastest,    false);
   bind(controlbinding::controltype::MOUSE_SCROLL, 0,                 &gameplayer::input_zoom,                true, 0.0, -1.0);
+  bind(controlbinding::controltype::MOUSE_BUTTON, 0,                 &gameplayer::input_fire1,               true);
+  bind(controlbinding::controltype::MOUSE_BUTTON, 1,                 &gameplayer::input_fire2,               true);
 
   if(gamepad != -1) {
     // gamepad / joystick bindings only if we actually have one connected, so we don't need runtime checks
@@ -393,6 +395,12 @@ void gameplayer::input_zoom(float amount) {
   //std::cout << "DEBUG: FOV now " << fov_angle << std::endl;
   update_fov(fov_angle);
   cache_matrix();   // update the cached projection matrix
+}
+void gameplayer::input_fire1(float amount __attribute__((__unused__))) {
+  current_ship->fire(0);
+}
+void gameplayer::input_fire2(float amount __attribute__((__unused__))) {
+  current_ship->fire(1);
 }
 void gameplayer::input_toggle_fullscreen(float amount __attribute__((__unused__))) {
   root.toggle_fullscreen();

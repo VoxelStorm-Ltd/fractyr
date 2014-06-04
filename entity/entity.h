@@ -2,6 +2,7 @@
 #define ENTITY_H_INCLUDED
 
 #include "vmath.h"
+#include "buffer.h"
 
 class world;        // forward dec
 class chunk;
@@ -21,16 +22,25 @@ protected:
   float drag   = 0.0;                     // how much drag this entity experiences (coefficient of drag * cross-sectional area)
 
 public:
-  entity(world &parent_world, chunk *parent_chunk, Vector3f const &position);
+  entity(world &parent_world,
+         chunk *parent_chunk,
+         Vector3f const &position,
+         Quatf const &orientation = Quatf::fromEulerAngles(0.0, 0.0, 0.0));
   virtual ~entity();
 
-  void update();
+  world *get_parent_world() const;
+  chunk *get_parent() const;
+  Vector3f const &get_position() const;
+  Vector3f const &get_velocity() const;
+  Quatf const &get_orientation() const;
+
+  virtual void update();
   void move(Vector3f const &direction);
   static void correct_point(Vector3f &coords, chunk *&thischunk);
   Vector3f check_collision(Vector3f const &other_coords, float other_radius) const;
 
-  void render() const;
-  void render_from() const;
+  virtual void render() const;
+  virtual void render_from() const;
 };
 
 #endif // ENTITY_H_INCLUDED

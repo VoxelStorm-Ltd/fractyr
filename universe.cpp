@@ -8,7 +8,10 @@
 #include "oculusstorm.h"
 #include "soundstorm.h"
 #include "world.h"
+#include "buffer_chunk.h"
 #include "ship.h"
+#include "blaster.h"
+#include "plasma.h"
 
 // loaders
 FTFont *font_load(  std::string const &filename, unsigned int size = 16);
@@ -36,7 +39,6 @@ extern soundstorm sound;
 extern GLFWwindow *window_main;
 extern oculusstorm *oculus;
 //extern FTFont *font_label;
-
 
 std::mt19937 universe::randomgen;
 unsigned int universe::randomseed = 1;
@@ -90,6 +92,7 @@ void universe::restart() {
   current_world = new world();
 
   player.current_ship = new ship(*current_world, current_world->get_chunk(Vector3i(0.0, 0.0, 0.0)), Vector3f(50.0, 50.0, 50.0));
+  player.current_ship->add_weapon(new blaster(player.current_ship));
 
   glfwSetInputMode(            window_main, GLFW_CURSOR, GLFW_CURSOR_NORMAL);     // release the cursor
   glfwSetCursorPosCallback(    window_main, callback_mousepos);
@@ -115,17 +118,18 @@ void universe::restart() {
 
 void universe::init_buffers() {
   /// Allocate new buffers after context switch
-  // TODO
-  // initialise fonts
-  // TODO
   if(current_world) {
     current_world->setup_buffers();
   }
+  plasma::buf.init();
+
+  // initialise fonts
+  // TODO
 }
 
 void universe::init_shaders() {
   /// Load and initialise shader programs
-  // TODO
+  plasma::buf.load_shader();
 }
 
 void universe::delete_buffers() {
@@ -134,11 +138,13 @@ void universe::delete_buffers() {
   if(current_world) {
     current_world->delete_buffers();
   }
+  plasma::buf.destroy();
 }
 
 void universe::delete_shaders() {
   /// Clean up all loaded shaders
-  //buffer_chunk::destroy_shader();
+  buffer_chunk::destroy_shader();
+  plasma::buf.destroy_shader();
 }
 
 void universe::render() {

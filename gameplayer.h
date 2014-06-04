@@ -121,6 +121,8 @@ public:
   void input_zoom_in(            float amount = 1.0);
   void input_zoom_out(           float amount = 1.0);
   void input_zoom(               float amount = 1.0);
+  void input_fire1(              float amount = 1.0);
+  void input_fire2(              float amount = 1.0);
   void input_toggle_fullscreen(  float amount = 1.0);
   void input_toggle_help(        float amount = 1.0);
   void input_toggle_hud(         float amount = 1.0);

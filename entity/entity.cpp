@@ -5,11 +5,14 @@
 #include "world.h"
 #include "chunk.h"
 
-entity::entity(world &parent_world, chunk *parent_chunk, Vector3f const &position)
+entity::entity(world &parent_world,
+               chunk *parent_chunk,
+               Vector3f const &position,
+               Quatf const &orientation)
   : parent_world(parent_world),
     parent(parent_chunk),
     position(position),
-    orientation(Quatd::fromEulerAngles(0.0, 0.0, 0.0)),
+    orientation(orientation),
     orientation_conjugate(orientation) {
   /// Default constructor
   parent_world.add_entity(this);
@@ -21,6 +24,22 @@ entity::entity(world &parent_world, chunk *parent_chunk, Vector3f const &positio
 
 entity::~entity() {
   /// Default destructor
+}
+
+world *entity::get_parent_world() const {
+  return &parent_world;
+}
+chunk *entity::get_parent() const {
+  return parent;
+}
+Vector3f const &entity::get_position() const {
+  return position;
+}
+Vector3f const &entity::get_velocity() const {
+  return velocity;
+}
+Quatf const &entity::get_orientation() const {
+  return orientation;
 }
 
 void entity::update() {
