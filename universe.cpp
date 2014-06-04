@@ -280,6 +280,7 @@ void universe::reinitialise_window() {
 
   glfwSetKeyCallback(window_main, callback_key);
   glfwSetWindowRefreshCallback(window_main, callback_windowrefresh);
+  glfwSetInputMode(window_main, GLFW_CURSOR, GLFW_CURSOR_DISABLED);     // for mouselook
 }
 
 void universe::loop_menu() {
