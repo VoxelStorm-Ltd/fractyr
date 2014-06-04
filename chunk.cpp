@@ -1,11 +1,11 @@
 #include "chunk.h"
 #include <random>
 #include <algorithm>
+#include <cmath>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "entity.h"
 #include "universe.h"
-#include "math.h"
 
 chunk::chunk(Vector3i const &chunk_coords, world &parent)
   : parent(&parent),
