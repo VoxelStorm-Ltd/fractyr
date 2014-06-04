@@ -16,6 +16,7 @@ public:
 private:
   std::vector<std::vector<std::vector<chunk*>>> chunks;     // 3D vector of chunk pointers, initially null
   std::vector<entity*> entities;                            // every entity that exists in the world
+  std::vector<chunk*> visible_chunks;                       // List of chunks which are currently visible.
 
 public:
   world();
@@ -23,7 +24,7 @@ public:
 
   // chunk operations and queries
   chunk *get_chunk(Vector3i const &chunk_coords);
-  std::vector<chunk*> get_visible_chunks(Vector3i const &chunk_coords, Quatf const &view_direction, int range);
+  void find_visible_chunks(Vector3i const &chunk_coords, Quatf const &view_direction, int range);
   Vector3f check_collision(Vector3i const &chunk_coords, Vector3f const &coords, float radius);
   void delete_buffers();
   void setup_buffers();

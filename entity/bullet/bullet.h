@@ -12,6 +12,8 @@ protected:
          Quatf const &orientation = Quatf::fromEulerAngles(0.0, 0.0, 0.0));
 public:
   virtual ~bullet();
+  virtual void collided_with(entity* other) override;
+  virtual entity::entity_type get_entity_type() const override;
 };
 
 #endif // BULLET_H_INCLUDED

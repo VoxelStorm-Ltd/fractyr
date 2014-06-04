@@ -9,6 +9,13 @@ class chunk;
 
 class entity {
   /// Polymorphic base class for all positionally located entities
+
+public:
+  enum class entity_type : char {
+    UNKNOWN,
+    BULLET,
+    SHIP
+  };
 protected:
   world &parent_world;                    // what world we're in
   chunk *parent = nullptr;                // what chunk we're currently in
@@ -18,10 +25,12 @@ protected:
   Quatf orientation_conjugate;            // conjugation of entity::orientation, cached
 
   float mass   = 1.0;                     // how much this weighs, kilograms
-  float radius = 0.0;                     // bounding sphere, metres
   float drag   = 0.0;                     // how much drag this entity experiences (coefficient of drag * cross-sectional area)
 
 public:
+  float health = 100.0;
+  float radius = 0.0;                     // bounding sphere, metres
+
   entity(world &parent_world,
          chunk *parent_chunk,
          Vector3f const &position,
@@ -34,11 +43,15 @@ public:
   Vector3f const &get_velocity() const;
   Quatf const &get_orientation() const;
   Quatf const &get_orientation_conjugate() const;
+  virtual entity_type get_entity_type() const;
 
   virtual void update();
   void move(Vector3f const &direction);
   static void correct_point(Vector3f &coords, chunk *&thischunk);
+
   Vector3f check_collision(Vector3f const &other_coords, float other_radius) const;
+  virtual float get_collision_damage() const;
+  virtual void collided_with(entity *other);
 
   virtual void render() const;
   virtual void render_from() const;

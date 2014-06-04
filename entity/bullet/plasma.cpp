@@ -25,11 +25,7 @@ plasma::~plasma() {
 
 void plasma::update() {
   if(time_to_live == 0) {
-    parent_world.remove_entity(this);
-    if(parent) {
-      parent->remove_entity(this);
-    }
-    delete this;
+    health = 0;
     return;
   }
   entity::update();
@@ -43,4 +39,8 @@ void plasma::render() const {
   glMultMatrixf(orientation_conjugate.transform());
   buf.render();
   glPopMatrix();
+}
+
+float plasma::get_collision_damage() const {
+  return 50;
 }

@@ -20,6 +20,8 @@ public:
 
   void render() const override final;
   void update() override final;
+
+  float get_collision_damage() const override;
 };
 
 #endif // GRUNT_H_INCLUDED

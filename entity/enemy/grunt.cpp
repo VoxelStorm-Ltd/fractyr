@@ -35,3 +35,7 @@ void grunt::update() {
 
   enemy::update();
 }
+
+float grunt::get_collision_damage() const {
+  return 100.0;
+}

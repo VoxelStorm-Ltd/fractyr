@@ -45,6 +45,10 @@ Quatf const &entity::get_orientation_conjugate() const {
   return orientation_conjugate;
 }
 
+entity::entity_type entity::get_entity_type() const {
+  return entity::entity_type::UNKNOWN;
+}
+
 void entity::update() {
   move(velocity);
 
@@ -120,6 +124,14 @@ Vector3f entity::check_collision(Vector3f const &other_coords, float other_radiu
   } else {
     return Vector3f(0.0, 0.0, 0.0);
   }
+}
+
+float entity::get_collision_damage() const {
+  return 0.0;
+}
+
+void entity::collided_with(entity *other) {
+  health -= other->get_collision_damage();
 }
 
 void entity::render() const {

@@ -317,6 +317,10 @@ void universe::loop_main() {
 
       update();
 
+      if (player.current_ship && player.current_ship->health <= 0) {
+        state = gamestate::LOST;
+      }
+
       if(oculus->enabled) {
         // render once for each eye
         player.setup_render_oculus_left();

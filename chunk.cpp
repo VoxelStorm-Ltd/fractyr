@@ -9,6 +9,9 @@
 #include "world.h"
 #include "grunt.h"
 #include "blaster.h"
+#include "gameplayer.h"
+
+extern gameplayer player;
 
 chunk::chunk(Vector3i const &chunk_coords, world &parent)
   : parent(&parent),
@@ -37,6 +40,30 @@ void chunk::update() {
   /// Update every entity in this chunk
   for(auto &e : entities) {
     e->update();
+  }
+
+  // Check for collisions between all pairs of entities in this chunk
+  for(auto it = entities.begin(); it != entities.end(); ++it) {
+    for(auto it2 = it+1; it2 != entities.end(); ++it2) {
+      //std::cout << "Checking collision between " << *it << " and " << *it2 << std::endl;
+      if((*it)->check_collision((*it2)->get_position(), (*it2)->radius).lengthSq() > 0) {
+          (*it)->collided_with(*it2);
+          (*it2)->collided_with(*it);
+      }
+    }
+  }
+
+  // Destroy any dead (non-player) entities
+  for(auto it = entities.begin(); it != entities.end();) {
+    entity *ent = *it;
+    if (ent->health <= 0 && ent != player.current_ship) {
+      //std::cout << "DEBUG: Removing entity: " << ent << std::endl;
+      it = entities.erase(it);
+      ent->get_parent_world()->remove_entity(ent);
+      delete ent;
+    } else {
+      ++it;
+    }
   }
 }
 

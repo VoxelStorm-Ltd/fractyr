@@ -11,3 +11,11 @@ bullet::bullet(world &parent_world,
 bullet::~bullet() {
   /// Default destructor
 }
+
+void bullet::collided_with(entity *other __attribute__((unused))) {
+  health = 0; // Destroy this bullet.
+}
+
+entity::entity_type bullet::get_entity_type() const {
+  return entity::entity_type::BULLET;
+}

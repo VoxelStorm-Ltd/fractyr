@@ -1,4 +1,6 @@
 #include "enemy.h"
+#include "world.h"
+#include "chunk.h"
 
 enemy::enemy(world &parent_world,
              chunk *parent_chunk,

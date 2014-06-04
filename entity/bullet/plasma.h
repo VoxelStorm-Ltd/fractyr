@@ -21,6 +21,8 @@ public:
 
   void update() override final;
   void render() const override final;
+
+  float get_collision_damage() const override;
 };
 
 #endif // PLASMA_H_INCLUDED

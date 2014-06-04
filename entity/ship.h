@@ -18,6 +18,7 @@ public:
   virtual ~ship();
 
   Vector3f get_weapon_position();
+  virtual entity::entity_type get_entity_type() const override;
 
   void update() override;
 
