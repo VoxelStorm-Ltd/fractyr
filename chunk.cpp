@@ -112,9 +112,9 @@ void chunk::setup() {
   vbodata.reserve(6 * 4 * numblocks * numblocks * numblocks);   // make sure to reserve the correct size to avoid re-allocations during construction
   ibodata.reserve(6 * 6 * numblocks * numblocks * numblocks);
 
-  Vector3f const normal0 = Vector3f( 0.0, 0.0, -1.0);
-  Vector3f const normal1 = Vector3f(-1.0, 0.0,  0.0);
-  Vector3f const normal2 = Vector3f( 0.0, 1.0,  0.0);
+  Vector3f const normal0( 0.0, 0.0, -1.0);
+  Vector3f const normal1(-1.0, 0.0,  0.0);
+  Vector3f const normal2( 0.0, 1.0,  0.0);
 
   for(unsigned int x = 0; x != numblocks; ++x) {
     for(unsigned int y = 0; y != numblocks; ++y) {
