@@ -852,6 +852,7 @@
 			<Add directory="buffers" />
 			<Add directory="entity" />
 			<Add directory="entity/bullet" />
+			<Add directory="entity/enemy" />
 			<Add directory="weapon" />
 			<Add directory="$(#boost.include)" />
 		</Compiler>
@@ -860,6 +861,8 @@
 		<Unit filename="buffers/buffer.h" />
 		<Unit filename="buffers/buffer_chunk.cpp" />
 		<Unit filename="buffers/buffer_chunk.h" />
+		<Unit filename="buffers/buffer_enemy_grunt.cpp" />
+		<Unit filename="buffers/buffer_enemy_grunt.h" />
 		<Unit filename="buffers/buffer_plasma.cpp" />
 		<Unit filename="buffers/buffer_plasma.h" />
 		<Unit filename="callback_error.cpp" />
@@ -869,6 +872,10 @@
 		<Unit filename="entity/bullet/bullet.h" />
 		<Unit filename="entity/bullet/plasma.cpp" />
 		<Unit filename="entity/bullet/plasma.h" />
+		<Unit filename="entity/enemy/enemy.cpp" />
+		<Unit filename="entity/enemy/enemy.h" />
+		<Unit filename="entity/enemy/grunt.cpp" />
+		<Unit filename="entity/enemy/grunt.h" />
 		<Unit filename="entity/entity.cpp" />
 		<Unit filename="entity/entity.h" />
 		<Unit filename="entity/ship.cpp" />
@@ -905,6 +912,14 @@
 			<Option link="1" />
 		</Unit>
 		<Unit filename="resources/shaders/chunk_vert.glsl">
+			<Option compile="1" />
+			<Option link="1" />
+		</Unit>
+		<Unit filename="resources/shaders/enemy_grunt_frag.glsl">
+			<Option compile="1" />
+			<Option link="1" />
+		</Unit>
+		<Unit filename="resources/shaders/enemy_grunt_vert.glsl">
 			<Option compile="1" />
 			<Option link="1" />
 		</Unit>

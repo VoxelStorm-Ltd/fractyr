@@ -3,7 +3,7 @@
 
 #include "bullet.h"
 
-class buffer_plasma;
+class buffer_plasma;      // forward dec
 
 class plasma : public bullet {
 public:

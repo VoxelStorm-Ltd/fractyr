@@ -15,11 +15,11 @@ public:
   ship(world &parent_world, chunk *parent_chunk,
        Vector3f const &position,
        Quatf const &orientation = Quatf::fromEulerAngles(0.0, 0.0, 0.0));
-  ~ship();
+  virtual ~ship();
 
   Vector3f get_weapon_position();
 
-  virtual void update() override final;
+  void update() override;
 
   void add_weapon(weapon *new_weapon);
 
