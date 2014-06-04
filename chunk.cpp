@@ -92,6 +92,10 @@ void chunk::setup() {
   vbodata.reserve(6 * 4 * numblocks * numblocks * numblocks);   // make sure to reserve the correct size to avoid re-allocations during construction
   ibodata.reserve(6 * 6 * numblocks * numblocks * numblocks);
 
+  Vector3f const normal0 = Vector3f( 0.0, 0.0, -1.0);
+  Vector3f const normal1 = Vector3f(-1.0, 0.0,  0.0);
+  Vector3f const normal2 = Vector3f( 0.0, 1.0,  0.0);
+
   for(unsigned int x = 0; x != numblocks; ++x) {
     for(unsigned int y = 0; y != numblocks; ++y) {
       for(unsigned int z = 0; z != numblocks; ++z) {
@@ -127,10 +131,6 @@ void chunk::setup() {
         Vector3f const coord101(coord001 + Vector3f(blocksize, 0.0f, 0.0f));
         Vector3f const coord011(coord001 + Vector3f(0.0f, blocksize, 0.0f));
         Vector3f const coord111(coord001 + Vector3f(blocksize, blocksize, 0.0f));
-
-        Vector3f const normal0 = (coord100 - coord000).crossProduct(coord010 - coord000);
-        Vector3f const normal1 = (coord011 - coord000).crossProduct(coord001 - coord000);
-        Vector3f const normal2 = (coord111 - coord010).crossProduct(coord011 - coord010);
 
         // front face
         unsigned int offset = vbodata.size();
