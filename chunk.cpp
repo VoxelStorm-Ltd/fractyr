@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include "entity.h"
 #include "universe.h"
+#include "world.h"
 
 chunk::chunk(Vector3i const &chunk_coords, world &parent)
   : parent(&parent),
@@ -52,7 +53,28 @@ void chunk::remove_entity(entity *thisentity) {
 
 void chunk::render(Vector3i const &view_chunk_coords) const {
   /// Draw the contents of this chunk as viewed from coords
-  Vector3i offset((coords - view_chunk_coords) * size);
+  Vector3i chunk_offset(coords - view_chunk_coords);
+  int constexpr worldsize_half = world::size / 2;
+  if(chunk_offset.x > worldsize_half) {
+    chunk_offset.x -= world::size;
+  }
+  if(chunk_offset.y > worldsize_half) {
+    chunk_offset.y -= world::size;
+  }
+  if(chunk_offset.z > worldsize_half) {
+    chunk_offset.z -= world::size;
+  }
+  if(chunk_offset.x < -worldsize_half) {
+    chunk_offset.x += world::size;
+  }
+  if(chunk_offset.y < -worldsize_half) {
+    chunk_offset.y += world::size;
+  }
+  if(chunk_offset.z < -worldsize_half) {
+    chunk_offset.z += world::size;
+  }
+
+  Vector3i const offset((chunk_offset) * size);
   glPushMatrix();
   glTranslatef(offset.x, offset.y, offset.z);
 
@@ -90,7 +112,8 @@ void chunk::setup() {
   std::uniform_real_distribution<float> dist_tri(-1.0, 1.0);
 
   // placeholder: spam random triangles
-  for(unsigned int i = 0; i != std::max(coords.x, 0) * 20; ++i) {
+  //for(unsigned int i = 0; i != std::max(coords.x, 0) * 20; ++i) {
+  for(unsigned int i = 0; i != 1000; ++i) {
     Vector3f const coord0(dist_chunkwide(universe::randomgen), dist_chunkwide(universe::randomgen), dist_chunkwide(universe::randomgen));
     Vector3f const coord1(coord0 + Vector3f(dist_tri(universe::randomgen), dist_tri(universe::randomgen), dist_tri(universe::randomgen)));
     Vector3f const coord2(coord0 + Vector3f(dist_tri(universe::randomgen), dist_tri(universe::randomgen), dist_tri(universe::randomgen)));
