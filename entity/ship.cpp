@@ -5,6 +5,8 @@ ship::ship(world &parent_world, chunk *parent_chunk, Vector3f const &position)
     orientation_conjugate(orientation) {
   /// Default constructor
   orientation_conjugate.conjugate();
+  mass = 10000.0;
+  drag = 3.0 * 5.0 * 5.0;
 }
 
 ship::~ship() {
@@ -35,4 +37,7 @@ void ship::roll(float roll) {
   Vector3f axis_roll(0.0f, 0.0f, 1.0f);
   axis_roll.rotate(orientation_conjugate);
   orientation *= Quatf::fromAxisRot(axis_roll, roll);
+
+  orientation_conjugate = orientation;    // update the cached conjugate
+  orientation_conjugate.conjugate();
 }

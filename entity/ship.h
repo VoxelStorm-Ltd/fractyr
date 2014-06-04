@@ -5,9 +5,7 @@
 
 class ship : public entity {
 protected:
-  float move_speed = 1.0 / 60.0;  // camera movement speed, metres per frame
-  float damping = 0.8;            // multiplier for movement damping
-  float acceleration = move_speed * ((1.0 / damping) - 1.0);   // the required acceleration to reach our desired max speed with our set damping
+  float acceleration = 0.02;      // engine acceleration, m/frame^2
 
   Quatf orientation_conjugate;    // conjugation of entity::orientation, cached
 

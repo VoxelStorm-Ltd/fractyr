@@ -17,7 +17,7 @@ protected:
 
   float mass   = 1.0;                     // how much this weighs, kilograms
   float radius = 0.0;                     // bounding sphere, metres
-  float drag   = 0.0;                     // how much drag this entity experiences (coefficient of drag)
+  float drag   = 0.0;                     // how much drag this entity experiences (coefficient of drag * cross-sectional area)
 
 public:
   entity(world &parent_world, chunk *parent_chunk, Vector3f const &position);

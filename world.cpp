@@ -40,10 +40,13 @@ std::vector<chunk*> world::get_visible_chunks(Vector3i const &chunk_coords,
   std::vector<chunk*> chunk_list;
   chunk_list.reserve(pow((range * 2) + 1, 3));
   // DEBUG ONLY
+  chunk_list.emplace_back(get_chunk(chunk_coords));
   for(int x = -range; x <= range; ++x) {
     for(int y = -range; y <= range; ++y) {
       for(int z = -range; z <= range; ++z) {
-        chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, z)));
+        if(!(x == 0 && y == 0 && z == 0)) {
+          chunk_list.emplace_back(get_chunk(chunk_coords + Vector3i(x, y, z)));
+        }
       }
     }
   }

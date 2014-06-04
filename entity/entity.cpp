@@ -1,4 +1,5 @@
 #include "entity.h"
+#include <limits>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "world.h"
@@ -24,9 +25,12 @@ void entity::update() {
   move(velocity);
 
   // apply drag
-  Vector3f const drag_force(velocity * velocity * drag * parent_world.drag);
-  Vector3f const deceleration(drag_force / mass);
-  velocity -= deceleration;
+  float const drag_force(velocity.lengthSq() * drag * parent_world.drag);
+  float const deceleration(drag_force / mass);
+  //std::cout << "DEBUG V = " << velocity.length() * 60.0 << "m/s, F = " << drag_force << "N, acc = " << deceleration << "m/s^2" << std::endl;
+  if(velocity != Vector3f(0.0, 0.0, 0.0)) {
+    velocity -= velocity.normalise_copy() * deceleration;
+  }
 }
 
 void entity::move(Vector3f const &direction) {
