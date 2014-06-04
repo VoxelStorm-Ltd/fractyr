@@ -18,7 +18,7 @@ chunk::chunk(Vector3i const &chunk_coords, world &parent)
 
 chunk::~chunk() {
   /// Default destructor
-  for(auto &e : entities) {
+  for(auto & e : entities) {
     delete e;
   }
 }
@@ -34,7 +34,7 @@ Vector3f chunk::check_collision(Vector3f const &coords, float radius) const {
 
 void chunk::update() {
   /// Update every entity in this chunk
-  for(auto &e : entities) {
+  for(auto & e : entities) {
     e->update();
   }
 }
@@ -80,7 +80,7 @@ void chunk::render(Vector3i const &view_chunk_coords) const {
 
   buf.render();
 
-  for(auto &e : entities) {
+  for(auto & e : entities) {
     e->render();
   }
 
@@ -122,13 +122,59 @@ void chunk::setup() {
 
   // Randomly add particles into the container
   for(unsigned int i = 0; i != 20; ++i) {
-    float const x = float(rand()) / RAND_MAX * size;
-    float const y = float(rand()) / RAND_MAX * size;
-    float const z = float(rand()) / RAND_MAX * size;
-    con.put(i, x, y, z);
+    Vector3f const coords(float(rand()) / RAND_MAX * size,
+                          float(rand()) / RAND_MAX * size,
+                          float(rand()) / RAND_MAX * size);
+    con.put(i, coords.x, coords.y, coords.z);
   }
 
   std::cout << "DEBUG: Voronoi volume: " << con.sum_cell_volumes() << std::endl;
+
+  voro::c_loop_all cell_loop(con);
+  voro::voronoicell_neighbor cell;
+  if(cell_loop.start()) {
+    do {
+      if(con.compute_cell(cell, cell_loop)) {
+        Vector3d coords;
+        cell_loop.pos(coords.x, coords.y, coords.z);
+        int cell_id = cell_loop.pid();
+
+        //cell.print_edges();      // DEBUG
+        //std::cout << "DEBUG " << coords << std::endl;
+
+        // Gather information about the computed Voronoi cell
+        std::vector<int> neighbour;           // list of neighbour IDs corresponding to faces  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l02198
+        cell.neighbors(neighbour);
+        std::vector<int> face_verts;
+        cell.face_vertices(face_verts);       // 0-bracketed list of vertex ids   http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l01839
+        std::vector<double> normals;
+        cell.normals(normals);                // normals by face, in threes  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l01639
+        std::vector<double> verts;
+        cell.vertices(coords.x, coords.y, coords.z, verts);
+
+        // Loop over all faces of the Voronoi cell
+        for(unsigned int i = 0, j = 0; i != neighbour.size(); ++i) {
+          // Skip if the neighbor information is smaller than
+          // this particle's ID, to avoid double counting. This
+          // also removes faces that touch the walls, since the
+          // neighbor information is set to negative numbers for
+          // these cases.
+          if(neighbour[i] > cell_id) {
+            // TODO: check if the two cells we're looking between are air/stone
+            // TODO: iterate through vertices of this face, and tesselate
+          }
+          // Skip to the next entry in the face vertex list
+          j += face_verts[j] + 1;
+        }
+      }
+    } while(cell_loop.inc());
+  }
+
+  // TODO:
+  //voro::voronoicell_neighbor cell;
+  //int num_edges = cell.number_of_edges();     // potentially slow function  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l02007
+  //int num_faces = cell.number_of_faces();     // potentially slow function  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l01721
+
 
   vbodata.shrink_to_fit();
   ibodata.shrink_to_fit();
