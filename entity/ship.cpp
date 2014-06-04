@@ -29,3 +29,10 @@ void ship::rotate(float yaw, float pitch) {
   orientation_conjugate = orientation;    // update the cached conjugate
   orientation_conjugate.conjugate();
 }
+
+void ship::roll(float roll) {
+  /// Rotate this ship through a roll angle relative to its orientation
+  Vector3f axis_roll(0.0f, 0.0f, 1.0f);
+  axis_roll.rotate(orientation_conjugate);
+  orientation *= Quatf::fromAxisRot(axis_roll, roll);
+}

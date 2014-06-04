@@ -114,6 +114,8 @@ public:
   void input_move_right(         float amount = 1.0);
   void input_move_up(            float amount = 1.0);
   void input_move_down(          float amount = 1.0);
+  void input_roll_left(          float amount = 1.0);
+  void input_roll_right(         float amount = 1.0);
   void input_turn_left(          float amount = 1.0);
   void input_turn_right(         float amount = 1.0);
   void input_zoom_in(            float amount = 1.0);

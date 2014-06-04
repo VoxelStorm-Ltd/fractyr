@@ -17,6 +17,7 @@ public:
 
   void accelerate(Vector3f accel);
   void rotate(float yaw, float pitch);
+  void roll(float roll);
 };
 
 #endif // SHIP_H_INCLUDED

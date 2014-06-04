@@ -236,8 +236,8 @@ void gameplayer::setup_input() {
   bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_LEFT,         &gameplayer::input_move_left);
   bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_D,            &gameplayer::input_move_right);
   bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_RIGHT,        &gameplayer::input_move_right);
-  bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_Q,            &gameplayer::input_turn_left);
-  bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_E,            &gameplayer::input_turn_right);
+  bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_Q,            &gameplayer::input_roll_left);
+  bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_E,            &gameplayer::input_roll_right);
   bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_SPACE,        &gameplayer::input_move_up);
   bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_LEFT_CONTROL, &gameplayer::input_move_down);
   bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_F11,          &gameplayer::input_toggle_fullscreen,   false);
@@ -343,6 +343,12 @@ void gameplayer::input_move_up(float amount) {
 }
 void gameplayer::input_move_down(float amount) {
   current_ship->accelerate(Vector3f(0.0, -amount, 0.0));
+}
+void gameplayer::input_roll_left(float amount) {
+  current_ship->roll(-amount);
+}
+void gameplayer::input_roll_right(float amount) {
+  current_ship->roll(amount);
 }
 void gameplayer::input_turn_left(float amount) {
   pre_rotation = fmodf(pre_rotation - (2.0 * amount), 360.0);
