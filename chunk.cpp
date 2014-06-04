@@ -13,7 +13,6 @@ chunk::chunk(Vector3i const &chunk_coords, world &parent)
     coords(chunk_coords) {
   /// Default constructor
   setup_buffers();
-  setup();
 }
 
 chunk::~chunk() {
