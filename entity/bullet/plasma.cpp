@@ -9,12 +9,13 @@ plasma::plasma(world &parent_world,
                chunk *parent_chunk,
                Vector3f const &position,
                Quatf const &orientation,
-               Vector3f const &ship_velocity)
+               Vector3f const &ship_velocity,
+               float shot_speed)
   : bullet(parent_world, parent_chunk, position, orientation) {
   /// Default constructor
   radius = 0.2;
 
-  velocity = Vector3f(0.0, 0.0, -1.5);
+  velocity = Vector3f(0.0, 0.0, -shot_speed);
   velocity.rotate(orientation_conjugate);
   velocity += ship_velocity;
 }

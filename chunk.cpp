@@ -9,9 +9,6 @@
 #include "world.h"
 #include "grunt.h"
 #include "blaster.h"
-#include "gameplayer.h"
-
-extern gameplayer player;
 
 chunk::chunk(Vector3i const &chunk_coords, world &parent)
   : parent(&parent),
@@ -37,12 +34,10 @@ Vector3f chunk::check_collision(Vector3f const &coords, float radius) const {
 }
 
 void chunk::update() {
-  /// Update every entity in this chunk
-  for(auto &e : entities) {
-    e->update();
-  }
+  /// Check for collisions and clean up any deleted entities in this chunk
 
   // Check for collisions between all pairs of entities in this chunk
+  // TODO: Also check neighboring chunks.
   for(auto it = entities.begin(); it != entities.end(); ++it) {
     for(auto it2 = it+1; it2 != entities.end(); ++it2) {
       //std::cout << "Checking collision between " << *it << " and " << *it2 << std::endl;
@@ -50,19 +45,6 @@ void chunk::update() {
           (*it)->collided_with(*it2);
           (*it2)->collided_with(*it);
       }
-    }
-  }
-
-  // Destroy any dead (non-player) entities
-  for(auto it = entities.begin(); it != entities.end();) {
-    entity *ent = *it;
-    if (ent->health <= 0 && ent != player.current_ship) {
-      //std::cout << "DEBUG: Removing entity: " << ent << std::endl;
-      it = entities.erase(it);
-      ent->get_parent_world()->remove_entity(ent);
-      delete ent;
-    } else {
-      ++it;
     }
   }
 }
@@ -268,5 +250,5 @@ void chunk::setup() {
 
   // generate enemies
   grunt *grunt1 = new grunt(*parent, this, Vector3f(70.0, 10.0, 50.0));
-  grunt1->add_weapon(new blaster(grunt1));
+  grunt1->add_weapon(new blaster(grunt1, 120.0, 0.9));
 }

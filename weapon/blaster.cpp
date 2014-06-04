@@ -2,8 +2,10 @@
 #include "plasma.h"
 #include "ship.h"
 
-blaster::blaster(ship *parent)
-  : weapon(parent) {
+blaster::blaster(ship *parent, float fire_rate, float shot_speed)
+  : weapon(parent),
+    fire_rate(fire_rate),
+    shot_speed(shot_speed) {
   /// Default constructor
 }
 
@@ -21,16 +23,18 @@ void blaster::fire() {
   Quatf const &barrel_orientation(parent->get_orientation());
   Quatf const &barrel_orientation_conjugate(parent->get_orientation_conjugate());
   chunk *thischunk(parent->get_parent());
-  Vector3f barrel_offset(1.0, 0.0, 0.0);
-  barrel_offset.rotate(barrel_orientation_conjugate);
+  Vector3f barrel_coords_left(1.0, 0.0, -parent->radius - 0.3);
+  barrel_coords_left.rotate(barrel_orientation_conjugate);
+  barrel_coords_left += barrel_coords;
 
-  Vector3f barrel_coords_left( barrel_coords - barrel_offset);
-  Vector3f barrel_coords_right(barrel_coords + barrel_offset);
+  Vector3f barrel_coords_right(-1.0, 0.0, -parent->radius - 0.3);
+  barrel_coords_right.rotate(barrel_orientation_conjugate);
+  barrel_coords_right += barrel_coords;
 
   parent->correct_point(barrel_coords_left,  thischunk);
   parent->correct_point(barrel_coords_right, thischunk);
 
-  new plasma(*parent->get_parent_world(), thischunk, barrel_coords_left,  barrel_orientation, parent->get_velocity());
-  new plasma(*parent->get_parent_world(), thischunk, barrel_coords_right, barrel_orientation, parent->get_velocity());
-  cooldown = 60 / 10;
+  new plasma(*parent->get_parent_world(), thischunk, barrel_coords_left,  barrel_orientation, parent->get_velocity(), shot_speed);
+  new plasma(*parent->get_parent_world(), thischunk, barrel_coords_right, barrel_orientation, parent->get_velocity(), shot_speed);
+  cooldown = fire_rate;
 }

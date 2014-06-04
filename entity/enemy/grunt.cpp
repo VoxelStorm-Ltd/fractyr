@@ -1,5 +1,9 @@
 #include "grunt.h"
 #include "buffer_enemy_grunt.h"
+#include "weapon.h"
+#include "gameplayer.h"
+
+extern gameplayer player;
 
 buffer_enemy_grunt grunt::buf;
 
@@ -28,11 +32,23 @@ void grunt::render() const {
 
 void grunt::update() {
   /// Update this enemy's AI actions
-  // TODO
-  velocity.x += (rand() / static_cast<float>(RAND_MAX) - 0.5) / 100.0;
-  velocity.y += (rand() / static_cast<float>(RAND_MAX) - 0.5) / 100.0;
-  velocity.z += (rand()  /static_cast<float>(RAND_MAX) - 0.5) / 100.0;
 
+  if((get_world_position() - player.current_ship->get_world_position()).lengthSq() < 40000) {
+    velocity.x += (rand() / static_cast<float>(RAND_MAX) - 0.5) / 100.0;
+    velocity.y += (rand() / static_cast<float>(RAND_MAX) - 0.5) / 100.0;
+    velocity.z += (rand()  /static_cast<float>(RAND_MAX) - 0.5) / 100.0;
+
+    Quatf target_orientation = Quatf::fromMatrix(Matrix4f::createLookAt(get_world_position(), player.current_ship->get_world_position(), Vector3f(0, 0, 1)));
+    orientation = orientation.slerp(0.05, target_orientation);
+    orientation.normalise();
+    orientation_conjugate = orientation.conjugate_copy();
+
+    for (auto weapon : weapons) {
+      weapon->fire();
+    }
+  } else {
+    velocity = Vector3f(0.0, 0.0, 0.0);
+  }
   enemy::update();
 }
 

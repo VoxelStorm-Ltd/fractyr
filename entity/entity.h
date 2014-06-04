@@ -40,6 +40,7 @@ public:
   world *get_parent_world() const;
   chunk *get_parent() const;
   Vector3f const &get_position() const;
+  Vector3f const get_world_position() const;
   Vector3f const &get_velocity() const;
   Quatf const &get_orientation() const;
   Quatf const &get_orientation_conjugate() const;

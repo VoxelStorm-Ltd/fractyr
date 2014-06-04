@@ -35,6 +35,9 @@ chunk *entity::get_parent() const {
 Vector3f const &entity::get_position() const {
   return position;
 }
+Vector3f const entity::get_world_position() const {
+  return position + (parent->coords * chunk::size);
+}
 Vector3f const &entity::get_velocity() const {
   return velocity;
 }

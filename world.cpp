@@ -3,6 +3,10 @@
 #include "vmath.h"
 #include "chunk.h"
 #include "entity.h"
+#include "ship.h"
+#include "gameplayer.h"
+
+extern gameplayer player;
 
 world::world() {
   /// Default constructor
@@ -293,8 +297,27 @@ void world::setup_buffers() {
 
 void world::update() {
   /// Update visible chunks
+  for (auto entity: entities) {
+    entity->update();
+  }
+
   for (auto thischunk: visible_chunks) {
     thischunk->update();
+  }
+
+  //std::cout << "DEBUG: Player coords: " << player.current_ship->get_world_position() << std::endl;
+
+  // Destroy any dead (non-player) entities
+  for(auto it = entities.begin(); it != entities.end();) {
+    entity *ent = *it;
+    if (ent->health <= 0 && ent != player.current_ship) {
+      //std::cout << "DEBUG: Removing entity: " << ent << std::endl;
+      it = entities.erase(it);
+      ent->get_parent()->remove_entity(ent);
+      delete ent;
+    } else {
+      ++it;
+    }
   }
 }
 

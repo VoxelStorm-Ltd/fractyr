@@ -5,8 +5,12 @@
 
 class blaster : public weapon {
   /// Basic classic video game slow-moving bullet blaster
+private:
+  float fire_rate;
+  float shot_speed;
+
 public:
-  blaster(ship *parent);
+  blaster(ship *parent, float fire_rate, float shot_speed);
   ~blaster();
 
   void fire() override final;
