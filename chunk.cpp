@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 #include "entity.h"
 #include "universe.h"
+#include "world.h"
 
 chunk::chunk(Vector3i const &chunk_coords, world &parent)
   : parent(&parent),
@@ -53,9 +54,29 @@ void chunk::remove_entity(entity *thisentity) {
 
 void chunk::render(Vector3i const &view_chunk_coords) const {
   /// Draw the contents of this chunk as viewed from coords
-  Vector3i offset((coords - view_chunk_coords) * size);
+  Vector3i offset(coords - view_chunk_coords);
+  int constexpr worldsize_half = world::size / 2;
+  if(offset.x > worldsize_half) {
+    offset.x -= world::size;
+  }
+  if(offset.y > worldsize_half) {
+    offset.y -= world::size;
+  }
+  if(offset.z > worldsize_half) {
+    offset.z -= world::size;
+  }
+  if(offset.x < -worldsize_half) {
+    offset.x += world::size;
+  }
+  if(offset.y < -worldsize_half) {
+    offset.y += world::size;
+  }
+  if(offset.z < -worldsize_half) {
+    offset.z += world::size;
+  }
+  offset *= size;
   glPushMatrix();
-  glTranslatef(-offset.x, -offset.y, -offset.z);
+  glTranslatef(offset.x, offset.y, offset.z);
 
   buf.render();
 
