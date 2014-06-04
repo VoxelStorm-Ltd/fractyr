@@ -52,7 +52,8 @@ void chunk::remove_entity(entity *thisentity) {
 
 void chunk::render(Vector3i const &view_chunk_coords) const {
   /// Draw the contents of this chunk as viewed from coords
-  Vector3i offset((coords - view_chunk_coords) * size);
+  //Vector3i offset((coords - view_chunk_coords) * size);
+  Vector3i offset((view_chunk_coords - coords) * size);
   glPushMatrix();
   glTranslatef(-offset.x, -offset.y, -offset.z);
 
@@ -119,9 +120,21 @@ void chunk::setup() {
   // base, top
   unsigned int offset = vbodata.size();
   vbodata.emplace_back(Vector3f(0.0,        0.0, 0.0       ), Vector3f(0.0, 1.0, 0.0));
-  vbodata.emplace_back(Vector3f(0.0,        0.0, size * 0.9), Vector3f(0.0, 1.0, 0.0));
-  vbodata.emplace_back(Vector3f(size * 0.9, 0.0, size * 0.9), Vector3f(0.0, 1.0, 0.0));
-  vbodata.emplace_back(Vector3f(size * 0.9, 0.0, 0.0       ), Vector3f(0.0, 1.0, 0.0));
+  vbodata.emplace_back(Vector3f(0.0,        0.0, size * 0.5), Vector3f(0.0, 1.0, 0.0));
+  vbodata.emplace_back(Vector3f(size * 0.5, 0.0, size * 0.5), Vector3f(0.0, 1.0, 0.0));
+  vbodata.emplace_back(Vector3f(size * 0.5, 0.0, 0.0       ), Vector3f(0.0, 1.0, 0.0));
+  ibodata.emplace_back(offset + 0);
+  ibodata.emplace_back(offset + 1);
+  ibodata.emplace_back(offset + 2);
+  ibodata.emplace_back(offset + 2);
+  ibodata.emplace_back(offset + 3);
+  ibodata.emplace_back(offset + 0);
+  // base, bottom
+  offset = vbodata.size();
+  vbodata.emplace_back(Vector3f(0.0,        0.0, 0.0       ), Vector3f(0.0, -1.0, 0.0));
+  vbodata.emplace_back(Vector3f(size * 0.5, 0.0, 0.0       ), Vector3f(0.0, -1.0, 0.0));
+  vbodata.emplace_back(Vector3f(size * 0.5, 0.0, size * 0.5), Vector3f(0.0, -1.0, 0.0));
+  vbodata.emplace_back(Vector3f(0.0,        0.0, size * 0.5), Vector3f(0.0, -1.0, 0.0));
   ibodata.emplace_back(offset + 0);
   ibodata.emplace_back(offset + 1);
   ibodata.emplace_back(offset + 2);
