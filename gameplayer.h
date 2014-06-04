@@ -72,7 +72,7 @@ public:
 
   // render setup
 private:
-  void cache_matrix(double nearplane = 2.0, double farplane = 3000.0);
+  void cache_matrix(double nearplane = 1.0, double farplane = 3000.0);
 public:
   void setup_render_perspective();
   void setup_render_oculus_left();

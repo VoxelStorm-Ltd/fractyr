@@ -33,6 +33,7 @@ public:
   Vector3f const &get_position() const;
   Vector3f const &get_velocity() const;
   Quatf const &get_orientation() const;
+  Quatf const &get_orientation_conjugate() const;
 
   virtual void update();
   void move(Vector3f const &direction);

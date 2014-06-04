@@ -41,6 +41,9 @@ Vector3f const &entity::get_velocity() const {
 Quatf const &entity::get_orientation() const {
   return orientation;
 }
+Quatf const &entity::get_orientation_conjugate() const {
+  return orientation_conjugate;
+}
 
 void entity::update() {
   move(velocity);

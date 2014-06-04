@@ -122,6 +122,7 @@ void universe::init_buffers() {
     current_world->setup_buffers();
   }
   plasma::buf.init();
+  plasma::buf.setup();
 
   // initialise fonts
   // TODO

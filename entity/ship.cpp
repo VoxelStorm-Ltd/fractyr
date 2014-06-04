@@ -19,8 +19,8 @@ ship::~ship() {
 
 Vector3f ship::get_weapon_position() {
   /// Return the vector position of the weapon's mount point
-  Vector3f offset(0.0, -1.0, 1.0);
-  offset.rotate(orientation);
+  Vector3f offset(0.0, -0.5, -2.0);
+  offset.rotate(orientation_conjugate);
   offset += position;
   return offset;
 }
