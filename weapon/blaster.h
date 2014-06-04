@@ -2,7 +2,6 @@
 #define BLASTER_H_INCLUDED
 
 #include "weapon.h"
-#include "buffer_plasma.h"
 
 class blaster : public weapon {
   /// Basic classic video game slow-moving bullet blaster
