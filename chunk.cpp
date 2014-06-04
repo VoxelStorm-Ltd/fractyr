@@ -7,8 +7,8 @@
 #include "universe.h"
 
 chunk::chunk(Vector3i const &chunk_coords, world &parent)
-  : coords(chunk_coords),
-    parent(&parent) {
+  : parent(&parent),
+    coords(chunk_coords) {
   /// Default constructor
   setup_buffers();
   setup();
@@ -83,11 +83,14 @@ void chunk::setup() {
   std::vector<buffer_chunk::vertex> vbodata;
   std::vector<GLuint>               ibodata;
 
+  vbodata.reserve(1000 * 6);
+  ibodata.reserve(1000 * 6);
+
   std::uniform_real_distribution<float> dist_chunkwide(size * 0.25, size * 0.75);
   std::uniform_real_distribution<float> dist_tri(-1.0, 1.0);
 
   // placeholder: spam random triangles
-  for(unsigned int i = 0; i != 1000; ++i) {
+  for(unsigned int i = 0; i != std::max(coords.x, 0) * 20; ++i) {
     Vector3f const coord0(dist_chunkwide(universe::randomgen), dist_chunkwide(universe::randomgen), dist_chunkwide(universe::randomgen));
     Vector3f const coord1(coord0 + Vector3f(dist_tri(universe::randomgen), dist_tri(universe::randomgen), dist_tri(universe::randomgen)));
     Vector3f const coord2(coord0 + Vector3f(dist_tri(universe::randomgen), dist_tri(universe::randomgen), dist_tri(universe::randomgen)));
@@ -113,5 +116,20 @@ void chunk::setup() {
     ibodata.emplace_back(offset + 2);
   }
 
+  // base, top
+  unsigned int offset = vbodata.size();
+  vbodata.emplace_back(Vector3f(0.0,        0.0, 0.0       ), Vector3f(0.0, 1.0, 0.0));
+  vbodata.emplace_back(Vector3f(0.0,        0.0, size * 0.9), Vector3f(0.0, 1.0, 0.0));
+  vbodata.emplace_back(Vector3f(size * 0.9, 0.0, size * 0.9), Vector3f(0.0, 1.0, 0.0));
+  vbodata.emplace_back(Vector3f(size * 0.9, 0.0, 0.0       ), Vector3f(0.0, 1.0, 0.0));
+  ibodata.emplace_back(offset + 0);
+  ibodata.emplace_back(offset + 1);
+  ibodata.emplace_back(offset + 2);
+  ibodata.emplace_back(offset + 2);
+  ibodata.emplace_back(offset + 3);
+  ibodata.emplace_back(offset + 0);
+
+  vbodata.shrink_to_fit();
+  ibodata.shrink_to_fit();
   buf.setup(vbodata, ibodata);
 }
