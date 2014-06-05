@@ -1,7 +1,7 @@
 #include "chunk.h"
 #include <random>
 #include <algorithm>
-#include <map>
+#include <vector>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <voro++.hh>
@@ -170,6 +170,7 @@ void chunk::setup() {
   // TODO: optimise this --^
 
   // populate this chunk and its neigbours' particles so we get a seamless join
+  unsigned int constexpr max_points = 600;
   unsigned int num_points = 0;
   Vector3i offset;
   for(offset.x = -1; offset.x != 2; ++offset.x) {
@@ -179,7 +180,6 @@ void chunk::setup() {
         world::correct_chunk_coords(chunk_coords);      // wrap them if appropriate
         srand(get_unique_seed(chunk_coords));           // seed predictably by coords
         Vector3f const chunk_offset(offset * size);
-        unsigned int constexpr max_points = 600;
         for(int i = 0; i != max_points; ++i) {
         //for(unsigned int i = 0; i != coords.y * 10; ++i) {
           Vector3f const cell_point((static_cast<float>(rand()) * size / RAND_MAX) + chunk_offset.x,
@@ -202,7 +202,7 @@ void chunk::setup() {
   std::cout << "DEBUG: num_points " << num_points << std::endl;
   //std::cout << "DEBUG: Voronoi volume: " << con.sum_cell_volumes() << std::endl;
 
-  std::map<int, bool> cell_is_solid;  // map of cell ID to whether they are solid or air
+  std::vector<bool> cell_is_solid(num_points, false);
 
   voro::c_loop_all cell_loop(con);
   voro::voronoicell_neighbor cell;
@@ -222,8 +222,9 @@ void chunk::setup() {
        cell_coords.z >  size + (size * chunk_margin)) {
       continue;           // don't consider any cell that is outside of the test margin
     }
-    cell_is_solid.insert(std::pair<int, bool>(cell_loop.pid(), get_is_solid(cell_coords)));   // cache the cell save check
+    cell_is_solid[cell_loop.pid()] = get_is_solid(cell_coords);   // cache the cell save check
   } while(cell_loop.inc());
+  // TODO: count falses and trues and compare
 
   cell_loop.start();                  // restart the loop
 
@@ -298,6 +299,6 @@ void chunk::setup() {
     ++total_chunks_generated;
     double time_total = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - timestart).count();
     total_time_taken += time_total;
-    std::cout << "DEBUG: chunk took " << time_total << "ms, avg: " << total_time_taken / total_chunks_generated << "ms, total: " << total_time_taken << "ms" << std::endl;
+    std::cout << "DEBUG: chunk took " << time_total << "ms, avg: " << total_time_taken / total_chunks_generated << "ms, total: " << total_time_taken << "ms, " << total_chunks_generated << "chunks" << std::endl;
   #endif
 }
