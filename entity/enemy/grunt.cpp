@@ -34,6 +34,8 @@ void grunt::render() const {
 void grunt::update() {
   /// Update this enemy's AI actions
 
+  // TODO: Take relative velocities and distance into account to correctly lead shots.
+
   if((get_world_position() - player.current_ship->get_world_position()).lengthSq() < 40000) {
     velocity.x += (rand() / static_cast<float>(RAND_MAX) - 0.5) / 100.0;
     velocity.y += (rand() / static_cast<float>(RAND_MAX) - 0.5) / 100.0;

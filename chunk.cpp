@@ -14,6 +14,11 @@ chunk::chunk(Vector3i const &chunk_coords, world &parent)
   : parent(&parent),
     coords(chunk_coords) {
   /// Default constructor
+
+  // generate enemies
+  grunt *grunt1 = new grunt(parent, this, Vector3f(70.0, 10.0, 50.0));
+  grunt1->add_weapon(new blaster(grunt1, 120.0, 0.9));
+
   setup_buffers();
 }
 
@@ -247,8 +252,4 @@ void chunk::setup() {
   vbodata.shrink_to_fit();
   ibodata.shrink_to_fit();
   buf.setup(vbodata, ibodata);
-
-  // generate enemies
-  grunt *grunt1 = new grunt(*parent, this, Vector3f(70.0, 10.0, 50.0));
-  grunt1->add_weapon(new blaster(grunt1, 120.0, 0.9));
 }

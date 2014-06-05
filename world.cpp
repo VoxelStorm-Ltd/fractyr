@@ -297,8 +297,8 @@ void world::setup_buffers() {
 
 void world::update() {
   /// Update visible chunks
-  for (auto entity: entities) {
-    entity->update();
+  for (unsigned int i = 0; i < entities.size(); ++i) { // Not using a foreach/iterator here because entities can be created during this loop if updating an entity causes a new chunk to be created.
+    entities[i]->update();
   }
 
   for (auto thischunk: visible_chunks) {
