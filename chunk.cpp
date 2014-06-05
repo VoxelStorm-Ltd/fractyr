@@ -9,6 +9,11 @@
 #include "universe.h"
 #include "world.h"
 
+#ifndef NDEBUG
+  double chunk::total_time_taken = 0;
+  unsigned int chunk::total_chunks_generated = 0;
+#endif
+
 chunk::chunk(Vector3i const &chunk_coords, world &parent)
   : parent(&parent),
     coords(chunk_coords) {
@@ -310,6 +315,9 @@ void chunk::setup() {
   buf.setup(vbodata, ibodata);
 
   #ifndef NDEBUG
-    std::cout << "DEBUG: chunk took " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - timestart).count() << "ms" << std::endl;
+    ++total_chunks_generated;
+    double time_total = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - timestart).count();
+    total_time_taken += time_total;
+    std::cout << "DEBUG: chunk took " << time_total << "ms, avg: " << total_time_taken / total_chunks_generated << "ms, total: " << total_time_taken << "ms" << std::endl;
   #endif
 }

@@ -21,6 +21,19 @@ private:
 
   buffer_chunk buf;                       // this chunk's graphics buffer
 
+  bool cells_computed = false;
+  struct cell {
+    std::vector<int>    neighbours;       // list of neighbours IDs corresponding to faces
+    std::vector<int>    face_verts;       // 0-bracketed list of vertex ids
+    std::vector<double> verts;            // vertices per cell
+    std::vector<double> normals;          // normals by face, in threes
+  };
+
+  #ifndef NDEBUG
+    static double total_time_taken;                 // time to generate, in milliseconds, for average
+    static unsigned int total_chunks_generated;     // number of chunks, to calculate average time per chunk
+  #endif
+
 public:
   chunk(Vector3i const &chunk_coords, world &parent);
   ~chunk();
