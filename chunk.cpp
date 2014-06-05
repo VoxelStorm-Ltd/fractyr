@@ -47,19 +47,29 @@ unsigned int chunk::get_unique_seed() const {
 
 bool chunk::get_is_solid(Vector3i const &chunk_coords, Vector3f const &local_coords) {
   /// Test a coordinate for solidity
-  Vector3f const coords_composite(chunk_coords + (local_coords / size));
+  unsigned int constexpr iters = 5;
+  unsigned int constexpr scale = 50;
+  Vector3f const coords_composite((local_coords / size) + static_cast<Vector3f>(chunk_coords));
 
-  unsigned int constexpr iters = 3;
+  //std::cout << "DEBUG: " << local_coords << std::endl;
+  //std::cout << "DEBUG: " << coords_composite << std::endl;
+
+  unsigned int x = coords_composite.x * scale;
+  unsigned int y = coords_composite.y * scale;
+  unsigned int z = coords_composite.z * scale;
+
+  //std::cout << "DEBUG: " << x << "," << y << "," << z << std::endl;
+
   unsigned int depth = 1;
   for(unsigned int i = 0; i != iters; ++i) {
     int matches = 0;
-    if((static_cast<unsigned int>(coords_composite.x) / depth) % 3 == 1) {
+    if((x / depth) % 3 == 1) {
       ++matches;
     }
-    if((static_cast<unsigned int>(coords_composite.y) / depth) % 3 == 1) {
+    if((y / depth) % 3 == 1) {
       ++matches;
     }
-    if((static_cast<unsigned int>(coords_composite.z) / depth) % 3 == 1) {
+    if((z / depth) % 3 == 1) {
       ++matches;
     }
     if(matches >= 2) {
