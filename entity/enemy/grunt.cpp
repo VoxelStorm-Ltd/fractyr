@@ -2,6 +2,7 @@
 #include "buffer_enemy_grunt.h"
 #include "weapon.h"
 #include "gameplayer.h"
+#include "playership.h"
 
 extern gameplayer player;
 

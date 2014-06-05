@@ -4,6 +4,7 @@
 #include "chunk.h"
 #include "entity.h"
 #include "ship.h"
+#include "playership.h"
 #include "gameplayer.h"
 
 extern gameplayer player;

@@ -7,7 +7,7 @@
 #include <GLFW/glfw3.h>
 #include "vmath.h"
 
-class ship;                       // forward dec
+class playership;                 // forward dec
 
 class gameplayer {
 private:
@@ -35,7 +35,7 @@ public:
   Vector2f cursorpos;             // on-screen cursor position
 
   // state
-  ship *current_ship = nullptr; // what entity we're currently controlling
+  playership *current_ship = nullptr; // what entity we're currently controlling
 
   // input
   struct controlbinding {
@@ -133,6 +133,7 @@ public:
   void input_graphics_nicest(    float amount = 1.0);
   void input_graphics_compromise(float amount = 1.0);
   void input_graphics_fastest(   float amount = 1.0);
+  void input_cheat(              float amount = 1.0);
 };
 
 #endif // GAMEPLAYER_H_INCLUDED

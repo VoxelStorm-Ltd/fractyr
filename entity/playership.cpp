@@ -18,6 +18,11 @@ void playership::update() {
   if (energy < max_energy) {
     energy++;
   }
+  #ifndef NDEBUG
+  if (invincible) {
+    energy = max_energy;
+  }
+  #endif
   ship::update();
 }
 
@@ -44,4 +49,14 @@ bool playership::fire(unsigned int weapon_id) {
     return true;
   }
   return false;
+}
+
+void playership::collided_with(entity *other) {
+  #ifndef NDEBUG
+    if (!invincible) {
+      entity::collided_with(other);
+    }
+  #else
+    entity::collided_with(other);
+  #endif
 }

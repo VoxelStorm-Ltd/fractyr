@@ -20,6 +20,7 @@ void weapon::update() {
 bool weapon::fire() {
   /// Fire this weapon
   std::cout << "ERROR: virtual base function " << __PRETTY_FUNCTION__ << " called; this should never happen" << std::endl;
+  return false;
 }
 
 unsigned int weapon::get_cost_per_shot() const {
