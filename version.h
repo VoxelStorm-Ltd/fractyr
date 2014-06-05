@@ -27,7 +27,5 @@ namespace AutoVersion{
 	
 	//These values are to keep track of your versioning state, don't modify them.
 	static const long BUILD_HISTORY = 56;
-	
-
 }
 #endif //VERSION_H

@@ -25,11 +25,17 @@ world::~world() {
   }
 }
 
+void world::correct_chunk_coords(Vector3i &chunk_coords) {
+  /// Wrap the chunk coords round if they exceed the bounds
+  chunk_coords.x = ((size + chunk_coords.x) % size);    // we can use modulo to do this branchlessly
+  chunk_coords.y = ((size + chunk_coords.y) % size);
+  chunk_coords.z = ((size + chunk_coords.z) % size);
+}
+
 chunk *world::get_chunk(Vector3i const &chunk_coords) {
   /// Find a chunk with the given coordinates, and generate it if it doesn't exist
-  Vector3i const checked_coords((size + chunk_coords.x) % size,
-                                (size + chunk_coords.y) % size,
-                                (size + chunk_coords.z) % size);     // the world wraps, so we just modulo
+  Vector3i checked_coords(chunk_coords);
+  correct_chunk_coords(checked_coords);
   chunk *&thischunk = chunks[checked_coords.x][checked_coords.y][checked_coords.z];
   if(!thischunk) {
     thischunk = new chunk(checked_coords, *this);
