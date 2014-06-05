@@ -63,11 +63,11 @@ bool chunk::get_is_solid(Vector3f const &local_coords) const {
 
 Vector3f chunk::get_colour(Vector3i const &chunk_coords, Vector3f const &local_coords) {
   /// Return the colour at these coordinates
-  Vector3f facecolour(0.92, 0.95, 1.00);      // 2329 Kid Glove normalised to 1
+  Vector3f face_colour(0.92, 0.95, 1.00);      // 2329 Kid Glove normalised to 1
   if(fmodf(local_coords.x, 10.0) < 1.0) {
-    facecolour.assign(1.0, 1.0, 0.0);       // test gold chunks
+    face_colour.assign(1.0, 1.0, 0.0);       // test gold chunks
   }
-  return facecolour;
+  return face_colour;
 }
 Vector3f chunk::get_colour(Vector3f const &local_coords) const {
   /// Wrapper function for the static
@@ -184,7 +184,6 @@ void chunk::setup() {
                       num_cells, num_cells, num_cells,                      // the number of grid blocks in each of the three coordinate directions
                       false, false, false,                                  // flags setting whether the container is periodic in each coordinate direction - see http://math.lbl.gov/voro++/doc/refman/classvoro_1_1container.html#a50aaf382a069b102930b88976215818f
                       ideal_points_per_block);                              // the initial memory allocation for each block (number of particles)
-  // TODO: optimise this --^
 
   // populate this chunk and its neigbours' particles so we get a seamless join
   unsigned int constexpr max_points = 600;
@@ -237,9 +236,14 @@ void chunk::setup() {
        cell_coords.y >  size + (size * chunk_margin) ||
        cell_coords.z < -size         * chunk_margin  ||
        cell_coords.z >  size + (size * chunk_margin)) {
+      cell_is_solid[cell_loop.pid()] = false;
+      // NOTE: this may produce erroneous output
       continue;           // don't consider any cell that is outside of the test margin
     }
-    cell_is_solid[cell_loop.pid()] = get_is_solid(cell_coords);   // cache the cell save check
+    Vector3i checked_chunk_coords(coords);
+    Vector3f checked_cell_coords(cell_coords);
+    entity::correct_point(checked_chunk_coords, checked_cell_coords);
+    cell_is_solid[cell_loop.pid()] = get_is_solid(checked_chunk_coords, checked_cell_coords);   // cache the cell save check
   } while(cell_loop.inc());
 
   cell_loop.start();                  // restart the loop
@@ -263,42 +267,91 @@ void chunk::setup() {
     }
     if(con.compute_cell(cell, cell_loop)) {
       // Gather information about the computed Voronoi cell
-      std::vector<int>    neighbours;
-      std::vector<int>    face_verts;
-      std::vector<double> verts;
-      std::vector<double> normals;
-      //neighbours.reserve(33);                   // measured max
-      neighbours.reserve(16);                   // measured average
+      std::vector<float> verts;
+      //verts.reserve(180);                       // measured max
+      //verts.reserve(82);                        // measured average
+      verts.reserve(3 * cell.p);                // actual requirement
+      // re-implemented from voro::voronoicell_base::vertices()
+      double *ptsp = cell.pts;
+      for(int i = 0; i < 3 * cell.p; i += 3) {
+        verts.emplace_back(cell_coords.x + static_cast<float>(*(ptsp++)) * 0.5f);
+        verts.emplace_back(cell_coords.y + static_cast<float>(*(ptsp++)) * 0.5f);
+        verts.emplace_back(cell_coords.z + static_cast<float>(*(ptsp++)) * 0.5f);
+      }
+      //normals.reserve(96);                      // measured max
+      //normals.reserve(47);                      // measured average
+      std::vector<int> face_verts;
       //face_verts.reserve(233);                  // measured max
       face_verts.reserve(97);                   // measured average
-      //verts.reserve(180);                       // measured max
-      verts.reserve(82);                        // measured average
-      //normals.reserve(96);                      // measured max
-      normals.reserve(47);                      // measured average
-      cell.neighbors(neighbours);               // list of neighbours IDs corresponding to faces  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l02198
-      cell.face_vertices(face_verts);           // 0-bracketed list of vertex ids   http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l01839
-      cell.vertices(cell_coords.x, cell_coords.y, cell_coords.z, verts);
-      cell.normals(normals);
+      std::vector<int> neighbours;
+      //neighbours.reserve(33);                   // measured max
+      neighbours.reserve(16);                   // measured average
+      // re-implemented from merge of voro::voronoicell_base::face_vertices() and voro::voronoicell_base::neighbors()
+      int vp(0);
+      for(int i = 1; i != cell.p; ++i) {
+        for(int j = 0; j != cell.nu[i]; ++j) {
+          int k = cell.ed[i][j];
+          if(k >= 0) {
+            face_verts.emplace_back(0);
+            face_verts.emplace_back(i);
+            neighbours.emplace_back(cell.ne[i][j]);
+            cell.ed[i][j] = -1 - k;
+            int l = cell.cycle_up(cell.ed[i][cell.nu[i] + j], k);
+            do {
+              face_verts.emplace_back(k);
+              int m = cell.ed[k][l];
+              cell.ed[k][l] = -1 - m;
+              l = cell.cycle_up(cell.ed[k][cell.nu[k] + l], m);
+              k = m;
+            } while(k != i);
+            int vn = face_verts.size();
+            face_verts[vp] = vn - vp - 1;
+            vp = vn;
+          }
+        }
+      }
+      // re-implemented from voro::voronoicell_base::reset_edges();
+      for(int i = 0; i != cell.p; ++i) {
+        for(int j = 0; j != cell.nu[i]; ++j) {
+          cell.ed[i][j] = -1 - cell.ed[i][j];
+        }
+      }
 
       for(unsigned int face = 0, vert_offset = 0; face != neighbours.size(); ++face) {    // loop over all faces of the Voronoi cell
-        if(//neighbours[face] >= 0 &&             // internal faces only - container edges have negative IDs
-           !cell_is_solid[neighbours[face]]) {  // only draw faces between solid and air cells
-          //std::cout << "DEBUG: face " << face << " neighbours[face] " << neighbours[face] << " face_verts[vert_offset] " << face_verts[vert_offset] << " vert_offset " << vert_offset << std::endl;
+        if(//neighbours[face] < 0 ||              // external faces - container edges have negative IDs
+           !cell_is_solid[neighbours[face]]) {  // draw faces between solid and air cells
           #ifdef NDEBUG
-            Vector3f const &facecolour(get_colour(cell_coords));
+            Vector3f const &face_colour(get_colour(cell_coords));
           #else
-            Vector3f facecolour(get_colour(cell_coords));
+            Vector3f face_colour(get_colour(cell_coords));
             if(neighbours[face] < 0) {
-              facecolour.assign(1.0, 0.0, 0.0);     // mark container-cut surfaces red
+              face_colour.assign(1.0, 0.0, 0.0);     // mark container-cut surfaces red
             }
           #endif
+          // tesselation: calculate normals
+          int const vert_index0 = 3 * face_verts[vert_offset + 1];
+          int const vert_index1 = 3 * face_verts[vert_offset + 2];
+          int const vert_index2 = 3 * face_verts[vert_offset + 3];
+          Vector3f face_normal((verts[vert_index0 + 1] - verts[vert_index1 + 1]) *
+                               (verts[vert_index2 + 2] - verts[vert_index0 + 2]) -
+                               (verts[vert_index2 + 1] - verts[vert_index0 + 1]) *
+                               (verts[vert_index0 + 2] - verts[vert_index1 + 2]),
+                               (verts[vert_index0 + 2] - verts[vert_index1 + 2]) *
+                               (verts[vert_index2    ] - verts[vert_index0    ]) -
+                               (verts[vert_index2 + 2] - verts[vert_index0 + 2]) *
+                               (verts[vert_index0    ] - verts[vert_index1    ]),
+                               (verts[vert_index0    ] - verts[vert_index1    ]) *
+                               (verts[vert_index2 + 1] - verts[vert_index0 + 1]) -
+                               (verts[vert_index2    ] - verts[vert_index0    ]) *
+                               (verts[vert_index0 + 1] - verts[vert_index1 + 1]));      // manually expanded cross product
+          face_normal.normalise();
           // tesselation: generate a (clockwise) list of the coordinates and normals of each vertex for this face
           unsigned int offset = vbodata.size();
           for(int i = 0; i < face_verts[vert_offset]; ++i) {
-            int vert_index = 3 * face_verts[vert_offset + i + 1];
+            unsigned int const vert_index = 3 * face_verts[vert_offset + i + 1];
             vbodata.emplace_back(Vector3f(verts[vert_index], verts[vert_index + 1], verts[vert_index + 2]),           // vertex coords
-                                 Vector3f(normals[(face * 3)], normals[(face * 3) + 1], normals[(face * 3) + 2]),     // vertex normal
-                                 facecolour);                                                                         // vertex colour:
+                                 face_normal,                                                                         // vertex normal
+                                 face_colour);                                                                        // vertex colour:
           }
           // tesselation: add indices in counter-clockwise winding order
           for(int i = 2; i < face_verts[vert_offset]; ++i) {
