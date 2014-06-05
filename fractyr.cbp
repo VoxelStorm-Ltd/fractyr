@@ -68,6 +68,7 @@
 					<Add library="lib\win32\libole32.a" />
 					<Add library="lib\win32\libsetupapi.a" />
 					<Add library="lib\win32\libz.a" />
+					<Add library="lib\win32\libvoro++.a" />
 				</Linker>
 			</Target>
 			<Target title="Win32_Release">
