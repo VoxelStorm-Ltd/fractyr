@@ -25,6 +25,9 @@ public:
   chunk(Vector3i const &chunk_coords, world &parent);
   ~chunk();
 
+  // query
+  unsigned int get_unique_seed() const;
+
   // collisions
   Vector3f check_collision(Vector3f const &coords, float radius) const;
 

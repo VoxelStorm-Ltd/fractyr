@@ -23,6 +23,11 @@ chunk::~chunk() {
   }
 }
 
+unsigned int chunk::get_unique_seed() const {
+  /// Return a guaranteed unique seed for this chunk
+  return (((coords.x * world::size) + coords.y) * world::size) + coords.z;
+}
+
 Vector3f chunk::check_collision(Vector3f const &coords, float radius) const {
   /// Check if a given point is colliding, and if so, return a normal vector to the collision surface
   // NOTE: coords can be less than 0 or greater than chunk::size by up to radius
