@@ -39,3 +39,7 @@ bool blaster::fire() {
   cooldown = fire_rate;
   return true;
 }
+
+unsigned int blaster::get_cost_per_shot() const {
+  return 25;
+}

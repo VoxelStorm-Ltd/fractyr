@@ -14,6 +14,7 @@ public:
   ~blaster();
 
   bool fire() override final;
+  virtual unsigned int get_cost_per_shot() const;
 };
 
 #endif // BLASTER_H_INCLUDED

@@ -15,7 +15,7 @@ grunt::grunt(world &parent_world,
   /// Default constructor
   radius = 3.0;
   mass = 1000.0;
-  energy = 200;
+  energy = 400;
 }
 
 grunt::~grunt() {
