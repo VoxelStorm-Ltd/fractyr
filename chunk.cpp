@@ -21,7 +21,7 @@ chunk::chunk(Vector3i const &chunk_coords, world &parent)
   /// Default constructor
 
   // generate enemies
-  float gruntscale = 1 + static_cast<float>((chunk_coords - Vector3i(world::size/2, world::size/2, world::size/2)).length()) / (world::size / 2);
+  float gruntscale = 1 + static_cast<float>((chunk_coords - Vector3i(world::size/2, world::size/2, world::size/2)).length()) / (world::size / 16);
   std::cout << "DEBUG: Spawning grunt with scale: " << gruntscale << std::endl;
   grunt *grunt1 = new grunt(parent, this, Vector3f(70.0, 10.0, 50.0), Quatf::fromEulerAngles(0.0, 0.0, 0.0), gruntscale);
   grunt1->add_weapon(new blaster(grunt1, 120.0  / gruntscale, 0.9 * gruntscale));
