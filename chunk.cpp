@@ -38,10 +38,9 @@ unsigned int chunk::get_unique_seed() const {
 
 bool chunk::get_is_solid(Vector3i const &chunk_coords, Vector3f const &local_coords) {
   /// Test a coordinate for solidity
-  if(local_coords.x > size * 0.2 &&
-     local_coords.x < size * 0.8 &&
-     local_coords.y > size * 0.2 &&
-     local_coords.y < size * 0.8) {               // solid tunnel through the x wall
+  Vector3f const coords_composite(chunk_coords + (local_coords / size));
+
+  if(fmodf(coords_composite.y, 2.0) >= 1.0) {
     return true;
   } else {
     return false;
