@@ -179,8 +179,8 @@ void chunk::setup() {
         world::correct_chunk_coords(chunk_coords);      // wrap them if appropriate
         srand(get_unique_seed(chunk_coords));           // seed predictably by coords
         Vector3f const chunk_offset(offset * size);
-        unsigned int const max_points = num_points + 600;
-        for(int i = 0; i != 600; ++i) {
+        unsigned int constexpr max_points = 600;
+        for(int i = 0; i != max_points; ++i) {
         //for(unsigned int i = 0; i != coords.y * 10; ++i) {
           Vector3f const cell_point((static_cast<float>(rand()) * size / RAND_MAX) + chunk_offset.x,
                                     (static_cast<float>(rand()) * size / RAND_MAX) + chunk_offset.y,
@@ -240,7 +240,7 @@ void chunk::setup() {
       //skip_cell_check:
       cell_is_solid.insert(std::pair<int, bool>(cell_loop.pid(), solid));   // save the entry
     } else {
-      std::cout << "WARNING: chunk " << coords << " failed to compute a cell" << std::endl;
+      ///std::cout << "WARNING: chunk " << coords << " failed to compute a cell" << std::endl;
     }
   } while(cell_loop.inc());
 
@@ -248,32 +248,31 @@ void chunk::setup() {
 
   // tesselate the appropriate cells
   do {
+    //int const cell_id = cell_loop.pid();
+    // check whether to include the cell
+    Vector3d cell_coords;
+    cell_loop.pos(cell_coords.x, cell_coords.y, cell_coords.z);
+    if(cell_coords.x < 0.0  ||
+       cell_coords.x > size ||
+       cell_coords.y < 0.0  ||
+       cell_coords.y > size ||
+       cell_coords.z < 0.0  ||
+       cell_coords.z > size) {
+      continue;           // don't render any cell that is outside of this chunk
+    }
     if(con.compute_cell(cell, cell_loop)) {
-      //int const cell_id = cell_loop.pid();
-      // check whether to include the cell
       if(!cell_is_solid[cell_loop.pid()]) {
         continue;                               // skip this cell if it's an air cell
       }
-      Vector3d cell_coords;
-      cell_loop.pos(cell_coords.x, cell_coords.y, cell_coords.z);
-      if(cell_coords.x < 0.0  ||
-         cell_coords.x > size ||
-         cell_coords.y < 0.0  ||
-         cell_coords.y > size ||
-         cell_coords.z < 0.0  ||
-         cell_coords.z > size) {
-        continue;           // don't render any cell that is outside of this chunk
-      }
-
       // Gather information about the computed Voronoi cell
-      std::vector<int>    neighbours;           // list of neighbours IDs corresponding to faces  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l02198
+      std::vector<int>    neighbours;
       std::vector<int>    face_verts;
       std::vector<double> verts;
       std::vector<double> normals;
-      cell.neighbors(neighbours);
+      cell.neighbors(neighbours);               // list of neighbours IDs corresponding to faces  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l02198
       cell.face_vertices(face_verts);           // 0-bracketed list of vertex ids   http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l01839
       cell.vertices(cell_coords.x, cell_coords.y, cell_coords.z, verts);
-      cell.normals(normals);                    // normals by face, in threes  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l01639
+      cell.normals(normals);
 
       for(unsigned int face = 0, vert_offset = 0; face != neighbours.size(); ++face) {    // loop over all faces of the Voronoi cell
         if(//neighbours[face] >= 0 &&             // internal faces only - container edges have negative IDs
