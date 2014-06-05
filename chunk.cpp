@@ -1,7 +1,6 @@
 #include "chunk.h"
 #include <random>
 #include <algorithm>
-#include <map>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <voro++.hh>
@@ -10,6 +9,11 @@
 #include "world.h"
 #include "grunt.h"
 #include "blaster.h"
+
+#ifndef NDEBUG
+  double chunk::total_time_taken = 0;
+  unsigned int chunk::total_chunks_generated = 0;
+#endif
 
 chunk::chunk(Vector3i const &chunk_coords, world &parent)
   : parent(&parent),
@@ -34,10 +38,38 @@ unsigned int chunk::get_unique_seed(Vector3i const &chunk_coords) {
   /// Return a guaranteed unique seed for these chunk coordinates
   return (((chunk_coords.x * world::size) + chunk_coords.y) * world::size) + chunk_coords.z;
 }
-
 unsigned int chunk::get_unique_seed() const {
-  /// Return a guaranteed unique seed for this chunk
+  /// Wrapper function for the static
   return get_unique_seed(coords);
+}
+
+bool chunk::get_is_solid(Vector3i const &chunk_coords, Vector3f const &local_coords) {
+  /// Test a coordinate for solidity
+  if(local_coords.x > size * 0.2 &&
+     local_coords.x < size * 0.8 &&
+     local_coords.y > size * 0.2 &&
+     local_coords.y < size * 0.8) {               // solid tunnel through the x wall
+    return true;
+  } else {
+    return false;
+  }
+}
+bool chunk::get_is_solid(Vector3f const &local_coords) const {
+  /// Wrapper function for the static
+  return get_is_solid(coords, local_coords);
+}
+
+Vector3f chunk::get_colour(Vector3i const &chunk_coords, Vector3f const &local_coords) {
+  /// Return the colour at these coordinates
+  Vector3f facecolour(0.92, 0.95, 1.00);      // 2329 Kid Glove normalised to 1
+  if(fmodf(local_coords.x, 10.0) < 1.0) {
+    facecolour.assign(1.0, 1.0, 0.0);       // test gold chunks
+  }
+  return facecolour;
+}
+Vector3f chunk::get_colour(Vector3f const &local_coords) const {
+  /// Wrapper function for the static
+  return get_colour(coords, local_coords);
 }
 
 Vector3f chunk::check_collision(Vector3f const &coords, float radius) const {
@@ -128,6 +160,10 @@ void chunk::setup_buffers() {
 
 void chunk::setup() {
   /// Refresh the buffer contents for this chunk
+  #ifndef NDEBUG
+    std::chrono::time_point<std::chrono::high_resolution_clock, std::chrono::duration<double>> timestart(std::chrono::high_resolution_clock::now());
+  #endif
+
   std::vector<buffer_chunk::vertex> vbodata;
   std::vector<GLuint>               ibodata;
 
@@ -137,17 +173,19 @@ void chunk::setup() {
 
   // Create a non-periodic particle container
   float constexpr chunk_margin = 0.25;                                      // how far outside each chunk we compute the voronoi space to avoid discontinuities at edges
-  //float constexpr chunk_margin = 1.0;                                       // how far outside each chunk we compute the voronoi space to avoid discontinuities at edges
-  //float constexpr chunk_margin = -0.1;                                       // how far outside each chunk we compute the voronoi space to avoid discontinuities at edges
+  unsigned int constexpr ideal_points_per_block = 8;                        // the optimal number of points per block in a container
+  unsigned int constexpr expected_points = 2500;                            // roughly how many points we're generating; test and update this for release
+  unsigned int constexpr num_cells = std::cbrt(expected_points / ideal_points_per_block);
   voro::container con(-size * chunk_margin, size + (size * chunk_margin),   // the minimum and maximum x coordinates
                       -size * chunk_margin, size + (size * chunk_margin),   // the minimum and maximum y coordinates
                       -size * chunk_margin, size + (size * chunk_margin),   // the minimum and maximum z coordinates
-                      6, 6, 6,                                              // the number of grid blocks in each of the three coordinate directions
+                      num_cells, num_cells, num_cells,                      // the number of grid blocks in each of the three coordinate directions
                       false, false, false,                                  // flags setting whether the container is periodic in each coordinate direction - see http://math.lbl.gov/voro++/doc/refman/classvoro_1_1container.html#a50aaf382a069b102930b88976215818f
-                      8);                                                   // the initial memory allocation for each block (number of particles)
+                      ideal_points_per_block);                              // the initial memory allocation for each block (number of particles)
   // TODO: optimise this --^
 
   // populate this chunk and its neigbours' particles so we get a seamless join
+  unsigned int constexpr max_points = 600;
   unsigned int num_points = 0;
   Vector3i offset;
   for(offset.x = -1; offset.x != 2; ++offset.x) {
@@ -157,8 +195,7 @@ void chunk::setup() {
         world::correct_chunk_coords(chunk_coords);      // wrap them if appropriate
         srand(get_unique_seed(chunk_coords));           // seed predictably by coords
         Vector3f const chunk_offset(offset * size);
-        unsigned int const max_points = num_points + 600;
-        for(int i = 0; i != 600; ++i) {
+        for(int i = 0; i != max_points; ++i) {
         //for(unsigned int i = 0; i != coords.y * 10; ++i) {
           Vector3f const cell_point((static_cast<float>(rand()) * size / RAND_MAX) + chunk_offset.x,
                                     (static_cast<float>(rand()) * size / RAND_MAX) + chunk_offset.y,
@@ -171,19 +208,16 @@ void chunk::setup() {
              cell_point.z >  size + (size * chunk_margin)) {
             continue;                   // don't add points outside the checked margin
           }
-          con.put(num_points,
-                  cell_point.x,
-                  cell_point.y,
-                  cell_point.z);
+          con.put(num_points, cell_point.x, cell_point.y, cell_point.z);
           ++num_points;
         }
       }
     }
   }
-  std::cout << "DEBUG: num_points " << num_points << std::endl;
+  //std::cout << "DEBUG: num_points " << num_points << std::endl;
   //std::cout << "DEBUG: Voronoi volume: " << con.sum_cell_volumes() << std::endl;
 
-  std::map<int, bool> cell_is_solid;  // map of cell ID to whether they are solid or air
+  bool cell_is_solid[num_points];
 
   voro::c_loop_all cell_loop(con);
   voro::voronoicell_neighbor cell;
@@ -193,94 +227,61 @@ void chunk::setup() {
   }
   // decide whether a cell is an air cell or a solid cell
   do {
-    if(con.compute_cell(cell, cell_loop)) {
-      Vector3d coords;
-      cell_loop.pos(coords.x, coords.y, coords.z);
-      if(coords.x < -size         * chunk_margin  ||
-         coords.x >  size + (size * chunk_margin) ||
-         coords.y < -size         * chunk_margin  ||
-         coords.y >  size + (size * chunk_margin) ||
-         coords.z < -size         * chunk_margin  ||
-         coords.z >  size + (size * chunk_margin)) {
-        continue;           // don't consider any cell that is outside of the test margin
-      }
-      std::vector<int> neighbours;              // list of neighbours IDs corresponding to faces  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l02198
-      cell.neighbors(neighbours);
-      bool solid = false;
-      for(unsigned int face = 0; face != neighbours.size(); ++face) {
-        //if(neighbours[face] < 0) {              // match external faces only (negative cell ID)
-        //  if(coords.y > size * 0.25 &&
-        //     coords.y < size * 0.75 &&
-        //     coords.z > size * 0.25 &&
-        //     coords.z < size * 0.75) {          // tunnel through the x wall
-        //    solid = false;
-        //  } else {
-        //    solid = true;
-        //  }
-        //}
-        // DEBUG ONLY:
-        if(neighbours[face] < 0) {              // match external faces only (negative cell ID)
-          solid = false;
-        } else {
-          if(coords.x > size * 0.2 &&
-             coords.x < size * 0.8 &&
-             coords.y > size * 0.2 &&
-             coords.y < size * 0.8) {          // tunnel through the x wall
-            solid = true;
-          } else {
-            solid = false;
-          }
-        }
-      }
-      cell_is_solid.insert(std::pair<int, bool>(cell_loop.pid(), solid));   // save the entry
-    } else {
-      std::cout << "WARNING: chunk " << coords << " failed to compute a cell" << std::endl;
+    Vector3d cell_coords;
+    cell_loop.pos(cell_coords.x, cell_coords.y, cell_coords.z);
+    if(cell_coords.x < -size         * chunk_margin  ||
+       cell_coords.x >  size + (size * chunk_margin) ||
+       cell_coords.y < -size         * chunk_margin  ||
+       cell_coords.y >  size + (size * chunk_margin) ||
+       cell_coords.z < -size         * chunk_margin  ||
+       cell_coords.z >  size + (size * chunk_margin)) {
+      continue;           // don't consider any cell that is outside of the test margin
     }
+    cell_is_solid[cell_loop.pid()] = get_is_solid(cell_coords);   // cache the cell save check
   } while(cell_loop.inc());
 
   cell_loop.start();                  // restart the loop
 
   // tesselate the appropriate cells
   do {
+    // check whether to include the cell
+    Vector3d cell_coords;
+    cell_loop.pos(cell_coords.x, cell_coords.y, cell_coords.z);
+    if(cell_coords.x < 0.0  ||
+       cell_coords.x > size ||
+       cell_coords.y < 0.0  ||
+       cell_coords.y > size ||
+       cell_coords.z < 0.0  ||
+       cell_coords.z > size) {
+      continue;           // don't render any cell that is outside of this chunk
+    }
+    //int const cell_id = cell_loop.pid();
+    if(!cell_is_solid[cell_loop.pid()]) {
+      continue;                               // skip this cell if it's an air cell
+    }
     if(con.compute_cell(cell, cell_loop)) {
-      //int const cell_id = cell_loop.pid();
-      // check whether to include the cell
-      if(!cell_is_solid[cell_loop.pid()]) {
-        continue;                               // skip this cell if it's an air cell
-      }
-      Vector3d coords;
-      cell_loop.pos(coords.x, coords.y, coords.z);
-      if(coords.x < 0.0  ||
-         coords.x > size ||
-         coords.y < 0.0  ||
-         coords.y > size ||
-         coords.z < 0.0  ||
-         coords.z > size) {
-        continue;           // don't render any cell that is outside of this chunk
-      }
-
       // Gather information about the computed Voronoi cell
-      std::vector<int>    neighbours;           // list of neighbours IDs corresponding to faces  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l02198
+      std::vector<int>    neighbours;
       std::vector<int>    face_verts;
       std::vector<double> verts;
       std::vector<double> normals;
-      cell.neighbors(neighbours);
+      cell.neighbors(neighbours);               // list of neighbours IDs corresponding to faces  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l02198
       cell.face_vertices(face_verts);           // 0-bracketed list of vertex ids   http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l01839
-      cell.vertices(coords.x, coords.y, coords.z, verts);
-      cell.normals(normals);                    // normals by face, in threes  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l01639
+      cell.vertices(cell_coords.x, cell_coords.y, cell_coords.z, verts);
+      cell.normals(normals);
 
       for(unsigned int face = 0, vert_offset = 0; face != neighbours.size(); ++face) {    // loop over all faces of the Voronoi cell
-        if(///neighbours[face] >= 0 &&             // internal faces only - container edges have negative IDs
+        if(//neighbours[face] >= 0 &&             // internal faces only - container edges have negative IDs
            !cell_is_solid[neighbours[face]]) {  // only draw faces between solid and air cells
           //std::cout << "DEBUG: face " << face << " neighbours[face] " << neighbours[face] << " face_verts[vert_offset] " << face_verts[vert_offset] << " vert_offset " << vert_offset << std::endl;
-          Vector3f facecolour(0.92, 0.95, 1.00);  // 2329 Kid Glove normalised to 1
-          if(fmodf(coords.x, 10.0) < 1.0) {
-            facecolour.assign(1.0, 1.0, 0.0);     // test gold chunks
-          }
-          // DEBUG ONLY:
-          if(neighbours[face] < 0) {
-            facecolour.assign(1.0, 0.0, 0.0);     // mark container-cut surfaces red
-          }
+          #ifdef NDEBUG
+            Vector3f const &facecolour(get_colour(cell_coords));
+          #else
+            Vector3f facecolour(get_colour(cell_coords));
+            if(neighbours[face] < 0) {
+              facecolour.assign(1.0, 0.0, 0.0);     // mark container-cut surfaces red
+            }
+          #endif
           // tesselation: generate a (clockwise) list of the coordinates and normals of each vertex for this face
           unsigned int offset = vbodata.size();
           for(int i = 0; i < face_verts[vert_offset]; ++i) {
@@ -307,4 +308,11 @@ void chunk::setup() {
   vbodata.shrink_to_fit();
   ibodata.shrink_to_fit();
   buf.setup(vbodata, ibodata);
+
+  #ifndef NDEBUG
+    ++total_chunks_generated;
+    double time_total = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - timestart).count();
+    total_time_taken += time_total;
+    std::cout << "DEBUG: chunk took " << time_total << "ms, avg: " << total_time_taken / total_chunks_generated << "ms, total: " << total_time_taken << "ms, " << total_chunks_generated << " chunks" << std::endl;
+  #endif
 }

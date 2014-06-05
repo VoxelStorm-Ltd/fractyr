@@ -21,6 +21,19 @@ private:
 
   buffer_chunk buf;                       // this chunk's graphics buffer
 
+  bool cells_computed = false;
+  struct cell {
+    std::vector<int>    neighbours;       // list of neighbours IDs corresponding to faces
+    std::vector<int>    face_verts;       // 0-bracketed list of vertex ids
+    std::vector<double> verts;            // vertices per cell
+    std::vector<double> normals;          // normals by face, in threes
+  };
+
+  #ifndef NDEBUG
+    static double total_time_taken;                 // time to generate, in milliseconds, for average
+    static unsigned int total_chunks_generated;     // number of chunks, to calculate average time per chunk
+  #endif
+
 public:
   chunk(Vector3i const &chunk_coords, world &parent);
   ~chunk();
@@ -28,6 +41,11 @@ public:
   // query
   static unsigned int get_unique_seed(Vector3i const &chunk_coords);
   unsigned int get_unique_seed() const;
+  // generators
+  static bool get_is_solid(Vector3i const &chunk_coords, Vector3f const &local_coords);
+  bool        get_is_solid(Vector3f const &local_coords) const;
+  static Vector3f get_colour(Vector3i const &chunk_coords, Vector3f const &local_coords);
+  Vector3f        get_colour(Vector3f const &local_coords) const;
 
   // collisions
   Vector3f check_collision(Vector3f const &coords, float radius) const;
