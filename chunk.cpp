@@ -166,7 +166,6 @@ void chunk::setup() {
                       num_cells, num_cells, num_cells,                      // the number of grid blocks in each of the three coordinate directions
                       false, false, false,                                  // flags setting whether the container is periodic in each coordinate direction - see http://math.lbl.gov/voro++/doc/refman/classvoro_1_1container.html#a50aaf382a069b102930b88976215818f
                       ideal_points_per_block);                              // the initial memory allocation for each block (number of particles)
-  // TODO: optimise this --^
 
   // populate this chunk and its neigbours' particles so we get a seamless join
   unsigned int constexpr max_points = 600;
@@ -248,7 +247,6 @@ void chunk::setup() {
       std::vector<int>    neighbours;
       std::vector<int>    face_verts;
       std::vector<double> verts;
-      std::vector<double> normals;
       //neighbours.reserve(33);                   // measured max
       neighbours.reserve(16);                   // measured average
       //face_verts.reserve(233);                  // measured max
@@ -256,11 +254,10 @@ void chunk::setup() {
       //verts.reserve(180);                       // measured max
       verts.reserve(82);                        // measured average
       //normals.reserve(96);                      // measured max
-      normals.reserve(47);                      // measured average
+      //normals.reserve(47);                      // measured average
       cell.neighbors(neighbours);               // list of neighbours IDs corresponding to faces  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l02198
       cell.face_vertices(face_verts);           // 0-bracketed list of vertex ids   http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l01839
       cell.vertices(cell_coords.x, cell_coords.y, cell_coords.z, verts);
-      cell.normals(normals);
 
       for(unsigned int face = 0, vert_offset = 0; face != neighbours.size(); ++face) {    // loop over all faces of the Voronoi cell
         if(//neighbours[face] >= 0 &&             // internal faces only - container edges have negative IDs
@@ -274,12 +271,29 @@ void chunk::setup() {
               facecolour.assign(1.0, 0.0, 0.0);     // mark container-cut surfaces red
             }
           #endif
+          // tesselation: calculate normals
+          int const vert_index0 = 3 * face_verts[vert_offset + 1];
+          int const vert_index1 = 3 * face_verts[vert_offset + 2];
+          int const vert_index2 = 3 * face_verts[vert_offset + 3];
+          Vector3f face_normal((verts[vert_index0 + 1] - verts[vert_index1 + 1]) *
+                               (verts[vert_index2 + 2] - verts[vert_index0 + 2]) -
+                               (verts[vert_index2 + 1] - verts[vert_index0 + 1]) *
+                               (verts[vert_index0 + 2] - verts[vert_index1 + 2]),
+                               (verts[vert_index0 + 2] - verts[vert_index1 + 2]) *
+                               (verts[vert_index2    ] - verts[vert_index0    ]) -
+                               (verts[vert_index2 + 2] - verts[vert_index0 + 2]) *
+                               (verts[vert_index0    ] - verts[vert_index1    ]),
+                               (verts[vert_index0    ] - verts[vert_index1    ]) *
+                               (verts[vert_index2 + 1] - verts[vert_index0 + 1]) -
+                               (verts[vert_index2    ] - verts[vert_index0    ]) *
+                               (verts[vert_index0 + 1] - verts[vert_index1 + 1]));      // manually expanded cross product
+          face_normal.normalise();
           // tesselation: generate a (clockwise) list of the coordinates and normals of each vertex for this face
           unsigned int offset = vbodata.size();
           for(int i = 0; i < face_verts[vert_offset]; ++i) {
             int vert_index = 3 * face_verts[vert_offset + i + 1];
             vbodata.emplace_back(Vector3f(verts[vert_index], verts[vert_index + 1], verts[vert_index + 2]),           // vertex coords
-                                 Vector3f(normals[(face * 3)], normals[(face * 3) + 1], normals[(face * 3) + 2]),     // vertex normal
+                                 face_normal,
                                  facecolour);                                                                         // vertex colour:
           }
           // tesselation: add indices in counter-clockwise winding order
