@@ -35,6 +35,7 @@ void grunt::update() {
   /// Update this enemy's AI actions
 
   // TODO: Take relative velocities and distance into account to correctly lead shots.
+  // TODO: The tracking gets confused if (I think) the player crosses the z axis, slerp should deal with this fine but isn't for some reason.
 
   if((get_world_position() - player.current_ship->get_world_position()).lengthSq() < 40000) {
     velocity.x += (rand() / static_cast<float>(RAND_MAX) - 0.5) / 100.0;
