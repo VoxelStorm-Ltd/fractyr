@@ -1,9 +1,10 @@
 #include "chunk.h"
 #include <random>
 #include <algorithm>
-#include <cmath>
+#include <map>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <voro++.hh>
 #include "entity.h"
 #include "universe.h"
 #include "world.h"
@@ -24,9 +25,14 @@ chunk::chunk(Vector3i const &chunk_coords, world &parent)
 
 chunk::~chunk() {
   /// Default destructor
-  for(auto &e : entities) {
+  for(auto & e : entities) {
     delete e;
   }
+}
+
+unsigned int chunk::get_unique_seed() const {
+  /// Return a guaranteed unique seed for this chunk
+  return (((coords.x * world::size) + coords.y) * world::size) + coords.z;
 }
 
 Vector3f chunk::check_collision(Vector3f const &coords, float radius) const {
@@ -95,7 +101,7 @@ void chunk::render(Vector3i const &view_chunk_coords) const {
 
   buf.render();
 
-  for(auto &e : entities) {
+  for(auto & e : entities) {
     e->render();
   }
 
@@ -120,134 +126,146 @@ void chunk::setup() {
   std::vector<buffer_chunk::vertex> vbodata;
   std::vector<GLuint>               ibodata;
 
-  // menger sponge
-  unsigned int constexpr iters = 2;
-  unsigned int constexpr numblocks = static_cast<int>(pow(3.0, static_cast<double>(iters)));
-  float constexpr blocksize = size / static_cast<float>(numblocks) / 2.0;
+  // voronoi triangulation
+  vbodata.reserve(20000);   // make sure to reserve the correct size to avoid re-allocations during construction
+  ibodata.reserve(30000);
 
-  vbodata.reserve(6 * 4 * numblocks * numblocks * numblocks);   // make sure to reserve the correct size to avoid re-allocations during construction
-  ibodata.reserve(6 * 6 * numblocks * numblocks * numblocks);
+  // Create a container with the geometry given above, and make it
+  // non-periodic in each of the three coordinates. Allocate space for
+  // eight particles within each computational block
+  voro::container con(0.0, size,                    // the minimum and maximum x coordinates
+  //                    0.0, size,                    // the minimum and maximum y coordinates
+  //                    0.0, size,                    // the minimum and maximum z coordinates
+  //voro::container con(size * 0.1, size * 0.9,       // the minimum and maximum x coordinates
+                      size * 0.1, size * 0.9,       // the minimum and maximum y coordinates
+                      size * 0.1, size * 0.9,       // the minimum and maximum z coordinates
+                      6, 6, 6,                      // the number of grid blocks in each of the three coordinate directions
+                      false, false, false,          // flags setting whether the container is periodic in each coordinate direction - see http://math.lbl.gov/voro++/doc/refman/classvoro_1_1container.html#a50aaf382a069b102930b88976215818f
+                      8);                           // the initial memory allocation for each block (number of particles)
 
-  Vector3f const normal0( 0.0, 0.0, -1.0);
-  Vector3f const normal1(-1.0, 0.0,  0.0);
-  Vector3f const normal2( 0.0, 1.0,  0.0);
-
-  for(unsigned int x = 0; x != numblocks; ++x) {
-    for(unsigned int y = 0; y != numblocks; ++y) {
-      for(unsigned int z = 0; z != numblocks; ++z) {
-        //blocksize = static_cast<int>(pow(3.0, static_cast<double>(iters))) * x/static_cast<float>(numblocks) * y/static_cast<float>(numblocks) * z/static_cast<float>(numblocks);
-        bool skip = false;
-        int depth = 1;
-        for(unsigned int i = 0; i != iters; ++i) {
-          int matches = 0;
-          if((x / depth) % 3 == 1) {
-            ++matches;
-          }
-          if((y / depth) % 3 == 1) {
-            ++matches;
-          }
-          if((z / depth) % 3 == 1) {
-            ++matches;
-          }
-          if(matches >= 2) {
-            skip = true;
-            break;
-          }
-          depth *= 3;
-        }
-        if(skip) {
-          continue;
-        }
-        Vector3f const coord000(blocksize * x, blocksize * y, blocksize * z);
-        Vector3f const coord100(coord000 + Vector3f(blocksize, 0.0f, 0.0f));
-        Vector3f const coord010(coord000 + Vector3f(0.0f, blocksize, 0.0f));
-        Vector3f const coord110(coord000 + Vector3f(blocksize, blocksize, 0.0f));
-
-        Vector3f const coord001(blocksize * x, blocksize * y, blocksize * z + blocksize);
-        Vector3f const coord101(coord001 + Vector3f(blocksize, 0.0f, 0.0f));
-        Vector3f const coord011(coord001 + Vector3f(0.0f, blocksize, 0.0f));
-        Vector3f const coord111(coord001 + Vector3f(blocksize, blocksize, 0.0f));
-
-        // front face
-        unsigned int offset = vbodata.size();
-        vbodata.emplace_back(coord000, normal0);
-        vbodata.emplace_back(coord010, normal0);
-        vbodata.emplace_back(coord110, normal0);
-        vbodata.emplace_back(coord100, normal0);
-        ibodata.emplace_back(offset + 0);
-        ibodata.emplace_back(offset + 1);
-        ibodata.emplace_back(offset + 2);
-        ibodata.emplace_back(offset + 2);
-        ibodata.emplace_back(offset + 3);
-        ibodata.emplace_back(offset + 0);
-
-        // back face
-        offset = vbodata.size();
-        vbodata.emplace_back(coord001, -normal0);
-        vbodata.emplace_back(coord011, -normal0);
-        vbodata.emplace_back(coord111, -normal0);
-        vbodata.emplace_back(coord101, -normal0);
-        ibodata.emplace_back(offset + 0);
-        ibodata.emplace_back(offset + 3);
-        ibodata.emplace_back(offset + 2);
-        ibodata.emplace_back(offset + 2);
-        ibodata.emplace_back(offset + 1);
-        ibodata.emplace_back(offset + 0);
-
-        // Side face 1
-        offset = vbodata.size();
-        vbodata.emplace_back(coord000, normal1);
-        vbodata.emplace_back(coord001, normal1);
-        vbodata.emplace_back(coord011, normal1);
-        vbodata.emplace_back(coord010, normal1);
-        ibodata.emplace_back(offset + 0);
-        ibodata.emplace_back(offset + 1);
-        ibodata.emplace_back(offset + 2);
-        ibodata.emplace_back(offset + 2);
-        ibodata.emplace_back(offset + 3);
-        ibodata.emplace_back(offset + 0);
-
-        // Side face 2
-        offset = vbodata.size();
-        vbodata.emplace_back(coord100, -normal1);
-        vbodata.emplace_back(coord101, -normal1);
-        vbodata.emplace_back(coord111, -normal1);
-        vbodata.emplace_back(coord110, -normal1);
-        ibodata.emplace_back(offset + 0);
-        ibodata.emplace_back(offset + 3);
-        ibodata.emplace_back(offset + 2);
-        ibodata.emplace_back(offset + 2);
-        ibodata.emplace_back(offset + 1);
-        ibodata.emplace_back(offset + 0);
-
-        // top face
-        offset = vbodata.size();
-        vbodata.emplace_back(coord010, normal2);
-        vbodata.emplace_back(coord011, normal2);
-        vbodata.emplace_back(coord111, normal2);
-        vbodata.emplace_back(coord110, normal2);
-        ibodata.emplace_back(offset + 0);
-        ibodata.emplace_back(offset + 1);
-        ibodata.emplace_back(offset + 2);
-        ibodata.emplace_back(offset + 2);
-        ibodata.emplace_back(offset + 3);
-        ibodata.emplace_back(offset + 0);
-
-        // bottom face
-        offset = vbodata.size();
-        vbodata.emplace_back(coord000, -normal2);
-        vbodata.emplace_back(coord001, -normal2);
-        vbodata.emplace_back(coord101, -normal2);
-        vbodata.emplace_back(coord100, -normal2);
-        ibodata.emplace_back(offset + 0);
-        ibodata.emplace_back(offset + 3);
-        ibodata.emplace_back(offset + 2);
-        ibodata.emplace_back(offset + 2);
-        ibodata.emplace_back(offset + 1);
-        ibodata.emplace_back(offset + 0);
-      }
-    }
+  // Randomly add particles into the container
+  srand(get_unique_seed());
+  for(unsigned int i = 0; i != 500; ++i) {
+    Vector3f const coords(float(rand()) / RAND_MAX * size,
+                          float(rand()) / RAND_MAX * size,
+                          float(rand()) / RAND_MAX * size);
+    con.put(i, coords.x, coords.y, coords.z);
   }
+
+  //std::cout << "DEBUG: Voronoi volume: " << con.sum_cell_volumes() << std::endl;
+
+  std::map<int, bool> cell_is_solid;  // map of cell ID to whether they are solid or air
+
+  voro::c_loop_all cell_loop(con);
+  voro::voronoicell_neighbor cell;
+  if(!cell_loop.start()) {            // start the loop
+    std::cout << "WARNING: chunk " << coords << " contains zero voronoi cells" << std::endl;
+    return;
+  }
+  // decide whether a cell is an air cell or a solid cell
+  do {
+    if(con.compute_cell(cell, cell_loop)) {
+      Vector3d coords;
+      cell_loop.pos(coords.x, coords.y, coords.z);
+      std::vector<int> neighbours;              // list of neighbours IDs corresponding to faces  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l02198
+      cell.neighbors(neighbours);
+      bool solid = false;
+      for(unsigned int face = 0; face != neighbours.size(); ++face) {
+        //if(neighbours[face] < 0) {              // match external faces only (negative cell ID)
+        //  if(coords.y > size * 0.25 &&
+        //     coords.y < size * 0.75 &&
+        //     coords.z > size * 0.25 &&
+        //     coords.z < size * 0.75) {          // tunnel through the x wall
+        //    solid = false;
+        //  } else {
+        //    solid = true;
+        //  }
+        //}
+        // DEBUG ONLY:
+        if(neighbours[face] < 0) {              // match external faces only (negative cell ID)
+          solid = false;
+        } else {
+          if(coords.y > size * 0.25 &&
+             coords.y < size * 0.75 &&
+             coords.z > size * 0.25 &&
+             coords.z < size * 0.75) {          // tunnel through the x wall
+            solid = true;
+          } else {
+            solid = false;
+          }
+        }
+      }
+      cell_is_solid.insert(std::pair<int, bool>(cell_loop.pid(), solid));   // save the entry
+    } else {
+      std::cout << "WARNING: chunk " << coords << " failed to compute a cell" << std::endl;
+    }
+  } while(cell_loop.inc());
+
+  cell_loop.start();                  // restart the loop
+
+  // tesselate the appropriate cells
+  do {
+    if(con.compute_cell(cell, cell_loop)) {
+      // check whether to include the cell
+      ///if(solid_cells.find(cell_loop.pid()) == solid_cells.end()) {
+      if(!cell_is_solid[cell_loop.pid()]) {
+        continue;                               // skip this cell if it's an air cell
+      }
+      Vector3d coords;
+      cell_loop.pos(coords.x, coords.y, coords.z);
+      //int cell_id = cell_loop.pid();
+
+      //cell.print_edges();      // DEBUG
+      //std::cout << "DEBUG " << coords << std::endl;
+
+      // Gather information about the computed Voronoi cell
+      std::vector<int>    neighbours;           // list of neighbours IDs corresponding to faces  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l02198
+      std::vector<int>    face_verts;
+      std::vector<double> verts;
+      std::vector<double> normals;
+      cell.neighbors(neighbours);
+      cell.face_vertices(face_verts);           // 0-bracketed list of vertex ids   http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l01839
+      cell.vertices(coords.x, coords.y, coords.z, verts);
+      cell.normals(normals);                    // normals by face, in threes  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l01639
+
+      for(unsigned int face = 0, vert_offset = 0; face != neighbours.size(); ++face) {    // loop over all faces of the Voronoi cell
+        // Skip if the neighbor information is smaller than
+        // this particle's ID, to avoid double counting. This
+        // also removes faces that touch the walls, since the
+        // neighbor information is set to negative numbers for
+        // these cases.
+        if(neighbours[face] < 0 ||              // external faces only - container edges have negative IDs
+           !cell_is_solid[neighbours[face]]) {  // only draw faces between solid and air cells
+          //std::cout << "DEBUG: face " << face << " neighbours[face] " << neighbours[face] << " face_verts[vert_offset] " << face_verts[vert_offset] << " vert_offset " << vert_offset << std::endl;
+          // TODO: check if the two cells we're looking between are air/stone
+
+          // tesselation: generate a (clockwise) list of the coordinates and normals of each vertex for this face
+          unsigned int offset = vbodata.size();
+          for(int i = 0; i < face_verts[vert_offset]; ++i) {
+            int vert_index = 3 * face_verts[vert_offset + i + 1];
+            vbodata.emplace_back(Vector3f(verts[vert_index], verts[vert_index + 1], verts[vert_index + 2]),           // vertex coords
+                                 Vector3f(normals[(face * 3)], normals[(face * 3) + 1], normals[(face * 3) + 2]));    // vertex normal
+          }
+          // tesselation: add indices in counter-clockwise winding order
+          for(int i = 2; i < face_verts[vert_offset]; ++i) {
+            ibodata.emplace_back(offset + 0);
+            ibodata.emplace_back(offset + i);
+            ibodata.emplace_back(offset + i - 1);
+          }
+        }
+        // Skip to the next entry in the face vertex list
+        vert_offset += face_verts[vert_offset] + 1;
+      }
+    } else {
+      std::cout << "WARNING: chunk " << coords << " failed to compute a cell" << std::endl;
+    }
+  } while(cell_loop.inc());
+
+  // TODO:
+  //voro::voronoicell_neighbor cell;
+  //int num_edges = cell.number_of_edges();     // potentially slow function  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l02007
+  //int num_faces = cell.number_of_faces();     // potentially slow function  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l01721
+
 
   vbodata.shrink_to_fit();
   ibodata.shrink_to_fit();

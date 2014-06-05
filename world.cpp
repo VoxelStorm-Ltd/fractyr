@@ -33,7 +33,7 @@ chunk *world::get_chunk(Vector3i const &chunk_coords) {
   chunk *&thischunk = chunks[checked_coords.x][checked_coords.y][checked_coords.z];
   if(!thischunk) {
     thischunk = new chunk(checked_coords, *this);
-    std::cout << "DEBUG: Created chunk at " << checked_coords << std::endl;
+    //std::cout << "DEBUG: Created chunk at " << checked_coords << std::endl;
   }
   return thischunk;
 }
