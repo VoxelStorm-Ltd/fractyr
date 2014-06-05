@@ -23,9 +23,14 @@ chunk::~chunk() {
   }
 }
 
+unsigned int chunk::get_unique_seed(Vector3i const &chunk_coords) {
+  /// Return a guaranteed unique seed for these chunk coordinates
+  return (((chunk_coords.x * world::size) + chunk_coords.y) * world::size) + chunk_coords.z;
+}
+
 unsigned int chunk::get_unique_seed() const {
   /// Return a guaranteed unique seed for this chunk
-  return (((coords.x * world::size) + coords.y) * world::size) + coords.z;
+  return get_unique_seed(coords);
 }
 
 Vector3f chunk::check_collision(Vector3f const &coords, float radius) const {
