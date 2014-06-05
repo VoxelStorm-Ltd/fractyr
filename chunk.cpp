@@ -213,16 +213,9 @@ void chunk::setup() {
       cell.normals(normals);                    // normals by face, in threes  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l01639
 
       for(unsigned int face = 0, vert_offset = 0; face != neighbours.size(); ++face) {    // loop over all faces of the Voronoi cell
-        // Skip if the neighbor information is smaller than
-        // this particle's ID, to avoid double counting. This
-        // also removes faces that touch the walls, since the
-        // neighbor information is set to negative numbers for
-        // these cases.
-        if(neighbours[face] < 0 ||              // external faces only - container edges have negative IDs
+        if(neighbours[face] >= 0 &&             // internal faces only - container edges have negative IDs
            !cell_is_solid[neighbours[face]]) {  // only draw faces between solid and air cells
           //std::cout << "DEBUG: face " << face << " neighbours[face] " << neighbours[face] << " face_verts[vert_offset] " << face_verts[vert_offset] << " vert_offset " << vert_offset << std::endl;
-          // TODO: check if the two cells we're looking between are air/stone
-
           // tesselation: generate a (clockwise) list of the coordinates and normals of each vertex for this face
           unsigned int offset = vbodata.size();
           for(int i = 0; i < face_verts[vert_offset]; ++i) {
