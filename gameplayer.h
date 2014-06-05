@@ -116,8 +116,12 @@ public:
   void input_move_down(          float amount = 1.0);
   void input_roll_left(          float amount = 1.0);
   void input_roll_right(         float amount = 1.0);
-  void input_turn_left(          float amount = 1.0);
-  void input_turn_right(         float amount = 1.0);
+  void input_yaw_left(           float amount = 1.0);
+  void input_yaw_right(          float amount = 1.0);
+  void input_pitch_up(           float amount = 1.0);
+  void input_pitch_down(         float amount = 1.0);
+  void input_view_left(          float amount = 1.0);
+  void input_view_right(         float amount = 1.0);
   void input_zoom_in(            float amount = 1.0);
   void input_zoom_out(           float amount = 1.0);
   void input_zoom(               float amount = 1.0);

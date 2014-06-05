@@ -41,7 +41,7 @@ void gameplayer::pollcontrols(GLFWwindow *thiswindow) {
       // see callback_scroll
       break;
     case controlbinding::controltype::JOYSTICK_AXIS_FULL:
-      if(fabs(axes[binding.control]) > binding.deadzone) {
+      if(fabsf(axes[binding.control]) > binding.deadzone) {
         if(binding.helddown && !binding.repeat) {
           break;                            // don't repeat
         }
