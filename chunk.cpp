@@ -229,6 +229,10 @@ void chunk::setup() {
   // tesselate the appropriate cells
   do {
     // check whether to include the cell
+    //int const cell_id = cell_loop.pid();
+    if(!cell_is_solid[cell_loop.pid()]) {
+      continue;                               // skip this cell if it's an air cell
+    }
     Vector3d cell_coords;
     cell_loop.pos(cell_coords.x, cell_coords.y, cell_coords.z);
     if(cell_coords.x < 0.0  ||
@@ -239,24 +243,20 @@ void chunk::setup() {
        cell_coords.z > size) {
       continue;           // don't render any cell that is outside of this chunk
     }
-    //int const cell_id = cell_loop.pid();
-    if(!cell_is_solid[cell_loop.pid()]) {
-      continue;                               // skip this cell if it's an air cell
-    }
     if(con.compute_cell(cell, cell_loop)) {
       // Gather information about the computed Voronoi cell
       std::vector<int>    neighbours;
       std::vector<int>    face_verts;
       std::vector<double> verts;
       std::vector<double> normals;
-      neighbours.reserve(16);                   // measured average
       //neighbours.reserve(33);                   // measured max
-      face_verts.reserve(97);                   // measured average
+      neighbours.reserve(16);                   // measured average
       //face_verts.reserve(233);                  // measured max
-      verts.reserve(82);                        // measured average
+      face_verts.reserve(97);                   // measured average
       //verts.reserve(180);                       // measured max
-      normals.reserve(47);                      // measured average
+      verts.reserve(82);                        // measured average
       //normals.reserve(96);                      // measured max
+      normals.reserve(47);                      // measured average
       cell.neighbors(neighbours);               // list of neighbours IDs corresponding to faces  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l02198
       cell.face_vertices(face_verts);           // 0-bracketed list of vertex ids   http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l01839
       cell.vertices(cell_coords.x, cell_coords.y, cell_coords.z, verts);
