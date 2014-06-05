@@ -82,6 +82,40 @@ void entity::move(Vector3f const &direction) {
   }
 }
 
+void entity::correct_point(Vector3i &chunk_coords, Vector3f &coords) {
+  /// Take a pair of speculative coords that may be out of bounds and return a valid pair of coords and chunk coords
+  if(__builtin_expect(coords.x > chunk::size, 0)) {      // branch prediction hint: unlikely (the usual case will not be chunk changes)
+    coords.x -= chunk::size;
+    chunk_coords.x += 1;
+    world::correct_chunk_coords(chunk_coords);
+  }
+  if(__builtin_expect(coords.x < 0.0f, 0)) {
+    coords.x += chunk::size;
+    chunk_coords.x -= 1;
+    world::correct_chunk_coords(chunk_coords);
+  }
+  if(__builtin_expect(coords.y > chunk::size, 0)) {
+    coords.y -= chunk::size;
+    chunk_coords.y += 1;
+    world::correct_chunk_coords(chunk_coords);
+  }
+  if(__builtin_expect(coords.y < 0.0f, 0)) {
+    coords.y += chunk::size;
+    chunk_coords.y -= 1;
+    world::correct_chunk_coords(chunk_coords);
+  }
+  if(__builtin_expect(coords.z > chunk::size, 0)) {
+    coords.z -= chunk::size;
+    chunk_coords.z += 1;
+    world::correct_chunk_coords(chunk_coords);
+  }
+  if(__builtin_expect(coords.z < 0.0f, 0)) {
+    coords.z += chunk::size;
+    chunk_coords.z -= 1;
+    world::correct_chunk_coords(chunk_coords);
+  }
+}
+
 void entity::correct_point(Vector3f &coords, chunk *&thischunk) {
   /// Take a coord in a chunk, that may be out of bounds, and return a valid pair of coords and chunk coords
   if(__builtin_expect(coords.x > chunk::size, 0)) {      // branch prediction hint: unlikely (the usual case will not be chunk changes)

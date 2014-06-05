@@ -37,6 +37,7 @@ public:
 
   virtual void update();
   void move(Vector3f const &direction);
+  static void correct_point(Vector3i &chunk_coords, Vector3f &coords);
   static void correct_point(Vector3f &coords, chunk *&thischunk);
   Vector3f check_collision(Vector3f const &other_coords, float other_radius) const;
 
