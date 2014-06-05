@@ -113,15 +113,18 @@ void chunk::setup() {
   // Create a container with the geometry given above, and make it
   // non-periodic in each of the three coordinates. Allocate space for
   // eight particles within each computational block
-  voro::container con(0.0, size,              // the minimum and maximum x coordinates
-                      0.0, size,              // the minimum and maximum y coordinates
-                      0.0, size,              // the minimum and maximum z coordinates
-                      6, 6, 6,                // the number of grid blocks in each of the three coordinate directions
-                      false, false, false,    // flags setting whether the container is periodic in each coordinate direction - see http://math.lbl.gov/voro++/doc/refman/classvoro_1_1container.html#a50aaf382a069b102930b88976215818f
-                      8);                     // the initial memory allocation for each block (number of particles)
+  ///voro::container con(0.0, size,                   // the minimum and maximum x coordinates
+  ///                    0.0, size,                   // the minimum and maximum y coordinates
+  ///                    0.0, size,                   // the minimum and maximum z coordinates
+  voro::container con(size * 0.25, size * 0.75,     // the minimum and maximum x coordinates
+                      size * 0.25, size * 0.75,     // the minimum and maximum y coordinates
+                      size * 0.25, size * 0.75,     // the minimum and maximum z coordinates
+                      6, 6, 6,                      // the number of grid blocks in each of the three coordinate directions
+                      false, false, false,          // flags setting whether the container is periodic in each coordinate direction - see http://math.lbl.gov/voro++/doc/refman/classvoro_1_1container.html#a50aaf382a069b102930b88976215818f
+                      8);                           // the initial memory allocation for each block (number of particles)
 
   // Randomly add particles into the container
-  for(unsigned int i = 0; i != 20; ++i) {
+  for(unsigned int i = 0; i != 200; ++i) {
     Vector3f const coords(float(rand()) / RAND_MAX * size,
                           float(rand()) / RAND_MAX * size,
                           float(rand()) / RAND_MAX * size);
@@ -151,17 +154,42 @@ void chunk::setup() {
         cell.normals(normals);                // normals by face, in threes  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l01639
         std::vector<double> verts;
         cell.vertices(coords.x, coords.y, coords.z, verts);
+        // TODO: if this is unused, comment it out
 
         // Loop over all faces of the Voronoi cell
-        for(unsigned int i = 0, j = 0; i != neighbour.size(); ++i) {
+        for(unsigned int face = 0, j = 0; face != neighbour.size(); ++face) {
           // Skip if the neighbor information is smaller than
           // this particle's ID, to avoid double counting. This
           // also removes faces that touch the walls, since the
           // neighbor information is set to negative numbers for
           // these cases.
-          if(neighbour[i] > cell_id) {
+          ///if(neighbour[face] > cell_id) {
+          ///if(neighbour[face] >= 0) {   // internal faces only
+          if(neighbour[face] < 0) {       // external faces only
             // TODO: check if the two cells we're looking between are air/stone
-            // TODO: iterate through vertices of this face, and tesselate
+            std::cout << "DEBUG: face " << face << " neighbour[face] " << neighbour[face] << " face_verts[j] " << face_verts[j] << " j " << j << std::endl;
+
+            // generate a list of the coordinates of each vertex
+            std::vector<Vector3f> vert_coords;
+            std::vector<Vector3f> vert_normals;
+            vert_coords.reserve( face_verts[j]);
+            vert_normals.reserve(face_verts[j]);
+            for(int i = 0; i < face_verts[j]; ++i) {
+              int temp = 3 * face_verts[j + i + 1];
+              vert_coords.emplace_back( verts[  temp], verts[  temp + 1], verts[  temp + 2]);
+              vert_normals.emplace_back(normals[(face * 3)], normals[(face * 3) + 1], normals[face + 2]);
+            }
+            // tesselate this face
+            for(int i = 2; i < face_verts[j]; ++i) {
+              // counter-clockwise winding order
+              unsigned int offset = vbodata.size();
+              vbodata.emplace_back(vert_coords[0],     vert_normals[0]);
+              vbodata.emplace_back(vert_coords[i],     vert_normals[i]);
+              vbodata.emplace_back(vert_coords[i - 1], vert_normals[i - 1]);
+              ibodata.emplace_back(offset + 0);
+              ibodata.emplace_back(offset + 1);
+              ibodata.emplace_back(offset + 2);
+            }
           }
           // Skip to the next entry in the face vertex list
           j += face_verts[j] + 1;
