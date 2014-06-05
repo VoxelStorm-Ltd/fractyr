@@ -248,10 +248,6 @@ void chunk::setup() {
 
   // tesselate the appropriate cells
   do {
-    //int const cell_id = cell_loop.pid();
-    if(!cell_is_solid[cell_loop.pid()]) {
-      continue;                               // skip this cell if it's an air cell
-    }
     // check whether to include the cell
     Vector3d cell_coords;
     cell_loop.pos(cell_coords.x, cell_coords.y, cell_coords.z);
@@ -262,6 +258,10 @@ void chunk::setup() {
        cell_coords.z < 0.0  ||
        cell_coords.z > size) {
       continue;           // don't render any cell that is outside of this chunk
+    }
+    //int const cell_id = cell_loop.pid();
+    if(!cell_is_solid[cell_loop.pid()]) {
+      continue;                               // skip this cell if it's an air cell
     }
     if(con.compute_cell(cell, cell_loop)) {
       // Gather information about the computed Voronoi cell
