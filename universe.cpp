@@ -233,10 +233,11 @@ void universe::render_energy_hud(float energy) {
   glDisable(GL_DEPTH_TEST);
 
   glColor4f(0.0, 0.0, 1.0, 0.8);
-  glLineWidth(10.0);
-  glBegin(GL_LINES);
+  glBegin(GL_QUADS);
   glVertex2i(windowsize.x * 0.25,                    5.0);
   glVertex2i(windowsize.x * (0.25 + (energy * 0.5)), 5.0);
+  glVertex2i(windowsize.x * (0.25 + (energy * 0.5)), 10.0);
+  glVertex2i(windowsize.x * 0.25,                    10.0);
   glEnd();
 
   glMatrixMode(GL_PROJECTION);
