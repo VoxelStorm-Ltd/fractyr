@@ -12,6 +12,7 @@
 #include "buffer_plasma.h"
 #include "buffer_enemy_grunt.h"
 #include "ship.h"
+#include "playership.h"
 #include "blaster.h"
 #include "plasma.h"
 #include "grunt.h"
@@ -96,8 +97,8 @@ void universe::restart() {
   current_world = new world();
 
   // world content setup
-  player.current_ship = new ship(*current_world, current_world->get_chunk(Vector3i(world::size/2, world::size/2, world::size/2)), Vector3f(70.0, 10.0, 10.0));
-  player.current_ship->add_weapon(new blaster(player.current_ship, 60.0, 1.5));
+  player.current_ship = new playership(*current_world, current_world->get_chunk(Vector3i(world::size/2, world::size/2, world::size/2)), Vector3f(70.0, 10.0, 10.0));
+  player.current_ship->add_weapon(new blaster(player.current_ship, 10.0, 1.5));
 
   glfwSetInputMode(            window_main, GLFW_CURSOR, GLFW_CURSOR_NORMAL);     // release the cursor
   glfwSetCursorPosCallback(    window_main, callback_mousepos);
@@ -168,6 +169,7 @@ void universe::render() {
     return;
   }
   player.current_ship->render_from();
+  render_energy_hud(player.current_ship->energy / playership::max_energy);
 }
 
 void universe::render_progressscreen(float progress, std::string const &message) {
@@ -209,6 +211,32 @@ void universe::render_progressscreen_hud(float progress, std::string const &mess
   glBegin(GL_LINES);
   glVertex2i(windowsize.x * 0.25,                      (windowsize.y * 0.25) - 10.0);
   glVertex2i(windowsize.x * (0.25 + (progress * 0.5)), (windowsize.y * 0.25) - 10.0);
+  glEnd();
+
+  glMatrixMode(GL_PROJECTION);
+  glPopMatrix();
+  glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+  glEnable(GL_DEPTH_TEST);
+}
+
+void universe::render_energy_hud(float energy) {
+  Vector2i const windowsize(player.get_windowsize());
+
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glLoadIdentity();
+  glOrtho(0, windowsize.x, 0, windowsize.y, -1, 1);
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+  glLoadIdentity();
+  glDisable(GL_DEPTH_TEST);
+
+  glColor4f(0.0, 0.0, 1.0, 0.8);
+  glLineWidth(10.0);
+  glBegin(GL_LINES);
+  glVertex2i(windowsize.x * 0.25,                    5.0);
+  glVertex2i(windowsize.x * (0.25 + (energy * 0.5)), 5.0);
   glEnd();
 
   glMatrixMode(GL_PROJECTION);
@@ -317,8 +345,10 @@ void universe::loop_main() {
 
       update();
 
-      if (player.current_ship && player.current_ship->health <= 0) {
-        state = gamestate::LOST;
+      if (player.current_ship) {
+        if (player.current_ship && player.current_ship->energy <= 0) {
+          state = gamestate::LOST;
+        }
       }
 
       if(oculus->enabled) {

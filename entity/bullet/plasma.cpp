@@ -26,7 +26,7 @@ plasma::~plasma() {
 
 void plasma::update() {
   if(time_to_live == 0) {
-    health = 0;
+    energy = 0;
     return;
   }
   entity::update();
@@ -43,5 +43,5 @@ void plasma::render() const {
 }
 
 float plasma::get_collision_damage() const {
-  return 50;
+  return 100;
 }

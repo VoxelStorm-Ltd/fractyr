@@ -13,10 +13,10 @@ blaster::~blaster() {
   /// Default destructor
 }
 
-void blaster::fire() {
+bool blaster::fire() {
   /// Fire this weapon
   if(cooldown != 0) {
-    return;
+    return false;
   }
   // position this at our ship
   Vector3f const &barrel_coords(parent->get_weapon_position());
@@ -37,4 +37,5 @@ void blaster::fire() {
   new plasma(*parent->get_parent_world(), thischunk, barrel_coords_left,  barrel_orientation, parent->get_velocity(), shot_speed);
   new plasma(*parent->get_parent_world(), thischunk, barrel_coords_right, barrel_orientation, parent->get_velocity(), shot_speed);
   cooldown = fire_rate;
+  return true;
 }

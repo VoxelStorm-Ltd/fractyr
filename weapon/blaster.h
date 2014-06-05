@@ -13,7 +13,7 @@ public:
   blaster(ship *parent, float fire_rate, float shot_speed);
   ~blaster();
 
-  void fire() override final;
+  bool fire() override final;
 };
 
 #endif // BLASTER_H_INCLUDED

@@ -28,7 +28,7 @@ protected:
   float drag   = 0.0;                     // how much drag this entity experiences (coefficient of drag * cross-sectional area)
 
 public:
-  float health = 100.0;
+  float energy = 100.0;                   // general stat used for health/moving/firing.
   float radius = 0.0;                     // bounding sphere, metres
 
   entity(world &parent_world,

@@ -24,10 +24,10 @@ public:
 
   void add_weapon(weapon *new_weapon);
 
-  void accelerate(Vector3f accel);
+  virtual void accelerate(Vector3f accel);
   void rotate(float yaw, float pitch);
   void roll(float roll);
-  void fire(unsigned int weapon_id);
+  virtual bool fire(unsigned int weapon_id);  // Attempts to fire current weapon, returns whether successful or not.
 };
 
 #endif // SHIP_H_INCLUDED

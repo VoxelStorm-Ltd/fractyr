@@ -16,7 +16,8 @@ public:
   virtual ~weapon();
 
   virtual void update();
-  virtual void fire();
+  virtual bool fire();                      // attempts to fire weapon, returns true if the weapon fired, false otherwise.
+  virtual unsigned int get_cost_per_shot() const;
 };
 
 #endif // WEAPON_H_INCLUDED

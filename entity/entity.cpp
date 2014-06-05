@@ -134,7 +134,7 @@ float entity::get_collision_damage() const {
 }
 
 void entity::collided_with(entity *other) {
-  health -= other->get_collision_damage();
+  energy -= other->get_collision_damage();
 }
 
 void entity::render() const {

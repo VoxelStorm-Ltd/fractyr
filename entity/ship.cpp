@@ -72,14 +72,14 @@ void ship::roll(float roll) {
   orientation_conjugate.conjugate();
 }
 
-void ship::fire(unsigned int weapon_id) {
+bool ship::fire(unsigned int weapon_id) {
   /// Fire the selected weapon
   #ifndef NDEBUG
     if(weapon_id >= weapons.size()) {
       std::cout << "ERROR: " << __PRETTY_FUNCTION__ << " tried to access index " << weapon_id << " of " << weapons.size() << std::endl;
-      return;
+      return false;
     }
   #endif
-  weapons[weapon_id]->fire();
+  return weapons[weapon_id]->fire();
 }
 
