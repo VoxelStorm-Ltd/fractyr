@@ -219,9 +219,13 @@ void chunk::setup() {
        cell_coords.z < -size         * chunk_margin  ||
        cell_coords.z >  size + (size * chunk_margin)) {
       cell_is_solid[cell_loop.pid()] = false;
+      // NOTE: this may produce erroneous output
       continue;           // don't consider any cell that is outside of the test margin
     }
-    cell_is_solid[cell_loop.pid()] = get_is_solid(cell_coords);   // cache the cell save check
+    Vector3i checked_chunk_coords(coords);
+    Vector3f checked_cell_coords(cell_coords);
+    entity::correct_point(checked_chunk_coords, checked_cell_coords);
+    cell_is_solid[cell_loop.pid()] = get_is_solid(checked_chunk_coords, checked_cell_coords);   // cache the cell save check
   } while(cell_loop.inc());
 
   cell_loop.start();                  // restart the loop
@@ -296,9 +300,8 @@ void chunk::setup() {
       }
 
       for(unsigned int face = 0, vert_offset = 0; face != neighbours.size(); ++face) {    // loop over all faces of the Voronoi cell
-        if(//neighbours[face] >= 0 &&             // internal faces only - container edges have negative IDs
-           !cell_is_solid[neighbours[face]]) {  // only draw faces between solid and air cells
-          //std::cout << "DEBUG: face " << face << " neighbours[face] " << neighbours[face] << " face_verts[vert_offset] " << face_verts[vert_offset] << " vert_offset " << vert_offset << std::endl;
+        if(//neighbours[face] < 0 ||              // external faces - container edges have negative IDs
+           !cell_is_solid[neighbours[face]]) {  // draw faces between solid and air cells
           #ifdef NDEBUG
             Vector3f const &face_colour(get_colour(cell_coords));
           #else

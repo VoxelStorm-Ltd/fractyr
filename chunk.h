@@ -40,10 +40,10 @@ public:
 
   // query
   static unsigned int get_unique_seed(Vector3i const &chunk_coords);
-  unsigned int get_unique_seed() const;
+  unsigned int        get_unique_seed() const;
   // generators
-  static bool get_is_solid(Vector3i const &chunk_coords, Vector3f const &local_coords);
-  bool        get_is_solid(Vector3f const &local_coords) const;
+  static bool get_is_solid(  Vector3i const &chunk_coords, Vector3f const &local_coords);
+  bool        get_is_solid(  Vector3f const &local_coords) const;
   static Vector3f get_colour(Vector3i const &chunk_coords, Vector3f const &local_coords);
   Vector3f        get_colour(Vector3f const &local_coords) const;
 
