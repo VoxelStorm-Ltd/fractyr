@@ -14,7 +14,8 @@ public:
   enum class entity_type : char {
     UNKNOWN,
     BULLET,
-    SHIP
+    ENEMY,
+    PLAYER
   };
 protected:
   world &parent_world;                    // what world we're in

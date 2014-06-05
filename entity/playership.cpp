@@ -60,3 +60,8 @@ void playership::collided_with(entity *other) {
     entity::collided_with(other);
   #endif
 }
+
+entity::entity_type playership::get_entity_type() const {
+  return entity::entity_type::PLAYER;
+}
+

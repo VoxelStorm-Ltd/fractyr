@@ -14,6 +14,7 @@ public:
   virtual ~enemy();
 
   virtual void update() override;
+  virtual entity::entity_type get_entity_type() const override;
 };
 
 #endif // ENEMY_H_INCLUDED

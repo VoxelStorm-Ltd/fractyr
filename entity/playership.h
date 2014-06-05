@@ -20,6 +20,7 @@ public:
   void accelerate(Vector3f accel) override;
   bool fire(unsigned int weapon_id) override;
   void collided_with(entity *other) override;
+  virtual entity::entity_type get_entity_type() const override;
 };
 
 #endif // PLAYERSHIP_H

@@ -20,3 +20,7 @@ void enemy::update() {
 
   ship::update();
 }
+
+entity::entity_type enemy::get_entity_type() const {
+  return entity::entity_type::ENEMY;
+}

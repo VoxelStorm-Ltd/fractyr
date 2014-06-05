@@ -26,10 +26,6 @@ Vector3f ship::get_weapon_position() {
   return offset;
 }
 
-entity::entity_type ship::get_entity_type() const {
-  return entity::entity_type::SHIP;
-}
-
 void ship::update() {
   entity::update();
   for(auto const &w : weapons) {
