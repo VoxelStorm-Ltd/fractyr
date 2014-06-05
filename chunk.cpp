@@ -1,7 +1,7 @@
 #include "chunk.h"
 #include <random>
 #include <algorithm>
-#include <set>
+#include <map>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <voro++.hh>
@@ -138,9 +138,7 @@ void chunk::setup() {
 
   //std::cout << "DEBUG: Voronoi volume: " << con.sum_cell_volumes() << std::endl;
 
-  std::set<int> air_cells;            // list of IDs of cells which are air
-  std::set<int> solid_cells;          // list of IDs of cells which are solid
-  // TODO: compare sizes of both sets, and only keep whichever is smallest
+  std::map<int, bool> cell_is_solid;  // map of cell ID to whether they are solid or air
 
   voro::c_loop_all cell_loop(con);
   voro::voronoicell_neighbor cell;
@@ -181,16 +179,11 @@ void chunk::setup() {
           }
         }
       }
-      if(solid) {
-        solid_cells.insert(cell_loop.pid());
-      } else {
-        air_cells.insert(cell_loop.pid());
-      }
+      cell_is_solid.insert(std::pair<int, bool>(cell_loop.pid(), solid));   // save the entry
     } else {
       std::cout << "WARNING: chunk " << coords << " failed to compute a cell" << std::endl;
     }
   } while(cell_loop.inc());
-  std::cout << "DEBUG: air cells: " << air_cells.size() << " solid cells: " << solid_cells.size() << std::endl;
 
   cell_loop.start();                  // restart the loop
 
@@ -198,7 +191,8 @@ void chunk::setup() {
   do {
     if(con.compute_cell(cell, cell_loop)) {
       // check whether to include the cell
-      if(solid_cells.find(cell_loop.pid()) == solid_cells.end()) {
+      ///if(solid_cells.find(cell_loop.pid()) == solid_cells.end()) {
+      if(!cell_is_solid[cell_loop.pid()]) {
         continue;                               // skip this cell if it's an air cell
       }
       Vector3d coords;
@@ -224,8 +218,8 @@ void chunk::setup() {
         // also removes faces that touch the walls, since the
         // neighbor information is set to negative numbers for
         // these cases.
-        if(neighbours[face] < 0 ||                                      // external faces only - container edges have negative IDs
-           air_cells.find(neighbours[face]) != air_cells.end()) {       // only draw faces between solid and air cells
+        if(neighbours[face] < 0 ||              // external faces only - container edges have negative IDs
+           !cell_is_solid[neighbours[face]]) {  // only draw faces between solid and air cells
           //std::cout << "DEBUG: face " << face << " neighbours[face] " << neighbours[face] << " face_verts[vert_offset] " << face_verts[vert_offset] << " vert_offset " << vert_offset << std::endl;
           // TODO: check if the two cells we're looking between are air/stone
 
