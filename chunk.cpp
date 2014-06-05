@@ -244,29 +244,55 @@ void chunk::setup() {
     }
     if(con.compute_cell(cell, cell_loop)) {
       // Gather information about the computed Voronoi cell
-      std::vector<int>   neighbours;
-      std::vector<int>   face_verts;
       std::vector<float> verts;
-      //neighbours.reserve(33);                   // measured max
-      neighbours.reserve(16);                   // measured average
-      cell.neighbors(neighbours);               // list of neighbours IDs corresponding to faces  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l02198
-      //normals.reserve(96);                      // measured max
-      //normals.reserve(47);                      // measured average
-      //face_verts.reserve(233);                  // measured max
-      face_verts.reserve(97);                   // measured average
-      cell.face_vertices(face_verts);           // 0-bracketed list of vertex ids   http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l01839
-
       //verts.reserve(180);                       // measured max
       //verts.reserve(82);                        // measured average
       verts.reserve(3 * cell.p);                // actual requirement
-      // re-implemented from voro::voronoicell_base::vertices
+      // re-implemented from voro::voronoicell_base::vertices()
       double *ptsp = cell.pts;
       for(unsigned int i = 0; i < 3 * cell.p; i += 3) {
         verts.emplace_back(cell_coords.x + static_cast<float>(*(ptsp++)) * 0.5f);
         verts.emplace_back(cell_coords.y + static_cast<float>(*(ptsp++)) * 0.5f);
         verts.emplace_back(cell_coords.z + static_cast<float>(*(ptsp++)) * 0.5f);
       }
-
+      //normals.reserve(96);                      // measured max
+      //normals.reserve(47);                      // measured average
+      std::vector<int> face_verts;
+      //face_verts.reserve(233);                  // measured max
+      face_verts.reserve(97);                   // measured average
+      std::vector<int> neighbours;
+      //neighbours.reserve(33);                   // measured max
+      neighbours.reserve(16);                   // measured average
+      // re-implemented from merge of voro::voronoicell_base::face_vertices() and voro::voronoicell_base::neighbors()
+      int vp(0);
+      for(int i = 1; i != cell.p; ++i) {
+        for(int j = 0; j != cell.nu[i]; ++j) {
+          int k = cell.ed[i][j];
+          if(k >= 0) {
+            face_verts.emplace_back(0);
+            face_verts.emplace_back(i);
+            neighbours.emplace_back(cell.ne[i][j]);
+            cell.ed[i][j] = -1 - k;
+            int l = cell.cycle_up(cell.ed[i][cell.nu[i] + j], k);
+            do {
+              face_verts.emplace_back(k);
+              int m = cell.ed[k][l];
+              cell.ed[k][l] = -1 - m;
+              l = cell.cycle_up(cell.ed[k][cell.nu[k] + l], m);
+              k = m;
+            } while(k != i);
+            int vn = face_verts.size();
+            face_verts[vp] = vn - vp - 1;
+            vp = vn;
+          }
+        }
+      }
+      // re-implemented from voro::voronoicell_base::reset_edges();
+      for(int i = 0; i != cell.p; ++i) {
+        for(int j = 0; j != cell.nu[i]; ++j) {
+          cell.ed[i][j] = -1 - cell.ed[i][j];
+        }
+      }
 
       for(unsigned int face = 0, vert_offset = 0; face != neighbours.size(); ++face) {    // loop over all faces of the Voronoi cell
         if(//neighbours[face] >= 0 &&             // internal faces only - container edges have negative IDs
