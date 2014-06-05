@@ -249,6 +249,14 @@ void chunk::setup() {
       std::vector<int>    face_verts;
       std::vector<double> verts;
       std::vector<double> normals;
+      neighbours.reserve(16);                   // measured average
+      //neighbours.reserve(33);                   // measured max
+      face_verts.reserve(97);                   // measured average
+      //face_verts.reserve(233);                  // measured max
+      verts.reserve(82);                        // measured average
+      //verts.reserve(180);                       // measured max
+      normals.reserve(47);                      // measured average
+      //normals.reserve(96);                      // measured max
       cell.neighbors(neighbours);               // list of neighbours IDs corresponding to faces  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l02198
       cell.face_vertices(face_verts);           // 0-bracketed list of vertex ids   http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l01839
       cell.vertices(cell_coords.x, cell_coords.y, cell_coords.z, verts);
