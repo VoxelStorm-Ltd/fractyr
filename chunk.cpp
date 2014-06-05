@@ -218,6 +218,7 @@ void chunk::setup() {
        cell_coords.y >  size + (size * chunk_margin) ||
        cell_coords.z < -size         * chunk_margin  ||
        cell_coords.z >  size + (size * chunk_margin)) {
+      cell_is_solid[cell_loop.pid()] = false;
       continue;           // don't consider any cell that is outside of the test margin
     }
     cell_is_solid[cell_loop.pid()] = get_is_solid(cell_coords);   // cache the cell save check
@@ -250,7 +251,7 @@ void chunk::setup() {
       verts.reserve(3 * cell.p);                // actual requirement
       // re-implemented from voro::voronoicell_base::vertices()
       double *ptsp = cell.pts;
-      for(unsigned int i = 0; i < 3 * cell.p; i += 3) {
+      for(int i = 0; i < 3 * cell.p; i += 3) {
         verts.emplace_back(cell_coords.x + static_cast<float>(*(ptsp++)) * 0.5f);
         verts.emplace_back(cell_coords.y + static_cast<float>(*(ptsp++)) * 0.5f);
         verts.emplace_back(cell_coords.z + static_cast<float>(*(ptsp++)) * 0.5f);
