@@ -152,8 +152,8 @@ void chunk::setup() {
   std::vector<GLuint>               ibodata;
 
   // voronoi triangulation
-  vbodata.reserve(20000);   // make sure to reserve the correct size to avoid re-allocations during construction
-  ibodata.reserve(30000);
+  vbodata.reserve(4000);   // make sure to reserve the correct size to avoid re-allocations during construction
+  ibodata.reserve(7500);
 
   // Create a non-periodic particle container
   float constexpr chunk_margin = 0.25;                                      // how far outside each chunk we compute the voronoi space to avoid discontinuities at edges
