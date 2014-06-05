@@ -212,36 +212,17 @@ void chunk::setup() {
   }
   // decide whether a cell is an air cell or a solid cell
   do {
-    if(con.compute_cell(cell, cell_loop)) {
-      Vector3d cell_coords;
-      cell_loop.pos(cell_coords.x, cell_coords.y, cell_coords.z);
-      if(cell_coords.x < -size         * chunk_margin  ||
-         cell_coords.x >  size + (size * chunk_margin) ||
-         cell_coords.y < -size         * chunk_margin  ||
-         cell_coords.y >  size + (size * chunk_margin) ||
-         cell_coords.z < -size         * chunk_margin  ||
-         cell_coords.z >  size + (size * chunk_margin)) {
-        continue;           // don't consider any cell that is outside of the test margin
-      }
-      bool solid;
-      // skipping this check may be faster
-      /*
-      std::vector<int> neighbours;              // list of neighbours IDs corresponding to faces  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l02198
-      cell.neighbors(neighbours);
-      for(unsigned int face = 0; face != neighbours.size(); ++face) {
-        if(neighbours[face] < 0) {              // match external faces only (negative cell ID)
-          solid = false;
-          goto skip_cell_check;
-        }
-      }
-      */
-      solid = get_is_solid(cell_coords);
-
-      //skip_cell_check:
-      cell_is_solid.insert(std::pair<int, bool>(cell_loop.pid(), solid));   // save the entry
-    } else {
-      ///std::cout << "WARNING: chunk " << coords << " failed to compute a cell" << std::endl;
+    Vector3d cell_coords;
+    cell_loop.pos(cell_coords.x, cell_coords.y, cell_coords.z);
+    if(cell_coords.x < -size         * chunk_margin  ||
+       cell_coords.x >  size + (size * chunk_margin) ||
+       cell_coords.y < -size         * chunk_margin  ||
+       cell_coords.y >  size + (size * chunk_margin) ||
+       cell_coords.z < -size         * chunk_margin  ||
+       cell_coords.z >  size + (size * chunk_margin)) {
+      continue;           // don't consider any cell that is outside of the test margin
     }
+    cell_is_solid.insert(std::pair<int, bool>(cell_loop.pid(), get_is_solid(cell_coords)));   // cache the cell save check
   } while(cell_loop.inc());
 
   cell_loop.start();                  // restart the loop
