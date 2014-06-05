@@ -45,6 +45,11 @@ extern GLFWwindow *window_main;
 extern oculusstorm *oculus;
 //extern FTFont *font_label;
 
+// linked binary resource blob symbols using blob_loader.h
+// music
+BLOB_LOAD(music_main_intro_ogg);
+BLOB_LOAD(music_main_loop_ogg);
+
 std::mt19937 universe::randomgen;
 unsigned int universe::randomseed = 1;
 
@@ -57,7 +62,8 @@ universe::universe()
   // initialise sound effects
   // TODO
   // initialise music
-  // TODO
+  sound.music_load(BLOB(music_main_intro_ogg), BLOB_SIZE(music_main_intro_ogg));   // id 0
+  sound.music_load(BLOB(music_main_loop_ogg),  BLOB_SIZE(music_main_loop_ogg));    // id 1
   sound.start_streamer();                 // only do this after all music has been loaded
 }
 
@@ -114,8 +120,8 @@ void universe::restart() {
 
   sound.music_clear(0);                         // clear the decks
   sound.music_clear(1);
-  //sound.music_queue(0, 0);                      // start the music
-  //sound.music_queue(0, 1);
+  sound.music_queue(0, 0);                      // start the music
+  sound.music_queue(0, 1);
   //sound.music_queue(1, 2);
   //sound.music_queue(1, 3);
   sound.set_music_volume(0, 1.0);
