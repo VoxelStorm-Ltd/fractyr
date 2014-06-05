@@ -131,15 +131,33 @@ void chunk::setup() {
                       6, 6, 6,                      // the number of grid blocks in each of the three coordinate directions
                       false, false, false,          // flags setting whether the container is periodic in each coordinate direction - see http://math.lbl.gov/voro++/doc/refman/classvoro_1_1container.html#a50aaf382a069b102930b88976215818f
                       8);                           // the initial memory allocation for each block (number of particles)
+  // TODO: optimise this --^
 
-  // Randomly add particles into the container
-  srand(get_unique_seed());
-  for(unsigned int i = 0; i != 500; ++i) {
-    Vector3f const coords(float(rand()) / RAND_MAX * size,
-                          float(rand()) / RAND_MAX * size,
-                          float(rand()) / RAND_MAX * size);
-    con.put(i, coords.x, coords.y, coords.z);
-  }
+  // populate this chunk and its neigbours' particles so we get a seamless join
+  Vector3i offset(-1, -1, -1);
+  //for(; offset.x != 2; ++offset.x) {
+    // DEBUG ONLY:
+    offset.x = 0;
+    offset.y = 0;
+    offset.z = 0;
+    //for(; offset.y != 2; ++offset.y) {
+      //for(; offset.z != 2; ++offset.z) {
+        Vector3i chunk_coords(coords + offset);
+        world::correct_chunk_coords(chunk_coords);      // wrap them if appropriate
+        srand(get_unique_seed(chunk_coords));           // seed predictably by coords
+        for(unsigned int i = 0; i != 500; ++i) {
+          //Vector3f const cell_point((static_cast<float>(rand()) / RAND_MAX * size) - (static_cast<float>(offset.x) * size),
+          //                          (static_cast<float>(rand()) / RAND_MAX * size) - (static_cast<float>(offset.y) * size),
+          //                          (static_cast<float>(rand()) / RAND_MAX * size) - (static_cast<float>(offset.z) * size));
+          Vector3f const cell_point((static_cast<float>(rand()) / RAND_MAX * size),
+                                    (static_cast<float>(rand()) / RAND_MAX * size),
+                                    (static_cast<float>(rand()) / RAND_MAX * size));
+          // TODO: optimise this --^
+          con.put(i, cell_point.x, cell_point.y, cell_point.z);
+        }
+      //}
+    //}
+  //}
 
   //std::cout << "DEBUG: Voronoi volume: " << con.sum_cell_volumes() << std::endl;
 
@@ -218,7 +236,7 @@ void chunk::setup() {
       cell.normals(normals);                    // normals by face, in threes  http://math.lbl.gov/voro++/doc/refman/cell_8cc_source.html#l01639
 
       for(unsigned int face = 0, vert_offset = 0; face != neighbours.size(); ++face) {    // loop over all faces of the Voronoi cell
-        if(neighbours[face] >= 0 &&             // internal faces only - container edges have negative IDs
+        if(///neighbours[face] >= 0 &&             // internal faces only - container edges have negative IDs
            !cell_is_solid[neighbours[face]]) {  // only draw faces between solid and air cells
           //std::cout << "DEBUG: face " << face << " neighbours[face] " << neighbours[face] << " face_verts[vert_offset] " << face_verts[vert_offset] << " vert_offset " << vert_offset << std::endl;
           // tesselation: generate a (clockwise) list of the coordinates and normals of each vertex for this face
