@@ -63,13 +63,16 @@ void entity::move(Vector3f const &direction) {
 
   correct_point(newposition, newparent);
 
-  Vector3f const &collision_vector(parent_world.check_collision(newparent->coords, newposition, radius));
-  if(__builtin_expect(collision_vector != Vector3f(0.0f, 0.0f, 0.0f), 0)) {     // branch prediction hint: unlikely (the usual case will be no collision)
+  Vector3f const &collision_normal(parent_world.check_collision(newparent->coords, newposition, radius));
+  if(__builtin_expect(collision_normal != Vector3f(0.0f, 0.0f, 0.0f), 0)) {     // branch prediction hint: unlikely (the usual case will be no collision)
+    std::cout << "DEBUG: collision!  Normal " << collision_normal << std::endl;
     // reflect our velocity by the collision vector
-    // TODO
+    velocity = direction - (collision_normal  * ((direction.dotProduct(collision_normal) * 2) / collision_normal.lengthSq()));
+
     // apply damping
     // TODO
 
+    newposition = position + velocity;
     correct_point(newposition, newparent);
   }
 
