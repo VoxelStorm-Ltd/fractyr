@@ -7,6 +7,7 @@ playership::playership(world &parent_world,
              Quatf const &orientation)
   : ship(parent_world, parent_chunk, position, orientation) {
   /// Default constructor
+  energy = max_energy;
 }
 
 playership::~playership() {

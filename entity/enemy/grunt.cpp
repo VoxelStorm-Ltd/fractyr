@@ -10,12 +10,14 @@ buffer_enemy_grunt grunt::buf;
 grunt::grunt(world &parent_world,
              chunk *parent_chunk,
              Vector3f const &position,
-             Quatf const &orientation)
-  : enemy(parent_world, parent_chunk, position, orientation) {
+             Quatf const &orientation,
+             float scale)
+  : enemy(parent_world, parent_chunk, position, orientation),
+    scale(scale) {
   /// Default constructor
-  radius = 3.0;
-  mass = 1000.0;
-  energy = 400;
+  radius = 3.0 * scale;
+  mass = 1000.0 * scale;
+  energy = 400 * scale * scale;
 }
 
 grunt::~grunt() {
@@ -27,6 +29,7 @@ void grunt::render() const {
   glPushMatrix();
   glTranslatef(position.x, position.y, position.z);
   glMultMatrixf(orientation_conjugate.transform());
+  glScalef(scale, scale, scale);
   buf.render();
   glPopMatrix();
 }

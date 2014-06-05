@@ -9,13 +9,14 @@ class grunt : public enemy {
 public:
   static buffer_enemy_grunt buf;                  // this object's graphics buffer
 protected:
-  float health = 10.0;                            // how much of a beating it can take
+  float scale = 1.0;
 
 public:
   grunt(world &parent_world,
         chunk *parent_chunk,
         Vector3f const &position,
-        Quatf const &orientation = Quatf::fromEulerAngles(0.0, 0.0, 0.0));
+        Quatf const &orientation = Quatf::fromEulerAngles(0.0, 0.0, 0.0),
+        float scale = 1.0);
   ~grunt();
 
   void render() const override final;

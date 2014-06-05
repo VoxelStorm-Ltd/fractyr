@@ -6,7 +6,7 @@
 
 class playership : public ship {
 public:
-  static unsigned int constexpr max_energy = 400;
+  static unsigned int constexpr max_energy = 1000;
 
   playership(world &parent_world,
              chunk *parent_chunk,
