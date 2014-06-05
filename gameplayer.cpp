@@ -229,13 +229,13 @@ void gameplayer::setup_input() {
 
   // default bindings
   bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_W,            &gameplayer::input_move_forward);
-  bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_UP,           &gameplayer::input_move_forward);
+  bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_UP,           &gameplayer::input_pitch_down);
   bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_S,            &gameplayer::input_move_back);
-  bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_DOWN,         &gameplayer::input_move_back);
+  bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_DOWN,         &gameplayer::input_pitch_up);
   bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_A,            &gameplayer::input_move_left);
-  bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_LEFT,         &gameplayer::input_move_left);
+  bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_LEFT,         &gameplayer::input_yaw_left);
   bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_D,            &gameplayer::input_move_right);
-  bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_RIGHT,        &gameplayer::input_move_right);
+  bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_RIGHT,        &gameplayer::input_yaw_right);
   bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_Q,            &gameplayer::input_roll_left);
   bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_E,            &gameplayer::input_roll_right);
   bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_SPACE,        &gameplayer::input_move_up);
@@ -252,7 +252,20 @@ void gameplayer::setup_input() {
 
   if(gamepad != -1) {
     // gamepad / joystick bindings only if we actually have one connected, so we don't need runtime checks
-    // TODO
+    bind(controlbinding::controltype::JOYSTICK_BUTTON,    0,  &gameplayer::input_fire1);
+    bind(controlbinding::controltype::JOYSTICK_BUTTON,    1,  &gameplayer::input_fire2);
+    bind(controlbinding::controltype::JOYSTICK_AXIS_FULL, 0,  &gameplayer::input_roll_right,   1.0);
+    bind(controlbinding::controltype::JOYSTICK_AXIS_FULL, 1,  &gameplayer::input_pitch_down,   1.0);
+    bind(controlbinding::controltype::JOYSTICK_AXIS_FULL, 2,  &gameplayer::input_move_forward, 1.0);
+    bind(controlbinding::controltype::JOYSTICK_AXIS_FULL, 3,  &gameplayer::input_yaw_right,    1.0);
+    //bind(controlbinding::controltype::JOYSTICK_BUTTON,    4,  &gameplayer::input_select_weapon_next);
+    //bind(controlbinding::controltype::JOYSTICK_BUTTON,    5,  &gameplayer::input_select_weapon_prev);
+    //bind(controlbinding::controltype::JOYSTICK_BUTTON,    12, &gameplayer::input_select_weapon_0);
+    //bind(controlbinding::controltype::JOYSTICK_BUTTON,    13, &gameplayer::input_select_weapon_1);
+    bind(controlbinding::controltype::JOYSTICK_BUTTON,    16, &gameplayer::input_move_up,      1.0);
+    bind(controlbinding::controltype::JOYSTICK_BUTTON,    17, &gameplayer::input_move_right,   1.0);
+    bind(controlbinding::controltype::JOYSTICK_BUTTON,    18, &gameplayer::input_move_down,    1.0);
+    bind(controlbinding::controltype::JOYSTICK_BUTTON,    19, &gameplayer::input_move_left,    1.0);
   }
 }
 
@@ -279,8 +292,6 @@ void gameplayer::move_mouse(Vector2f const &mouse_pos) {
   //rotation_yaw = fmodf(rotation_yaw + mouse_diff.x, 360.0);
   //rotation_pitch += mouse_diff.y;
   //clamp_pitch();
-  rotation_yaw   = 0.0;
-  rotation_pitch = 0.0;
 
   if(__builtin_expect(!current_ship, 0)) {        // branch prediction: unlikely to not have a ship
     return;
@@ -352,10 +363,22 @@ void gameplayer::input_roll_left(float amount) {
 void gameplayer::input_roll_right(float amount) {
   current_ship->roll(amount);
 }
-void gameplayer::input_turn_left(float amount) {
+void gameplayer::input_yaw_left(float amount) {
+  current_ship->rotate(-amount, 0.0);
+}
+void gameplayer::input_yaw_right(float amount) {
+  current_ship->rotate(amount, 0.0);
+}
+void gameplayer::input_pitch_up(float amount) {
+  current_ship->rotate(0.0, -amount);
+}
+void gameplayer::input_pitch_down(float amount) {
+  current_ship->rotate(0.0, amount);
+}
+void gameplayer::input_view_left(float amount) {
   pre_rotation = fmodf(pre_rotation - (2.0 * amount), 360.0);
 }
-void gameplayer::input_turn_right(float amount) {
+void gameplayer::input_view_right(float amount) {
   pre_rotation = fmodf(pre_rotation + (2.0 * amount), 360.0);
 }
 void gameplayer::input_zoom_in(float amount) {
