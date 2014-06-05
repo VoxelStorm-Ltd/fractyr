@@ -17,7 +17,13 @@
 
 chunk::chunk(Vector3i const &chunk_coords, world &parent)
   : parent(&parent),
-    coords(chunk_coords) {
+    coords(chunk_coords),
+    con(-size * chunk_margin, size + (size * chunk_margin),   // the minimum and maximum x coordinates
+        -size * chunk_margin, size + (size * chunk_margin),   // the minimum and maximum y coordinates
+        -size * chunk_margin, size + (size * chunk_margin),   // the minimum and maximum z coordinates
+        num_cells, num_cells, num_cells,                      // the number of grid blocks in each of the three coordinate directions
+        false, false, false,                                  // flags setting whether the container is periodic in each coordinate direction - see http://math.lbl.gov/voro++/doc/refman/classvoro_1_1container.html#a50aaf382a069b102930b88976215818f
+        ideal_points_per_block) {                             // the initial memory allocation for each block (number of particles){
   /// Default constructor
 
   // generate enemies
@@ -97,13 +103,19 @@ Vector3f chunk::get_colour(Vector3f const &local_coords) const {
   return get_colour(coords, local_coords);
 }
 
-Vector3f chunk::check_collision(Vector3f const &coords, float radius) const {
+Vector3f chunk::check_collision(Vector3f const &coords, float radius) {
   /// Check if a given point is colliding, and if so, return a normal vector to the collision surface
-  // NOTE: coords can be less than 0 or greater than chunk::size by up to radius
-
-  // TODO (note: use branch prediction hints for collision checks)
-
-  return Vector3f(0.0, 0.0, 0.0);
+  // NOTE: coords can be less than 0 or greater than chunk::size by up to chunk_margin
+  Vector3d result;
+  int cell_id;
+  if(__builtin_expect(!con.find_voronoi_cell(coords.x, coords.y, coords.z, result.x, result.y, result.z, cell_id), 0)) {  // branch prediction: likely found
+    return Vector3f(0.0, 0.0, 0.0);
+  }
+  if(__builtin_expect(!get_is_solid(result), 1)) {  // branch prediction: likely not solid
+    return Vector3f(0.0, 0.0, 0.0);
+  }
+  result.normalise();
+  return result;
 }
 
 void chunk::update() {
@@ -195,18 +207,6 @@ void chunk::setup() {
   // voronoi triangulation
   vbodata.reserve(4000);   // make sure to reserve the correct size to avoid re-allocations during construction
   ibodata.reserve(7500);
-
-  // Create a non-periodic particle container
-  float constexpr chunk_margin = 0.25;                                      // how far outside each chunk we compute the voronoi space to avoid discontinuities at edges
-  unsigned int constexpr ideal_points_per_block = 8;                        // the optimal number of points per block in a container
-  unsigned int constexpr expected_points = 2500;                            // roughly how many points we're generating; test and update this for release
-  unsigned int constexpr num_cells = std::cbrt(expected_points / ideal_points_per_block);
-  voro::container con(-size * chunk_margin, size + (size * chunk_margin),   // the minimum and maximum x coordinates
-                      -size * chunk_margin, size + (size * chunk_margin),   // the minimum and maximum y coordinates
-                      -size * chunk_margin, size + (size * chunk_margin),   // the minimum and maximum z coordinates
-                      num_cells, num_cells, num_cells,                      // the number of grid blocks in each of the three coordinate directions
-                      false, false, false,                                  // flags setting whether the container is periodic in each coordinate direction - see http://math.lbl.gov/voro++/doc/refman/classvoro_1_1container.html#a50aaf382a069b102930b88976215818f
-                      ideal_points_per_block);                              // the initial memory allocation for each block (number of particles)
 
   // populate this chunk and its neigbours' particles so we get a seamless join
   unsigned int constexpr max_points = 600;

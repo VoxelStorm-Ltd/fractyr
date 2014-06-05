@@ -2,6 +2,7 @@
 #define CHUNK_H_INCLUDED
 
 #include <vector>
+#include <voro++.hh>
 #include "vmath.h"
 #include "buffer_chunk.h"
 
@@ -21,13 +22,13 @@ private:
 
   buffer_chunk buf;                       // this chunk's graphics buffer
 
-  bool cells_computed = false;
-  struct cell {
-    std::vector<int>    neighbours;       // list of neighbours IDs corresponding to faces
-    std::vector<int>    face_verts;       // 0-bracketed list of vertex ids
-    std::vector<double> verts;            // vertices per cell
-    std::vector<double> normals;          // normals by face, in threes
-  };
+  // Create a non-periodic particle container
+  static float constexpr chunk_margin = 0.25;                               // how far outside each chunk we compute the voronoi space to avoid discontinuities at edges
+  static unsigned int constexpr ideal_points_per_block = 8;                 // the optimal number of points per block in a container
+  static unsigned int constexpr expected_points = 2500;                     // roughly how many points we're generating; test and update this for release
+  static unsigned int constexpr num_cells = std::cbrt(expected_points / ideal_points_per_block);
+  voro::container con;
+
 
   #ifndef NDEBUG
     static double total_time_taken;                 // time to generate, in milliseconds, for average
@@ -48,7 +49,7 @@ public:
   Vector3f        get_colour(Vector3f const &local_coords) const;
 
   // collisions
-  Vector3f check_collision(Vector3f const &coords, float radius) const;
+  Vector3f check_collision(Vector3f const &coords, float radius);
 
   // update
   void update();
