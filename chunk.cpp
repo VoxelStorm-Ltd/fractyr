@@ -1,7 +1,6 @@
 #include "chunk.h"
 #include <random>
 #include <algorithm>
-#include <vector>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <voro++.hh>
@@ -199,10 +198,10 @@ void chunk::setup() {
       }
     }
   }
-  std::cout << "DEBUG: num_points " << num_points << std::endl;
+  //std::cout << "DEBUG: num_points " << num_points << std::endl;
   //std::cout << "DEBUG: Voronoi volume: " << con.sum_cell_volumes() << std::endl;
 
-  std::vector<bool> cell_is_solid(num_points, false);
+  bool cell_is_solid[num_points];
 
   voro::c_loop_all cell_loop(con);
   voro::voronoicell_neighbor cell;
@@ -224,7 +223,6 @@ void chunk::setup() {
     }
     cell_is_solid[cell_loop.pid()] = get_is_solid(cell_coords);   // cache the cell save check
   } while(cell_loop.inc());
-  // TODO: count falses and trues and compare
 
   cell_loop.start();                  // restart the loop
 
@@ -299,6 +297,6 @@ void chunk::setup() {
     ++total_chunks_generated;
     double time_total = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - timestart).count();
     total_time_taken += time_total;
-    std::cout << "DEBUG: chunk took " << time_total << "ms, avg: " << total_time_taken / total_chunks_generated << "ms, total: " << total_time_taken << "ms, " << total_chunks_generated << "chunks" << std::endl;
+    std::cout << "DEBUG: chunk took " << time_total << "ms, avg: " << total_time_taken / total_chunks_generated << "ms, total: " << total_time_taken << "ms, " << total_chunks_generated << " chunks" << std::endl;
   #endif
 }
