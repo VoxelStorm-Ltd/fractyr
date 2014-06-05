@@ -45,7 +45,6 @@ void gameplayer::pollcontrols(GLFWwindow *thiswindow) {
         if(binding.helddown && !binding.repeat) {
           break;                            // don't repeat
         }
-        std::cout << "DEBUG: joystick axis " << binding.control << " value " << std::fixed << axes[binding.control] << " scale " << binding.scale << " final " << axes[binding.control] * binding.scale << std::endl;
         (this->*binding.function)(axes[binding.control] * binding.scale);
         binding.helddown = true;
       } else {
