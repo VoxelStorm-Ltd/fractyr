@@ -12,10 +12,13 @@ public:
   struct vertex {
     Vector3<GLfloat> coords;
     Vector3<GLfloat> normal;
+    Vector3<GLfloat> colour;
     vertex(Vector3<GLfloat> coords,
-           Vector3<GLfloat> normal)
+           Vector3<GLfloat> normal,
+           Vector3<GLfloat> colour)
     : coords(coords),
-      normal(normal) {
+      normal(normal),
+      colour(colour) {
       /// specific constructor
     }
   };
@@ -23,6 +26,7 @@ private:
   // per-vertex attribute indices
   static GLuint attrib_coords;
   static GLuint attrib_normal;
+  static GLuint attrib_colour;
 public:
   buffer_chunk();
   ~buffer_chunk()       override final;

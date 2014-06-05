@@ -11,6 +11,7 @@ BLOB_LOAD(shaders_chunk_frag_glsl);
 GLuint buffer_chunk::shader = 0;
 GLuint buffer_chunk::attrib_coords = 0;
 GLuint buffer_chunk::attrib_normal = 0;
+GLuint buffer_chunk::attrib_colour = 0;
 
 buffer_chunk::buffer_chunk() {
   /// Default constructor
@@ -37,6 +38,7 @@ void buffer_chunk::load_shader() {
   // cache attribute and uniform indices
   attrib_coords = glGetAttribLocation(shader, "coords");
   attrib_normal = glGetAttribLocation(shader, "normal");
+  attrib_colour = glGetAttribLocation(shader, "colour");
 }
 
 void buffer_chunk::destroy_shader() {
@@ -80,14 +82,17 @@ void buffer_chunk::render() const {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
   glEnableVertexAttribArray(attrib_coords);
   glEnableVertexAttribArray(attrib_normal);
+  glEnableVertexAttribArray(attrib_colour);
   glVertexAttribPointer(attrib_coords, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::coords)));
   glVertexAttribPointer(attrib_normal, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::normal)));
+  glVertexAttribPointer(attrib_colour, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::colour)));
 
   glDrawElements(GL_TRIANGLES, numverts, GL_UNSIGNED_INT, 0);
 
   glUseProgram(0);
   glDisableVertexAttribArray(attrib_coords);
   glDisableVertexAttribArray(attrib_normal);
+  glDisableVertexAttribArray(attrib_colour);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }

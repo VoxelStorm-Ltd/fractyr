@@ -3,6 +3,7 @@
 #pragma debug(off)
 
 varying vec3 normal_frag;
+varying vec3 colour_frag;
 varying vec3 reflectdir_frag;
 varying vec3 coords_camlocal_frag;
 
@@ -13,7 +14,7 @@ void main() {
   //const vec3 colour_lamb = vec3(0.80, 0.80, 0.77);       // 2244 Pearl White
   //const vec3 colour_lamb = vec3(1.00, 1.00, 0.96);       // 2244 Pearl White normalised to 1
   //const vec3 colour_lamb = vec3(0.74, 0.77, 0.80);       // 2329 Kid Glove
-  const vec3 colour_lamb = vec3(0.92, 0.95, 1.00);       // 2329 Kid Glove normalised to 1
+  //const vec3 colour_lamb = vec3(0.92, 0.95, 1.00);       // 2329 Kid Glove normalised to 1
   const vec3 colour_spec = vec3(0.95, 0.92, 0.84) * 0.6;       // 2268 Pearly Gates
   //const vec3 colour_spec = vec3(1.00, 0.97, 0.89);       //  Pearly Gates normalised to 1
 
@@ -27,7 +28,7 @@ void main() {
     specular = pow(specangle, 10.0);
   }
 
-  gl_FragColor.rgb = (colour_lamb * lambertian) +
+  gl_FragColor.rgb = (colour_frag * lambertian) +
                      (colour_spec * specular);
   gl_FragColor.a = 1.0;
 }
