@@ -22,9 +22,11 @@ void callback_key(GLFWwindow *thiswindow __attribute__((unused)),
     #ifndef NDEBUG
       case GLFW_KEY_O:
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);      // wireframe
+        glDisable(GL_CULL_FACE);
         break;
       case GLFW_KEY_P:
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);      // filled
+        glEnable(GL_CULL_FACE);
         break;
     #endif
     /*
