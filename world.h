@@ -10,7 +10,7 @@ class entity;
 class world {
   /// Container class for chunks, objects and their relevant functions
 public:
-  static int constexpr size = 256;                          // how many chunks in each direction
+  static int constexpr size = 8;                          // how many chunks in each direction
   float const drag = 1.0;                                   // equal to 0.5 * mass-density of the fluid
 
 private:

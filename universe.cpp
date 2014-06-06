@@ -103,7 +103,9 @@ void universe::restart() {
   current_world = new world();
 
   // world content setup
-  player.current_ship = new playership(*current_world, current_world->get_chunk(Vector3i(world::size/2, world::size/2-5, world::size/2)), Vector3f(70.0, 10.0, 10.0));
+  player.current_ship = new playership(*current_world,
+                                       current_world->get_chunk(Vector3i(world::size / 3, world::size / 3, world::size / 3)),
+                                       Vector3f(chunk::size / 3, chunk::size / 3, chunk::size / 3));
   player.current_ship->add_weapon(new blaster(player.current_ship, 10.0, 1.5));
 
   glfwSetInputMode(            window_main, GLFW_CURSOR, GLFW_CURSOR_NORMAL);     // release the cursor

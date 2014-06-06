@@ -27,8 +27,8 @@ chunk::chunk(Vector3i const &chunk_coords, world &parent)
   /// Default constructor
 
   // generate enemies
-  float gruntscale = 1 + static_cast<float>((chunk_coords - Vector3i(world::size/2.0, world::size/2.0, world::size/2.0)).length()) / (world::size / 16);
-  std::cout << "DEBUG: Spawning grunt with scale: " << gruntscale << std::endl;
+  float gruntscale = 1;// + static_cast<float>((chunk_coords - Vector3i(world::size/2.0, world::size/2.0, world::size/2.0)).length()) / (world::size / 16);
+  //std::cout << "DEBUG: Spawning grunt with scale: " << gruntscale << std::endl;
   grunt *grunt1 = new grunt(parent, this, Vector3f(size/2.0, size/2.0, size/2.0), Quatf::fromEulerAngles(0.0, 0.0, 0.0), gruntscale);
   grunt1->add_weapon(new blaster(grunt1, 120.0  / gruntscale, 0.9 * gruntscale));
 
@@ -53,16 +53,16 @@ unsigned int chunk::get_unique_seed() const {
 
 bool chunk::get_is_solid(Vector3i const &chunk_coords, Vector3f const &local_coords) {
   /// Test a coordinate for solidity
-  unsigned int constexpr iters = 10;
-  float constexpr scale = 0.2;
+  unsigned int constexpr iters = 5;
+  float constexpr scale = 0.5/static_cast<float>(world::size);
   Vector3f const coords_composite((local_coords / size) + static_cast<Vector3f>(chunk_coords));
 
   //std::cout << "DEBUG: " << local_coords << std::endl;
   //std::cout << "DEBUG: " << coords_composite << std::endl;
 
-  float x0 = fmod(coords_composite.x * scale, 3.0) - 1.5;
-  float y0 = fmod(coords_composite.y * scale, 3.0) - 1.5;
-  float z0 = fmod(coords_composite.z * scale, 3.0) - 1.5;
+  float x0 = coords_composite.x * scale - 1.0;
+  float y0 = coords_composite.y * scale - 1.0;
+  float z0 = coords_composite.z * scale - 1.0;
 
   float x = x0;
   float y = y0;
@@ -77,11 +77,11 @@ bool chunk::get_is_solid(Vector3i const &chunk_coords, Vector3f const &local_coo
     z = powf(z, 5) - 10.0 * powf(z, 3) * (x * x + y * y) + 5 * z * (powf(x, 4) + powf(y, 4)) + z0;
 
     if (x + y + z > 1000000) {
-      return false;
+      return true;
     }
   }
 
-  return true;
+  return false;
 }
 bool chunk::get_is_solid(Vector3f const &local_coords) const {
   /// Wrapper function for the static
