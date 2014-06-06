@@ -11,11 +11,13 @@
 #include "buffer_chunk.h"
 #include "buffer_plasma.h"
 #include "buffer_enemy_grunt.h"
+#include "buffer_enemy_core.h"
 #include "ship.h"
 #include "playership.h"
 #include "blaster.h"
 #include "plasma.h"
 #include "grunt.h"
+#include "core.h"
 #include "chunk.h"
 
 // loaders
@@ -157,6 +159,7 @@ void universe::init_buffers() {
   plasma::buf.setup();
   grunt::buf.init();
   grunt::buf.setup();
+  core::buf.setup();
 
   // initialise fonts
   delete font_title;

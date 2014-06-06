@@ -134,8 +134,10 @@ void entity::move(Vector3f const &direction) {
       }
     #endif // NDEBUG
       velocity = direction - (collision_normal  * ((direction.dotProduct(collision_normal) * 2) / collision_normal.lengthSq()));
+      velocity /= 2.0;
+    #ifndef NDEBUG
     }
-    #endif
+    #endif // NDEBUG
 
     //velocity = Vector3f(0.0f, 0.0f, 0.0f);
     // apply damping
@@ -233,7 +235,9 @@ float entity::get_collision_damage() const {
 }
 
 void entity::collided_with(entity *other) {
-  energy -= other->get_collision_damage();
+  if (get_entity_type() != entity::entity_type::ENEMY && other->get_entity_type() != entity::entity_type::ENEMY) {
+    energy -= other->get_collision_damage();
+  }
 }
 
 void entity::render() const {
