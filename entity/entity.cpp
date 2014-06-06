@@ -128,17 +128,13 @@ void entity::move(Vector3f const &direction) {
     Vector3f collision_normal = -(test_dir_sum/test_points_collided);
     collision_normal.normalise();
     #ifndef NDEBUG
-    if (this->get_entity_type() == entity_type::PLAYER) {
-      std::cout << "DEBUG: " << test_points_collided << ": " << test_dir_sum << " collision!  Normal " << collision_normal << std::endl;
-    }
-    #endif // NDEBUG
-
-    #ifndef NDEBUG
-      if(!player.noclip) {
-    #endif
-      velocity = direction - (collision_normal  * ((direction.dotProduct(collision_normal) * 2) / collision_normal.lengthSq()));
-    #ifndef NDEBUG
+    if(!player.noclip) {
+      if (this->get_entity_type() == entity_type::PLAYER) {
+        std::cout << "DEBUG: " << test_points_collided << ": " << test_dir_sum << " collision!  Normal " << collision_normal << std::endl;
       }
+    #endif // NDEBUG
+      velocity = direction - (collision_normal  * ((direction.dotProduct(collision_normal) * 2) / collision_normal.lengthSq()));
+    }
     #endif
 
     //velocity = Vector3f(0.0f, 0.0f, 0.0f);
@@ -153,7 +149,7 @@ void entity::move(Vector3f const &direction) {
   if(parent != newparent) {
     parent->remove_entity(this);
     newparent->add_entity(this);
-    std::cout << "DEBUG: entity moved chunks from " << parent->coords << " to " << newparent->coords << std::endl;
+    //std::cout << "DEBUG: entity moved chunks from " << parent->coords << " to " << newparent->coords << std::endl;
     parent = newparent;
   }
 }
