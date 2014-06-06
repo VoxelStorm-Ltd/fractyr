@@ -39,7 +39,6 @@ void grunt::render() const {
 
 void grunt::update() {
   /// Update this enemy's AI actions
-
   // TODO: The tracking gets confused if (I think) the player crosses the z axis, slerp should deal with this fine but isn't for some reason.
 
   Vector3f aimpos = player.current_ship->get_world_position() - get_world_position();
@@ -56,15 +55,21 @@ void grunt::update() {
   if(aimpos.y < -halfworld) aimpos.y += worldsize;
   if(aimpos.z < -halfworld) aimpos.z += worldsize;
 
-  // DEBUG ONLY:
-  return;
+  #ifndef NDEBUG
+    if(player.invisible) {
+      orientation *= Quatf::fromAxisRot(Vector3f(0.0, 1.0, 0.0), 0.1);    // spin gently
+      orientation_conjugate = orientation.conjugate_copy();
+      enemy::update();
+      return;
+    }
+  #endif
 
   if(aimpos.lengthSq() < 10000) {
     velocity.x += (rand() / static_cast<float>(RAND_MAX) - 0.5) / 100.0;
     velocity.y += (rand() / static_cast<float>(RAND_MAX) - 0.5) / 100.0;
     velocity.z += (rand()  /static_cast<float>(RAND_MAX) - 0.5) / 100.0;
 
-    Quatf target_orientation = Quatf::fromMatrix(Matrix4f::createLookAt(Vector3f(0.0, 0.0, 0.0), aimpos, Vector3f(0.0, 0.0, 1.0)));
+    Quatf const &target_orientation = Quatf::fromMatrix(Matrix4f::createLookAt(Vector3f(0.0, 0.0, 0.0), aimpos, Vector3f(0.0, 0.0, 1.0)));
     orientation = orientation.slerp(0.05, target_orientation);
     orientation.normalise();
     orientation_conjugate = orientation.conjugate_copy();

@@ -248,7 +248,8 @@ void gameplayer::setup_input() {
   bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_F6,           &gameplayer::input_graphics_compromise, false);
   bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_F7,           &gameplayer::input_graphics_fastest,    false);
   #ifndef NDEBUG
-    bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_F,          &gameplayer::input_cheat,               false);
+    bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_F,          &gameplayer::input_cheat_god,           false);
+    bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_I,          &gameplayer::input_cheat_invisible,     false);
   #endif
   bind(controlbinding::controltype::MOUSE_SCROLL, 0,                 &gameplayer::input_zoom,                true, 0.0, -1.0);
   bind(controlbinding::controltype::MOUSE_BUTTON, 0,                 &gameplayer::input_fire1,               true);
@@ -451,12 +452,20 @@ void gameplayer::input_graphics_fastest(float amount __attribute__((__unused__))
 }
 
 #ifndef NDEBUG
-  void gameplayer::input_cheat(float ammout __attribute__((__unused__))) {
+  void gameplayer::input_cheat_god(float ammout __attribute__((__unused__))) {
     current_ship->invincible = !current_ship->invincible;
     if(current_ship->invincible) {
       std::cout << "CHEAT: god mode on" << std::endl;
     } else {
       std::cout << "CHEAT: god mode off" << std::endl;
+    }
+  }
+  void gameplayer::input_cheat_invisible(float ammout __attribute__((__unused__))) {
+    invisible = !invisible;
+    if(invisible) {
+      std::cout << "CHEAT: invisibility on" << std::endl;
+    } else {
+      std::cout << "CHEAT: invisibility off" << std::endl;
     }
   }
 #endif
