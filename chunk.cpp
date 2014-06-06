@@ -53,36 +53,34 @@ unsigned int chunk::get_unique_seed() const {
 
 bool chunk::get_is_solid(Vector3i const &chunk_coords, Vector3f const &local_coords) {
   /// Test a coordinate for solidity
-  unsigned int constexpr iters = 5;
-  unsigned int constexpr scale = 50;
+  unsigned int constexpr iters = 10;
+  float constexpr scale = 0.2;
   Vector3f const coords_composite((local_coords / size) + static_cast<Vector3f>(chunk_coords));
 
   //std::cout << "DEBUG: " << local_coords << std::endl;
   //std::cout << "DEBUG: " << coords_composite << std::endl;
 
-  unsigned int x = coords_composite.x * scale;
-  unsigned int y = coords_composite.y * scale;
-  unsigned int z = coords_composite.z * scale;
+  float x0 = fmod(coords_composite.x * scale, 2.0) - 1.0;
+  float y0 = fmod(coords_composite.y * scale, 2.0) - 1.0;
+  float z0 = fmod(coords_composite.z * scale, 2.0) - 1.0;
+
+  float x = x0;
+  float y = y0;
+  float z = z0;
 
   //std::cout << "DEBUG: " << x << "," << y << "," << z << std::endl;
 
-  unsigned int depth = 1;
-  for(unsigned int i = 0; i != iters; ++i) {
-    int matches = 0;
-    if((x / depth) % 3 == 1) {
-      ++matches;
-    }
-    if((y / depth) % 3 == 1) {
-      ++matches;
-    }
-    if((z / depth) % 3 == 1) {
-      ++matches;
-    }
-    if(matches >= 2) {
+  // quintic mandelbulb:
+  for (unsigned int i = 0; i != iters; ++i) {
+    x = powf(x, 5) - 10.0 * powf(x, 3) * (y * y + z * z) + 5 * x * (powf(y, 4) + powf(z, 4)) + x0;
+    y = powf(y, 5) - 10.0 * powf(y, 3) * (z * z + x * x) + 5 * y * (powf(z, 4) + powf(x, 4)) + y0;
+    z = powf(z, 5) - 10.0 * powf(z, 3) * (x * x + y * y) + 5 * z * (powf(x, 4) + powf(y, 4)) + z0;
+
+    if (x + y + z > 1000000) {
       return false;
     }
-    depth *= 3;
   }
+
   return true;
 }
 bool chunk::get_is_solid(Vector3f const &local_coords) const {
