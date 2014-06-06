@@ -250,6 +250,7 @@ void gameplayer::setup_input() {
   #ifndef NDEBUG
     bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_F,          &gameplayer::input_cheat_god,           false);
     bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_I,          &gameplayer::input_cheat_invisible,     false);
+    bind(controlbinding::controltype::KEYBOARD, GLFW_KEY_N,          &gameplayer::input_cheat_noclip,        false);
   #endif
   bind(controlbinding::controltype::MOUSE_SCROLL, 0,                 &gameplayer::input_zoom,                true, 0.0, -1.0);
   bind(controlbinding::controltype::MOUSE_BUTTON, 0,                 &gameplayer::input_fire1,               true);
@@ -466,6 +467,14 @@ void gameplayer::input_graphics_fastest(float amount __attribute__((__unused__))
       std::cout << "CHEAT: invisibility on" << std::endl;
     } else {
       std::cout << "CHEAT: invisibility off" << std::endl;
+    }
+  }
+  void gameplayer::input_cheat_noclip(float ammout __attribute__((__unused__))) {
+    noclip = !noclip;
+    if(noclip) {
+      std::cout << "CHEAT: noclip on" << std::endl;
+    } else {
+      std::cout << "CHEAT: noclip off" << std::endl;
     }
   }
 #endif
