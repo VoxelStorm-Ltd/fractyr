@@ -126,8 +126,12 @@ void buffer_enemy_grunt::render() const {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void buffer_enemy_grunt::cuboid(Vector3f const pos, Vector3f const size, Vector4f colour, std::vector<vertex> &vbodata, std::vector<GLuint> &ibodata) {
-  Vector3f const size_half(size/2.0);
+void buffer_enemy_grunt::cuboid(Vector3f const &pos,
+                                Vector3f const &size,
+                                Vector4f const &colour,
+                                std::vector<vertex> &vbodata,
+                                std::vector<GLuint> &ibodata) const {
+  Vector3f const size_half(size / 2.0);
   Vector3f const coord000(-size_half + pos);
   Vector3f const coord100(coord000 + Vector3f(size.x, 0.0f,   0.0f));
   Vector3f const coord010(coord000 + Vector3f(0.0f,   size.y, 0.0f));
