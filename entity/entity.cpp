@@ -35,7 +35,30 @@ chunk *entity::get_parent() const {
 Vector3f const &entity::get_position() const {
   return position;
 }
-Vector3f const entity::get_world_position() const {
+Vector3f entity::get_offset(Vector3i const &start_chunk_coords,
+                            Vector3f const &start_coords,
+                            Vector3i const &end_chunk_coords,
+                            Vector3f const &end_coords) {
+  /// Calculate the relative coordinate difference in local coords between this entity and another location
+  Vector3i chunk_offset(start_chunk_coords - end_chunk_coords);
+  if(chunk_offset.x >  world::size / 2) chunk_offset.x -= world::size;
+  if(chunk_offset.y >  world::size / 2) chunk_offset.y -= world::size;
+  if(chunk_offset.z >  world::size / 2) chunk_offset.z -= world::size;
+  if(chunk_offset.x < -world::size / 2) chunk_offset.x += world::size;
+  if(chunk_offset.y < -world::size / 2) chunk_offset.y += world::size;
+  if(chunk_offset.z < -world::size / 2) chunk_offset.z += world::size;
+  return Vector3f(start_coords - end_coords) + (chunk_offset * chunk::size);
+}
+Vector3f entity::get_offset(Vector3i const &other_chunk_coords,
+                            Vector3f const &other_coords) const {
+  /// Wrapper function for the above
+  return get_offset(parent->coords, position, other_chunk_coords, other_coords);
+}
+Vector3f entity::get_offset(entity const &other_entity) const {
+  /// Wrapper function for the above
+  return get_offset(other_entity.get_parent()->coords, other_entity.get_position());
+}
+Vector3f entity::get_world_position() const {
   return position + (parent->coords * chunk::size);
 }
 Vector3f const &entity::get_velocity() const {

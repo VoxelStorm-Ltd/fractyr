@@ -49,12 +49,15 @@ void grunt::update() {
   float constexpr halfworld = worldsize / 2.0;
 
   // Wrap aim position around the world.
-  if (aimpos.x > halfworld)  aimpos.x -= worldsize;
-  if (aimpos.y > halfworld)  aimpos.y -= worldsize;
-  if (aimpos.z > halfworld)  aimpos.z -= worldsize;
-  if (aimpos.x < -halfworld) aimpos.x += worldsize;
-  if (aimpos.y < -halfworld) aimpos.y += worldsize;
-  if (aimpos.z < -halfworld) aimpos.z += worldsize;
+  if(aimpos.x >  halfworld) aimpos.x -= worldsize;
+  if(aimpos.y >  halfworld) aimpos.y -= worldsize;
+  if(aimpos.z >  halfworld) aimpos.z -= worldsize;
+  if(aimpos.x < -halfworld) aimpos.x += worldsize;
+  if(aimpos.y < -halfworld) aimpos.y += worldsize;
+  if(aimpos.z < -halfworld) aimpos.z += worldsize;
+
+  // DEBUG ONLY:
+  return;
 
   if(aimpos.lengthSq() < 10000) {
     velocity.x += (rand() / static_cast<float>(RAND_MAX) - 0.5) / 100.0;

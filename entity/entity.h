@@ -41,7 +41,10 @@ public:
   world *get_parent_world() const;
   chunk *get_parent() const;
   Vector3f const &get_position() const;
-  Vector3f const get_world_position() const;
+  static Vector3f get_offset(Vector3i const &start_chunk_coords, Vector3f const &start_coords, Vector3i const &end_chunk_coords,  Vector3f const &end_coords);
+  Vector3f get_offset(Vector3i const &other_chunk_coords, Vector3f const &other_coords) const;
+  Vector3f get_offset(entity const &other_entity) const;
+  Vector3f get_world_position() const;
   Vector3f const &get_velocity() const;
   Quatf const &get_orientation() const;
   Quatf const &get_orientation_conjugate() const;
