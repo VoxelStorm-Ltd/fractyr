@@ -134,6 +134,7 @@ void entity::move(Vector3f const &direction) {
       }
     #endif // NDEBUG
       velocity = direction - (collision_normal  * ((direction.dotProduct(collision_normal) * 2) / collision_normal.lengthSq()));
+    #ifndef NDEBUG
     }
     #endif
 
