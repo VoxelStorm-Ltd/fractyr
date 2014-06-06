@@ -84,7 +84,7 @@ void buffer_shard::setup() {
   ibodata.emplace_back(0);
 
   #ifndef NDEBUG
-    std::cout << "Uploading " << vbodata.size() << " verts, " << ibodata.size() << " indices to plasma vbo ("
+    std::cout << "Uploading " << vbodata.size() << " verts, " << ibodata.size() << " indices to shard vbo ("
               << (vbodata.size() * sizeof(vertex)) / 1024 << "KB, "
               << (ibodata.size() * sizeof(vertex)) / 1024 << "KB)" << std::endl;
   #endif

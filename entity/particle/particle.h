@@ -5,7 +5,7 @@
 #include "buffer_shard.h"
 
 class particle : public entity {
-protected:
+public:
   static buffer_shard buf;                        // this object's graphics buffer
 
   unsigned int time_to_live = 30;                 // how long to exist for, in frames
