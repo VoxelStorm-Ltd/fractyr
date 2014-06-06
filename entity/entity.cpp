@@ -248,7 +248,7 @@ float entity::get_collision_damage() const {
 }
 
 void entity::collided_with(entity *other) {
-  if (get_entity_type() != entity::entity_type::ENEMY && other->get_entity_type() != entity::entity_type::ENEMY) {
+  if (get_entity_type() != entity::entity_type::ENEMY || other->get_entity_type() != entity::entity_type::ENEMY) {
     energy -= other->get_collision_damage();
   }
 }
