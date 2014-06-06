@@ -47,6 +47,10 @@ chunk::~chunk() {
   }
 }
 
+Vector3i const &chunk::get_coords() const {
+  return coords;
+}
+
 unsigned int chunk::get_unique_seed(Vector3i const &chunk_coords) {
   /// Return a guaranteed unique seed for these chunk coordinates
   return (((chunk_coords.x * world::size) + chunk_coords.y) * world::size) + chunk_coords.z;

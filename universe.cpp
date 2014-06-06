@@ -112,8 +112,8 @@ void universe::restart() {
     for(  c.y = 0; c.y != world::size; ++c.y) {
       for(c.z = 0; c.z != world::size; ++c.z) {
         float const progress(++chunks_done / chunks_to_load);
-        std::stringstream ss("Loading... ");
-        ss << static_cast<unsigned int>(progress * 100.0f);
+        std::stringstream ss;
+        ss << static_cast<unsigned int>(progress * 100.0f) << "ing...";
         render_progressscreen(progress, ss.str());
         current_world->get_chunk(c);
       }
@@ -124,6 +124,14 @@ void universe::restart() {
   player.current_ship = new playership(*current_world,
                                        current_world->get_chunk(Vector3i(world::size / 2, world::size / 2, world::size / 2)),
                                        Vector3f(chunk::size / 4, chunk::size / 3, chunk::size / 3));
+  // slide the player ship down until we're not in a solid surface
+  /*
+  while(player.current_ship->check_collision(player.current_ship->get_position(), 4.0) != Vector3f(0.0, 0.0, 0.0)) {
+    player.current_ship->move_force(Vector3f(0.1, 0.2, 0.3));
+    std::cout << "DEBUG: Player coords now " << player.current_ship->get_parent()->get_coords() << ", " << player.current_ship->get_position() << std::endl;
+  }
+  */
+
   player.current_ship->add_weapon(new blaster(player.current_ship));
 
   glfwSetInputMode(            window_main, GLFW_CURSOR, GLFW_CURSOR_NORMAL);     // release the cursor

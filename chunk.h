@@ -48,6 +48,7 @@ public:
   ~chunk();
 
   // query
+  Vector3i const &get_coords() const;
   static unsigned int get_unique_seed(Vector3i const &chunk_coords);
   unsigned int        get_unique_seed() const;
   // generators
