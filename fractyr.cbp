@@ -864,6 +864,8 @@
 		<Unit filename="buffers/buffer.h" />
 		<Unit filename="buffers/buffer_chunk.cpp" />
 		<Unit filename="buffers/buffer_chunk.h" />
+		<Unit filename="buffers/buffer_enemy_core.cpp" />
+		<Unit filename="buffers/buffer_enemy_core.h" />
 		<Unit filename="buffers/buffer_enemy_grunt.cpp" />
 		<Unit filename="buffers/buffer_enemy_grunt.h" />
 		<Unit filename="buffers/buffer_plasma.cpp" />
@@ -877,6 +879,8 @@
 		<Unit filename="entity/bullet/bullet.h" />
 		<Unit filename="entity/bullet/plasma.cpp" />
 		<Unit filename="entity/bullet/plasma.h" />
+		<Unit filename="entity/enemy/core.cpp" />
+		<Unit filename="entity/enemy/core.h" />
 		<Unit filename="entity/enemy/enemy.cpp" />
 		<Unit filename="entity/enemy/enemy.h" />
 		<Unit filename="entity/enemy/grunt.cpp" />
