@@ -8,7 +8,7 @@ ship::ship(world &parent_world, chunk *parent_chunk,
   /// Default constructor
   mass = 10000.0;
   drag = 3.0 * 5.0 * 5.0;
-  radius = 2.0;
+  radius = 5.0;
 }
 
 ship::~ship() {

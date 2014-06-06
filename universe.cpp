@@ -123,7 +123,7 @@ void universe::restart() {
   // world content setup
   player.current_ship = new playership(*current_world,
                                        current_world->get_chunk(Vector3i(world::size / 2, world::size / 2, world::size / 2)),
-                                       Vector3f(chunk::size / 4, chunk::size / 3, chunk::size / 3));
+                                       Vector3f(chunk::size / 5, chunk::size / 3, chunk::size / 3));
   // slide the player ship down until we're not in a solid surface
   /*
   while(player.current_ship->check_collision(player.current_ship->get_position(), 4.0) != Vector3f(0.0, 0.0, 0.0)) {
