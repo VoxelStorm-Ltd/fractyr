@@ -29,6 +29,8 @@ public:
   Vector3f check_collision(Vector3i const &chunk_coords, Vector3f const &coords, float radius);
   void delete_buffers();
   void setup_buffers();
+  void preload_chunks();
+  void clear_chunks();
 
   // update
   void update();

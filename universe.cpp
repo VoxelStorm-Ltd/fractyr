@@ -108,23 +108,10 @@ void universe::restart() {
 
   delete current_world;
   current_world = new world();
-
-  // chunk pre-loading
-  float constexpr chunks_to_load = world::size * world::size * world::size;
-  float chunks_done = 0;
-  for(Vector3i c;  c.x != world::size; ++c.x) {
-    for(  c.y = 0; c.y != world::size; ++c.y) {
-      for(c.z = 0; c.z != world::size; ++c.z) {
-        float const progress(++chunks_done / chunks_to_load);
-        std::stringstream ss;
-        ss << static_cast<unsigned int>(progress * 100.0f) << "ing...";
-        render_progressscreen(progress, ss.str());
-        current_world->get_chunk(c);
-      }
-    }
-  }
+  current_world->preload_chunks();
 
   // world content setup
+  delete player.current_ship;
   player.current_ship = new playership(*current_world,
                                        current_world->get_chunk(Vector3i(1, 1, 5)),
                                        Vector3f(chunk::size / 3, chunk::size / 3, chunk::size / 3));
@@ -164,6 +151,7 @@ void universe::init_buffers() {
   /// Allocate new buffers after context switch
   if(current_world) {
     current_world->setup_buffers();
+    current_world->preload_chunks();
   }
   plasma::buf.init();
   plasma::buf.setup();
@@ -197,6 +185,7 @@ void universe::delete_buffers() {
   /// Note: this should be safe to call even on null buffers
   if(current_world) {
     current_world->delete_buffers();
+    current_world->clear_chunks();
   }
   plasma::buf.destroy();
   grunt::buf.destroy();
@@ -473,11 +462,13 @@ void universe::loop_main() {
       break;
     case gamestate::WON:
       std::cout << "Win." << std::endl;
-      loop_menu();
+      restart();
+      state = gamestate::RUNNING;
       break;
     case gamestate::LOST:
       std::cout << "Lost." << std::endl;
-      loop_menu();
+      restart();
+      state = gamestate::RUNNING;
       break;
     case gamestate::MENU:
       std::cout << "Finished loop from menu" << std::endl;

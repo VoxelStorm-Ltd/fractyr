@@ -6,8 +6,10 @@
 #include "ship.h"
 #include "playership.h"
 #include "gameplayer.h"
+#include "universe.h"
 
 extern gameplayer player;
+extern universe root;
 
 world::world() {
   /// Default constructor
@@ -17,13 +19,7 @@ world::world() {
 
 world::~world() {
   /// Default destructor
-  for(auto &x : chunks) {
-    for(auto &y : x) {
-      for(auto &z : y) {
-        delete z;
-      }
-    }
-  }
+  clear_chunks();
 }
 
 void world::correct_chunk_coords(Vector3i &chunk_coords) {
@@ -303,6 +299,35 @@ void world::setup_buffers() {
       }
     }
   }
+}
+
+void world::preload_chunks() {
+  /// Chunk pre-loading
+  float constexpr chunks_to_load = world::size * world::size * world::size;
+  float chunks_done = 0;
+  for(Vector3i c;  c.x != size; ++c.x) {
+    for(  c.y = 0; c.y != size; ++c.y) {
+      for(c.z = 0; c.z != size; ++c.z) {
+        float const progress(++chunks_done / chunks_to_load);
+        std::stringstream ss;
+        ss << static_cast<unsigned int>(progress * 100.0f) << "ing...";
+        root.render_progressscreen(progress, ss.str());
+        get_chunk(c);
+      }
+    }
+  }
+}
+
+void world::clear_chunks() {
+  /// Destroy all chunks
+  for(auto &x : chunks) {
+    for(auto &y : x) {
+      for(auto &z : y) {
+        delete z;
+      }
+    }
+  }
+  chunks.clear();
 }
 
 void world::update() {
