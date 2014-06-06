@@ -93,7 +93,6 @@ void entity::update() {
 void entity::move(Vector3f const &direction) {
   Vector3f newposition(position + direction);
   chunk *newparent = parent;
-
   //std::cout << "DEBUG: Entity attempting to move to: " << static_cast<Vector3i>(newposition) << std::endl;
   correct_point(newposition, newparent);
 
@@ -113,7 +112,7 @@ void entity::move(Vector3f const &direction) {
 
   for (auto test_dir : test_dirs) {
     Vector3f test_point(test_dir + newposition);
-    chunk *test_parent = parent;
+    chunk *test_parent = newparent;
     correct_point(test_point, test_parent);
 
     Vector3f const &collision_normal(parent_world.check_collision(test_parent->coords, test_point, radius));
@@ -125,8 +124,7 @@ void entity::move(Vector3f const &direction) {
 
   // reflect our velocity by the collision vector
   if (__builtin_expect(test_points_collided != 0 && test_dir_sum != Vector3f(0.0, 0.0, 0.0), 0)) { // If none or all test points are colliding, don't do a collision.
-    Vector3f collision_normal = -(test_dir_sum/test_points_collided);
-    collision_normal.normalise();
+    Vector3f collision_normal = -test_dir_sum / test_points_collided;
     #ifndef NDEBUG
     if(!player.noclip) {
       if (this->get_entity_type() == entity_type::PLAYER) {
@@ -134,7 +132,8 @@ void entity::move(Vector3f const &direction) {
       }
     #endif // NDEBUG
       velocity = direction - (collision_normal  * ((direction.dotProduct(collision_normal) * 2) / collision_normal.lengthSq()));
-      velocity /= 2.0;
+      velocity *= 0.9;
+      //velocity = Vector3f(0.0, 0.0, 0.0);
     #ifndef NDEBUG
     }
     #endif // NDEBUG
@@ -142,11 +141,10 @@ void entity::move(Vector3f const &direction) {
     //velocity = Vector3f(0.0f, 0.0f, 0.0f);
     // apply damping
     // TODO
-
+    newparent = parent;
     newposition = position + velocity;
     correct_point(newposition, newparent);
   }
-
   position = newposition;
   if(parent != newparent) {
     parent->remove_entity(this);
