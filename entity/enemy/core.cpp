@@ -18,9 +18,9 @@ core::core(world &parent_world,
   : enemy(parent_world, parent_chunk, position, orientation),
     scale(scale) {
   /// Default constructor
-  radius = 3.0 * scale;
+  radius = 5.0 * scale;
   mass = 1000.0 * scale;
-  energy = 400 * scale * scale;
+  energy = 1000 * scale * scale;
 }
 
 core::~core() {
