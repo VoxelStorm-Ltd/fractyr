@@ -4,6 +4,9 @@
 #include <GLFW/glfw3.h>
 #include "world.h"
 #include "chunk.h"
+#include "gameplayer.h"
+
+extern gameplayer player;
 
 entity::entity(world &parent_world,
                chunk *parent_chunk,
@@ -105,42 +108,45 @@ void entity::move(Vector3f const &direction) {
 
   //std::cout << "DEBUG: Corrected to: " << static_cast<Vector3i>(newposition) << std::endl;
 
-  unsigned int iters = 1;
-  while(iters--) {
-    Vector3f test_dir_sum = Vector3f(0, 0, 0);
-    unsigned int test_points_collided = 0;
+  Vector3f test_dir_sum = Vector3f(0, 0, 0);
+  unsigned int test_points_collided = 0;
 
-    for (auto test_dir : test_dirs) {
-      Vector3f test_point(test_dir + newposition);
-      chunk *test_parent = parent;
-      correct_point(test_point, test_parent);
+  for (auto test_dir : test_dirs) {
+    Vector3f test_point(test_dir + newposition);
+    chunk *test_parent = parent;
+    correct_point(test_point, test_parent);
 
-      Vector3f const &collision_normal(parent_world.check_collision(test_parent->coords, test_point, radius));
-      if(__builtin_expect(collision_normal != Vector3f(0.0f, 0.0f, 0.0f), 0)) {     // branch prediction hint: unlikely (the usual case will be no collision)
-        ++test_points_collided;
-        test_dir_sum += test_dir;
-      }
+    Vector3f const &collision_normal(parent_world.check_collision(test_parent->coords, test_point, radius));
+    if(__builtin_expect(collision_normal != Vector3f(0.0f, 0.0f, 0.0f), 0)) {     // branch prediction hint: unlikely (the usual case will be no collision)
+      ++test_points_collided;
+      test_dir_sum += test_dir;
     }
+  }
 
-    // reflect our velocity by the collision vector
-    if (__builtin_expect(test_points_collided != 0 && test_dir_sum != Vector3f(0.0, 0.0, 0.0), 0)) { // If none or all test points are colliding, don't do a collision.
-      Vector3f collision_normal = -(test_dir_sum/test_points_collided);
-      collision_normal.normalise();
-      #ifndef NDEBUG
-      if (this->get_entity_type() == entity_type::PLAYER) {
-        std::cout << "DEBUG: " << test_points_collided << ": " << test_dir_sum << " collision!  Normal " << collision_normal << std::endl;
-      }
-      #endif // NDEBUG
+  // reflect our velocity by the collision vector
+  if (__builtin_expect(test_points_collided != 0 && test_dir_sum != Vector3f(0.0, 0.0, 0.0), 0)) { // If none or all test points are colliding, don't do a collision.
+    Vector3f collision_normal = -(test_dir_sum/test_points_collided);
+    collision_normal.normalise();
+    #ifndef NDEBUG
+    if (this->get_entity_type() == entity_type::PLAYER) {
+      std::cout << "DEBUG: " << test_points_collided << ": " << test_dir_sum << " collision!  Normal " << collision_normal << std::endl;
+    }
+    #endif // NDEBUG
+
+    #ifndef NDEBUG
+      if(!player.noclip) {
+    #endif
       velocity = direction - (collision_normal  * ((direction.dotProduct(collision_normal) * 2) / collision_normal.lengthSq()));
-      //velocity = Vector3f(0.0f, 0.0f, 0.0f);
-      // apply damping
-      // TODO
+    #ifndef NDEBUG
+      }
+    #endif
 
-      newposition = position + velocity;
-      correct_point(newposition, newparent);
-    } else {
-      break;
-    }
+    //velocity = Vector3f(0.0f, 0.0f, 0.0f);
+    // apply damping
+    // TODO
+
+    newposition = position + velocity;
+    correct_point(newposition, newparent);
   }
 
   position = newposition;

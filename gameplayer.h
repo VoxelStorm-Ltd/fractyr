@@ -69,6 +69,7 @@ public:
 
   #ifndef NDEBUG
     bool invisible = false;
+    bool noclip    = false;
   #endif
 
   gameplayer();
@@ -140,6 +141,7 @@ public:
   #ifndef NDEBUG
     void input_cheat_god(        float amount = 1.0);
     void input_cheat_invisible(  float amount = 1.0);
+    void input_cheat_noclip(     float amount = 1.0);
   #endif
 };
 

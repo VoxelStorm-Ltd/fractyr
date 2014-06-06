@@ -23,9 +23,16 @@ private:
   buffer_chunk buf;                       // this chunk's graphics buffer
 
   // Create a non-periodic particle container
+  static float constexpr point_density = 0.0006;   // points per cubic metre; default 0.0006 = 600 per 100m^3
+  //static float constexpr point_density = 0.000005;   // points per cubic metre; default 0.0006 = 600 per 100m^3
+  //static float constexpr point_density = 0.001;   // points per cubic metre; default 0.0006 = 600 per 100m^3
+  static unsigned int constexpr max_points = point_density * size * size * size;
   static float constexpr chunk_margin = 0.25;                               // how far outside each chunk we compute the voronoi space to avoid discontinuities at edges
   static unsigned int constexpr ideal_points_per_block = 8;                 // the optimal number of points per block in a container
-  static unsigned int constexpr expected_points = 2500;                     // roughly how many points we're generating; test and update this for release
+  static unsigned int constexpr expected_points = max_points +              // roughly how many points we're generating - central cube
+                                                  (max_points * 4 * chunk_margin) +                                 // cardinal neighbours
+                                                  (max_points * 8 * chunk_margin * chunk_margin) +                  // cardinal corners
+                                                  (max_points * 8 * chunk_margin * chunk_margin * chunk_margin);    // remote corners
   static unsigned int constexpr num_cells = std::cbrt(expected_points / ideal_points_per_block);
   voro::container con;
 
