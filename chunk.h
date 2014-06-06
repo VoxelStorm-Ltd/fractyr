@@ -5,6 +5,7 @@
 #include <voro++.hh>
 #include "vmath.h"
 #include "buffer_chunk.h"
+#include "world.h"
 
 class world;          // forward dec
 class entity;
@@ -12,7 +13,7 @@ class entity;
 class chunk {
   /// A renderable and collidable area of space
 public:
-  static float constexpr size = 100.0;    // chunk size per side
+  static float constexpr size = 800.0 / world::size;    // chunk size per side
 
   world *parent = nullptr;                // what world it belongs to
   Vector3i coords;                        // where this chunk is

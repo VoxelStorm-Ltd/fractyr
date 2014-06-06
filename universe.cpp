@@ -105,6 +105,21 @@ void universe::restart() {
   delete current_world;
   current_world = new world();
 
+  // chunk pre-loading
+  float constexpr chunks_to_load = world::size * world::size * world::size;
+  float chunks_done = 0;
+  for(Vector3i c;  c.x != world::size; ++c.x) {
+    for(  c.y = 0; c.y != world::size; ++c.y) {
+      for(c.z = 0; c.z != world::size; ++c.z) {
+        float const progress(++chunks_done / chunks_to_load);
+        std::stringstream ss("Loading... ");
+        ss << static_cast<unsigned int>(progress * 100.0f);
+        render_progressscreen(progress, ss.str());
+        current_world->get_chunk(c);
+      }
+    }
+  }
+
   // world content setup
   player.current_ship = new playership(*current_world,
                                        current_world->get_chunk(Vector3i(world::size / 2, world::size / 2, world::size / 2)),
@@ -148,7 +163,7 @@ void universe::init_buffers() {
   delete font_loading;
   font_title   = nullptr;
   font_loading = nullptr;
-  font_title   = font_load(BLOB(title_ttf), BLOB_SIZE(title_ttf), 70);
+  font_title   = font_load(BLOB(title_ttf), BLOB_SIZE(title_ttf), 120);
   font_loading = font_load(BLOB(title_ttf), BLOB_SIZE(title_ttf), 24);
 }
 
@@ -219,7 +234,7 @@ void universe::render_progressscreen_hud(float progress, std::string const &mess
   glLoadIdentity();
   glDisable(GL_DEPTH_TEST);
 
-  float const font_title_advance   = font_title->Advance(message.c_str(), message.length());
+  float const font_title_advance = font_title->Advance("Fractyr", 7);
   float const font_loading_advance = font_loading->Advance(message.c_str(), message.length());
   Vector2i const titlepos(  (windowsize.x - font_title_advance)   / 2.0, (windowsize.y * 0.60));
   Vector2i const messagepos((windowsize.x - font_loading_advance) / 2.0, (windowsize.y * 0.25) + 10.0);
@@ -228,15 +243,14 @@ void universe::render_progressscreen_hud(float progress, std::string const &mess
   font_title->Render("Fractyr", 7, FTPoint(titlepos.x, titlepos.y - 2), FTPoint(), FTGL::RENDER_FRONT);
   glColor4f(0.9, 0.9, 0.0, 1.0);
   font_title->Render("Fractyr", 7, FTPoint(titlepos.x, titlepos.y),     FTPoint(), FTGL::RENDER_FRONT);
+  glBegin(GL_LINES);
+  glVertex2i(windowsize.x * 0.25,                      (windowsize.y * 0.25) - 11.0);
+  glVertex2i(windowsize.x * (0.25 + (progress * 0.5)), (windowsize.y * 0.25) - 11.0);
+  glEnd();
   glColor4f(1.0, 1.0, 0.0, 1.0);
   glBegin(GL_LINES);
   glVertex2i(windowsize.x * 0.25,                      (windowsize.y * 0.25) - 10.0);
   glVertex2i(windowsize.x * (0.25 + (progress * 0.5)), (windowsize.y * 0.25) - 10.0);
-  glEnd();
-  glColor4f(0.0, 0.0, 0.0, 1.0);
-  glBegin(GL_LINES);
-  glVertex2i(windowsize.x * 0.25,                      (windowsize.y * 0.25) - 11.0);
-  glVertex2i(windowsize.x * (0.25 + (progress * 0.5)), (windowsize.y * 0.25) - 11.0);
   glEnd();
 
   glMatrixMode(GL_PROJECTION);
