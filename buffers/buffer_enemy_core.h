@@ -34,7 +34,7 @@ public:
   static void destroy_shader();
   void setup();
   void render() const override final;
-  void cuboid(Vector3f const pos, Vector3f const size, Vector4f colour, std::vector<vertex> &vbodata, std::vector<GLuint> &ibodata);
+  void cuboid(Vector3f const &pos, Vector3f const &size, Vector4f const &colour, std::vector<vertex> &vbodata, std::vector<GLuint> &ibodata) const;
 };
 
 #endif // BUFFER_ENEMY_CORE_H_INCLUDED

@@ -121,8 +121,12 @@ void buffer_enemy_core::render() const {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void buffer_enemy_core::cuboid(Vector3f const pos, Vector3f const size, Vector4f colour, std::vector<vertex> &vbodata, std::vector<GLuint> &ibodata) {
-  Vector3f const size_half(size/2.0);
+void buffer_enemy_core::cuboid(Vector3f const &pos,
+                                Vector3f const &size,
+                                Vector4f const &colour,
+                                std::vector<vertex> &vbodata,
+                                std::vector<GLuint> &ibodata) const {
+  Vector3f const size_half(size / 2.0);
   Vector3f const coord000(-size_half + pos);
   Vector3f const coord100(coord000 + Vector3f(size.x, 0.0f,   0.0f));
   Vector3f const coord010(coord000 + Vector3f(0.0f,   size.y, 0.0f));
@@ -133,9 +137,12 @@ void buffer_enemy_core::cuboid(Vector3f const pos, Vector3f const size, Vector4f
   Vector3f const coord011(coord001 + Vector3f(0.0f,   size.y, 0.0f));
   Vector3f const coord111(coord001 + Vector3f(size.x, size.y, 0.0f));
 
-  Vector3f const normal0( 0.0, 0.0, -1.0);
-  Vector3f const normal1(-1.0, 0.0,  0.0);
-  Vector3f const normal2( 0.0, 1.0,  0.0);
+  Vector3f const normal0( 0.0,  0.0, -1.0);
+  Vector3f const normal1(-1.0,  0.0,  0.0);
+  Vector3f const normal2( 0.0,  1.0,  0.0);
+  Vector3f const normal3( 0.0,  0.0,  1.0);
+  Vector3f const normal4( 1.0,  0.0,  0.0);
+  Vector3f const normal5( 0.0, -1.0,  0.0);
 
 
   // front face
@@ -153,16 +160,17 @@ void buffer_enemy_core::cuboid(Vector3f const pos, Vector3f const size, Vector4f
 
   // back face
   offset = vbodata.size();
-  vbodata.emplace_back(coord001, -normal0, colour);
-  vbodata.emplace_back(coord011, -normal0, colour);
-  vbodata.emplace_back(coord111, -normal0, colour);
-  vbodata.emplace_back(coord101, -normal0, colour);
+  vbodata.emplace_back(coord001, normal3, colour);
+  vbodata.emplace_back(coord011, normal3, colour);
+  vbodata.emplace_back(coord111, normal3, colour);
+  vbodata.emplace_back(coord101, normal3, colour);
   ibodata.emplace_back(offset + 0);
   ibodata.emplace_back(offset + 3);
   ibodata.emplace_back(offset + 2);
   ibodata.emplace_back(offset + 2);
   ibodata.emplace_back(offset + 1);
   ibodata.emplace_back(offset + 0);
+
 
   // Side face 1
   offset = vbodata.size();
@@ -179,10 +187,10 @@ void buffer_enemy_core::cuboid(Vector3f const pos, Vector3f const size, Vector4f
 
   // Side face 2
   offset = vbodata.size();
-  vbodata.emplace_back(coord100, -normal1, colour);
-  vbodata.emplace_back(coord101, -normal1, colour);
-  vbodata.emplace_back(coord111, -normal1, colour);
-  vbodata.emplace_back(coord110, -normal1, colour);
+  vbodata.emplace_back(coord100, normal4, colour);
+  vbodata.emplace_back(coord101, normal4, colour);
+  vbodata.emplace_back(coord111, normal4, colour);
+  vbodata.emplace_back(coord110, normal4, colour);
   ibodata.emplace_back(offset + 0);
   ibodata.emplace_back(offset + 3);
   ibodata.emplace_back(offset + 2);
@@ -205,10 +213,10 @@ void buffer_enemy_core::cuboid(Vector3f const pos, Vector3f const size, Vector4f
 
   // bottom face
   offset = vbodata.size();
-  vbodata.emplace_back(coord000, -normal2, colour);
-  vbodata.emplace_back(coord001, -normal2, colour);
-  vbodata.emplace_back(coord101, -normal2, colour);
-  vbodata.emplace_back(coord100, -normal2, colour);
+  vbodata.emplace_back(coord000, normal5, colour);
+  vbodata.emplace_back(coord001, normal5, colour);
+  vbodata.emplace_back(coord101, normal5, colour);
+  vbodata.emplace_back(coord100, normal5, colour);
   ibodata.emplace_back(offset + 0);
   ibodata.emplace_back(offset + 3);
   ibodata.emplace_back(offset + 2);
