@@ -103,15 +103,13 @@ void entity::move(Vector3f const &direction) {
   Vector3f const &collision_normal(parent_world.check_collision(newparent->coords, newposition, radius));
   if(__builtin_expect(collision_normal != Vector3f(0.0f, 0.0f, 0.0f), 0)) {     // branch prediction hint: unlikely (the usual case will be no collision)
     #ifndef NDEBUG
-    if(this->get_entity_type() == entity_type::PLAYER) {
-      std::cout << "DEBUG: collision!  Normal " << collision_normal << std::endl;
-    }
+      if(!player.noclip) {
+        if(this->get_entity_type() == entity_type::PLAYER) {
+          std::cout << "DEBUG: collision!  Normal " << collision_normal << std::endl;
+        }
     #endif // NDEBUG
     // reflect our velocity by the collision vector
     //velocity = direction - (collision_normal  * ((direction.dotProduct(collision_normal) * 2) / collision_normal.lengthSq()));
-    #ifndef NDEBUG
-      if(!player.noclip) {
-    #endif
     velocity = Vector3f(0.0f, 0.0f, 0.0f);
     #ifndef NDEBUG
       }
@@ -127,7 +125,7 @@ void entity::move(Vector3f const &direction) {
   if(parent != newparent) {
     parent->remove_entity(this);
     newparent->add_entity(this);
-    std::cout << "DEBUG: entity moved chunks from " << parent->coords << " to " << newparent->coords << std::endl;
+    //std::cout << "DEBUG: entity moved chunks from " << parent->coords << " to " << newparent->coords << std::endl;
     parent = newparent;
   }
 }
