@@ -21,6 +21,7 @@ public:
 
   void render() const override final;
   void update() override final;
+  void destroy() override final;
 
   float get_collision_damage() const override;
 };

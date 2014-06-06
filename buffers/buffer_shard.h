@@ -1,11 +1,11 @@
-#ifndef BUFFER_ENEMY_GRUNT_H_INCLUDED
-#define BUFFER_ENEMY_GRUNT_H_INCLUDED
+#ifndef BUFFER_SHARD_H_INCLUDED
+#define BUFFER_SHARD_H_INCLUDED
 
 #include "buffer.h"
 #include <vector>
 #include "vmath.h"
 
-class buffer_enemy_grunt : public buffer {
+class buffer_shard : public buffer {
 public:
   static GLuint shader;                                // shader program for this buffer type
 
@@ -28,13 +28,12 @@ private:
   static GLuint attrib_normal;
   static GLuint attrib_colour;
 public:
-  buffer_enemy_grunt();
-  ~buffer_enemy_grunt() override final;
+  buffer_shard();
+  ~buffer_shard() override final;
   static void load_shader();
   static void destroy_shader();
   void setup();
   void render() const override final;
-  void cuboid(Vector3f const &pos, Vector3f const &size, Vector4f const &colour, std::vector<vertex> &vbodata, std::vector<GLuint> &ibodata) const;
 };
 
-#endif // BUFFER_ENEMY_GRUNT_H_INCLUDED
+#endif // BUFFER_SHARD_H_INCLUDED

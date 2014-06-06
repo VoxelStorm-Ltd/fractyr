@@ -320,8 +320,9 @@ void world::update() {
   // Destroy any dead (non-player) entities
   for(auto it = entities.begin(); it != entities.end();) {
     entity *ent = *it;
-    if (ent->energy <= 0 && ent != player.current_ship) {
+    if(ent->energy <= 0 && ent != player.current_ship) {
       //std::cout << "DEBUG: Removing entity: " << ent << std::endl;
+      (*it)->destroy();
       it = entities.erase(it);
       ent->get_parent()->remove_entity(ent);
       delete ent;

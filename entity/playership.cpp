@@ -28,7 +28,7 @@ void playership::update() {
 
 void playership::accelerate(Vector3f accel) {
   /// Accelerate this ship along a given vector relative to its orientation
-  if (energy > accel.length() + 1) {
+  if(energy > accel.length() + 1) {
     energy -= static_cast<int>(accel.length());
     ship::accelerate(accel);
   }
@@ -44,7 +44,7 @@ bool playership::fire(unsigned int weapon_id) {
     }
   #endif
 
-  if (energy > weapons[weapon_id]->get_cost_per_shot() && ship::fire(weapon_id)) {
+  if(energy > weapons[weapon_id]->get_cost_per_shot() && ship::fire(weapon_id)) {
     energy -= weapons[weapon_id]->get_cost_per_shot();
     return true;
   }

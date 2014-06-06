@@ -855,6 +855,7 @@
 			<Add directory="entity" />
 			<Add directory="entity/bullet" />
 			<Add directory="entity/enemy" />
+			<Add directory="entity/particle" />
 			<Add directory="weapon" />
 			<Add directory="$(#boost.include)" />
 		</Compiler>
@@ -869,6 +870,8 @@
 		<Unit filename="buffers/buffer_enemy_grunt.h" />
 		<Unit filename="buffers/buffer_plasma.cpp" />
 		<Unit filename="buffers/buffer_plasma.h" />
+		<Unit filename="buffers/buffer_shard.cpp" />
+		<Unit filename="buffers/buffer_shard.h" />
 		<Unit filename="callback_error.cpp" />
 		<Unit filename="chunk.cpp" />
 		<Unit filename="chunk.h" />
@@ -884,6 +887,8 @@
 		<Unit filename="entity/enemy/grunt.h" />
 		<Unit filename="entity/entity.cpp" />
 		<Unit filename="entity/entity.h" />
+		<Unit filename="entity/particle/particle.cpp" />
+		<Unit filename="entity/particle/particle.h" />
 		<Unit filename="entity/playership.cpp" />
 		<Unit filename="entity/playership.h" />
 		<Unit filename="entity/ship.cpp" />
@@ -973,7 +978,7 @@
 			<debugger />
 			<AutoVersioning>
 				<Scheme minor_max="10" build_max="0" rev_max="0" rev_rand_max="10" build_times_to_increment_minor="100" />
-				<Settings autoincrement="1" date_declarations="1" update_manifest="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="version.h" />
+				<Settings autoincrement="1" date_declarations="1" use_define="0" update_manifest="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="version.h" />
 				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
 				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
 			</AutoVersioning>
