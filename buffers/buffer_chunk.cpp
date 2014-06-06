@@ -60,9 +60,9 @@ void buffer_chunk::setup(std::vector<vertex> const &vbodata, std::vector<GLuint>
       std::cout << "WARNING: " << __PRETTY_FUNCTION__ << ": shader not previously loaded, loading now - fix this for release!" << std::endl;
       load_shader();
     }
-    std::cout << "Uploading " << vbodata.size() << " verts, " << ibodata.size() << " indices to chunk vbo ("
-              << (vbodata.size() * sizeof(vertex)) / 1024 << "KB, "
-              << (ibodata.size() * sizeof(vertex)) / 1024 << "KB)" << std::endl;
+    //std::cout << "Uploading " << vbodata.size() << " verts, " << ibodata.size() << " indices to chunk vbo ("
+    //          << (vbodata.size() * sizeof(vertex)) / 1024 << "KB, "
+    //          << (ibodata.size() * sizeof(vertex)) / 1024 << "KB)" << std::endl;
   #endif
   numverts = ibodata.size();
   glBindBuffer(GL_ARRAY_BUFFER, vbo);

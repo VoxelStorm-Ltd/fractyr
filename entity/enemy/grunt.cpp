@@ -86,14 +86,14 @@ void grunt::update() {
 
 void grunt::destroy() {
   /// Make an explosion
-  for(unsigned int p = 0; p != 20; ++p) {
+  for(unsigned int p = 0; p != 40; ++p) {
     new particle(parent_world,
                  parent,
                  position,
                  orientation,
-                 Vector3f((rand() % 4) - 8,
-                          (rand() % 4) - 8,
-                          (rand() % 4) - 8));
+                 velocity + Vector3f((static_cast<float>(rand()) / RAND_MAX) - 0.5,
+                                     (static_cast<float>(rand()) / RAND_MAX) - 0.5,
+                                     (static_cast<float>(rand()) / RAND_MAX) - 0.5) * 0.5);
   }
 }
 

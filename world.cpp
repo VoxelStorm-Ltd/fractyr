@@ -348,7 +348,7 @@ void world::remove_entity(entity *thisentity) {
 void world::render(Vector3i const &chunk_coords,
                    Quatf const &view_direction) {
   /// Draw the relevant portions of this world
-  find_visible_chunks(chunk_coords, view_direction, 3);    // refresh the list of visible chunks
+  find_visible_chunks(chunk_coords, view_direction, 4);    // refresh the list of visible chunks
   for(auto const &c : visible_chunks) {
     c->render(chunk_coords);
   }

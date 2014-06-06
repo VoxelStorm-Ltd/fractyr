@@ -10,6 +10,7 @@ particle::particle(world &parent_world,
   : entity(parent_world, parent_chunk, position, orientation) {
   /// Default constructor
   velocity = new_velocity;
+  time_to_live *= (static_cast<float>(rand()) / RAND_MAX) + 0.5;
 }
 
 particle::~particle() {

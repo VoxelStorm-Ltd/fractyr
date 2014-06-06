@@ -458,6 +458,6 @@ void chunk::setup() {
     ++total_chunks_generated;
     double time_total = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - timestart).count();
     total_time_taken += time_total;
-    std::cout << "DEBUG: chunk took " << time_total << "ms, avg: " << total_time_taken / total_chunks_generated << "ms, total: " << total_time_taken << "ms, " << total_chunks_generated << " chunks" << std::endl;
+    //std::cout << "DEBUG: chunk took " << time_total << "ms, avg: " << total_time_taken / total_chunks_generated << "ms, total: " << total_time_taken << "ms, " << total_chunks_generated << " chunks" << std::endl;
   #endif
 }
