@@ -9,6 +9,7 @@
 #include "world.h"
 #include "grunt.h"
 #include "blaster.h"
+#include "gruntblaster.h"
 
 #ifndef NDEBUG
   double chunk::total_time_taken = 0;
@@ -30,7 +31,7 @@ chunk::chunk(Vector3i const &chunk_coords, world &parent)
   float gruntscale = 1;// + static_cast<float>((chunk_coords - Vector3i(world::size/2.0, world::size/2.0, world::size/2.0)).length()) / (world::size / 16);
   //std::cout << "DEBUG: Spawning grunt with scale: " << gruntscale << std::endl;
   grunt *grunt1 = new grunt(parent, this, Vector3f(size/2.0, size/2.0, size/2.0), Quatf::fromEulerAngles(0.0, 0.0, 0.0), gruntscale);
-  grunt1->add_weapon(new blaster(grunt1, 120.0  / gruntscale, 0.9 * gruntscale));
+  grunt1->add_weapon(new gruntblaster(grunt1));
 
   setup_buffers();
 }

@@ -18,6 +18,7 @@ public:
   virtual void update();
   virtual bool fire();                      // attempts to fire weapon, returns true if the weapon fired, false otherwise.
   virtual unsigned int get_cost_per_shot() const;
+  virtual float get_shot_speed() const;     // used to calculate how much to lead the player by
 };
 
 #endif // WEAPON_H_INCLUDED

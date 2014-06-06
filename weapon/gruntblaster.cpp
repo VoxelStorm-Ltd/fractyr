@@ -1,17 +1,17 @@
-#include "blaster.h"
+#include "gruntblaster.h"
 #include "plasma.h"
 #include "ship.h"
 
-blaster::blaster(ship *parent)
+gruntblaster::gruntblaster(ship *parent)
   : weapon(parent) {
   /// Default constructor
 }
 
-blaster::~blaster() {
+gruntblaster::~gruntblaster() {
   /// Default destructor
 }
 
-bool blaster::fire() {
+bool gruntblaster::fire() {
   /// Fire this weapon
   if(cooldown != 0) {
     return false;
@@ -38,10 +38,10 @@ bool blaster::fire() {
   return true;
 }
 
-unsigned int blaster::get_cost_per_shot() const {
+unsigned int gruntblaster::get_cost_per_shot() const {
   return 25;
 }
 
-float blaster::get_shot_speed() const {
-  return 1.5;
+float gruntblaster::get_shot_speed() const {
+  return 0.9;
 }

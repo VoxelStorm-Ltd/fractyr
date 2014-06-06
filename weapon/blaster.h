@@ -6,15 +6,15 @@
 class blaster : public weapon {
   /// Basic classic video game slow-moving bullet blaster
 private:
-  float fire_rate;
-  float shot_speed;
+  float fire_rate = 10;
 
 public:
-  blaster(ship *parent, float fire_rate, float shot_speed);
+  blaster(ship *parent);
   ~blaster();
 
   bool fire() override final;
-  virtual unsigned int get_cost_per_shot() const;
+  unsigned int get_cost_per_shot() const;
+  float get_shot_speed() const;
 };
 
 #endif // BLASTER_H_INCLUDED

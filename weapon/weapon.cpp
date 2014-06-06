@@ -26,3 +26,7 @@ bool weapon::fire() {
 unsigned int weapon::get_cost_per_shot() const {
   return 50;
 }
+
+float weapon::get_shot_speed() const {
+  return 1.0;
+}
