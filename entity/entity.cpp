@@ -92,26 +92,55 @@ void entity::move(Vector3f const &direction) {
   chunk *newparent = parent;
 
   //std::cout << "DEBUG: Entity attempting to move to: " << static_cast<Vector3i>(newposition) << std::endl;
-
   correct_point(newposition, newparent);
+
+  std::vector<Vector3f> test_dirs = {
+    Vector3f(Vector3f( radius, 0,      0)          * orientation),
+    Vector3f(Vector3f(-radius, 0,      0)          * orientation),
+    Vector3f(Vector3f(0,       radius, 0)          * orientation),
+    Vector3f(Vector3f(0,      -radius, 0)          * orientation),
+    Vector3f(Vector3f(0,               0, radius)  * orientation),
+    Vector3f(Vector3f(0,               0, -radius) * orientation),
+  };
 
   //std::cout << "DEBUG: Corrected to: " << static_cast<Vector3i>(newposition) << std::endl;
 
-  Vector3f const &collision_normal(parent_world.check_collision(newparent->coords, newposition, radius));
-  if(__builtin_expect(collision_normal != Vector3f(0.0f, 0.0f, 0.0f), 0)) {     // branch prediction hint: unlikely (the usual case will be no collision)
-    #ifndef NDEBUG
-    if (this->get_entity_type() == entity_type::PLAYER) {
-      std::cout << "DEBUG: collision!  Normal " << collision_normal << std::endl;
-    }
-    #endif // NDEBUG
-    // reflect our velocity by the collision vector
-    //velocity = direction - (collision_normal  * ((direction.dotProduct(collision_normal) * 2) / collision_normal.lengthSq()));
-    velocity = Vector3f(0.0f, 0.0f, 0.0f);
-    // apply damping
-    // TODO
+  unsigned int iters = 1;
+  while(iters--) {
+    Vector3f test_dir_sum = Vector3f(0, 0, 0);
+    unsigned int test_points_collided = 0;
 
-    newposition = position + velocity;
-    correct_point(newposition, newparent);
+    for (auto test_dir : test_dirs) {
+      Vector3f test_point(test_dir + newposition);
+      chunk *test_parent = parent;
+      correct_point(test_point, test_parent);
+
+      Vector3f const &collision_normal(parent_world.check_collision(test_parent->coords, test_point, radius));
+      if(__builtin_expect(collision_normal != Vector3f(0.0f, 0.0f, 0.0f), 0)) {     // branch prediction hint: unlikely (the usual case will be no collision)
+        ++test_points_collided;
+        test_dir_sum += test_dir;
+      }
+    }
+
+    // reflect our velocity by the collision vector
+    if (__builtin_expect(test_points_collided != 0 && test_dir_sum != Vector3f(0.0, 0.0, 0.0), 0)) { // If none or all test points are colliding, don't do a collision.
+      Vector3f collision_normal = -(test_dir_sum/test_points_collided);
+      collision_normal.normalise();
+      #ifndef NDEBUG
+      if (this->get_entity_type() == entity_type::PLAYER) {
+        std::cout << "DEBUG: " << test_points_collided << ": " << test_dir_sum << " collision!  Normal " << collision_normal << std::endl;
+      }
+      #endif // NDEBUG
+      velocity = direction - (collision_normal  * ((direction.dotProduct(collision_normal) * 2) / collision_normal.lengthSq()));
+      //velocity = Vector3f(0.0f, 0.0f, 0.0f);
+      // apply damping
+      // TODO
+
+      newposition = position + velocity;
+      correct_point(newposition, newparent);
+    } else {
+      break;
+    }
   }
 
   position = newposition;
