@@ -104,7 +104,7 @@ void universe::restart() {
 
   // world content setup
   player.current_ship = new playership(*current_world,
-                                       current_world->get_chunk(Vector3i(world::size / 3, world::size / 3, world::size / 3)),
+                                       current_world->get_chunk(Vector3i(world::size / 2, world::size / 2, world::size / 2)),
                                        Vector3f(chunk::size / 3, chunk::size / 3, chunk::size / 3));
   player.current_ship->add_weapon(new blaster(player.current_ship, 10.0, 1.5));
 

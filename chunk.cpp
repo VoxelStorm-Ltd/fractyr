@@ -53,16 +53,25 @@ unsigned int chunk::get_unique_seed() const {
 
 bool chunk::get_is_solid(Vector3i const &chunk_coords, Vector3f const &local_coords) {
   /// Test a coordinate for solidity
+
+  /*
+    Quintic Mandelbulb world generation.
+    The range for a quintic mandelbulb is something like -1.5:1.5 in x, y and z
+    So we scale the world down to this size.
+    The middle of a mandelbulb is a pretty boring, fully solid thing, so we only take a quarter of the bulb with some interesting surface.
+    By only doing a few iterations and having a high cutoff, we intentionally get an imperfect mandelbulb with more tunnels and stuff.
+  */
   unsigned int constexpr iters = 5;
-  float constexpr scale = 0.5/static_cast<float>(world::size);
+  float constexpr cutoff = 100000.0;
+  float constexpr scale = 1.5/static_cast<float>(world::size);
   Vector3f const coords_composite((local_coords / size) + static_cast<Vector3f>(chunk_coords));
 
   //std::cout << "DEBUG: " << local_coords << std::endl;
   //std::cout << "DEBUG: " << coords_composite << std::endl;
 
-  float x0 = coords_composite.x * scale - 1.0;
-  float y0 = coords_composite.y * scale - 1.0;
-  float z0 = coords_composite.z * scale - 1.0;
+  float x0 = coords_composite.x * scale;
+  float y0 = coords_composite.y * scale;
+  float z0 = coords_composite.z * scale;
 
   float x = x0;
   float y = y0;
@@ -70,13 +79,14 @@ bool chunk::get_is_solid(Vector3i const &chunk_coords, Vector3f const &local_coo
 
   //std::cout << "DEBUG: " << x << "," << y << "," << z << std::endl;
 
-  // quintic mandelbulb:
+  // inverted quintic mandelbulb:
   for (unsigned int i = 0; i != iters; ++i) {
-    x = powf(x, 5) - 10.0 * powf(x, 3) * (y * y + z * z) + 5 * x * (powf(y, 4) + powf(z, 4)) + x0;
-    y = powf(y, 5) - 10.0 * powf(y, 3) * (z * z + x * x) + 5 * y * (powf(z, 4) + powf(x, 4)) + y0;
-    z = powf(z, 5) - 10.0 * powf(z, 3) * (x * x + y * y) + 5 * z * (powf(x, 4) + powf(y, 4)) + z0;
+    x = powf(x, 5) - 10.0 * x * x * x * (y * y + z * z) + 5 * x * (powf(y, 4) + powf(z, 4)) + x0;
+    y = powf(y, 5) - 10.0 * y * y * y * (z * z + x * x) + 5 * y * (powf(z, 4) + powf(x, 4)) + y0;
+    z = powf(z, 5) - 10.0 * z * z * z * (x * x + y * y) + 5 * z * (powf(x, 4) + powf(y, 4)) + z0;
 
-    if (x + y + z > 1000000) {
+    if (fabs(x + y + z) > cutoff) {
+      //std::cout << "DEBUG: " << x0 << "," << y0 << "," << z0 << std::endl;
       return true;
     }
   }
