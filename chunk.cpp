@@ -85,7 +85,10 @@ chunk::chunk(Vector3i const &chunk_coords, world &parent)
 chunk::~chunk() {
   /// Default destructor
   for(auto & e : entities) {
-    delete e;
+    // Don't delete the player ship, universe is responsible for that.
+    if(e->get_entity_type() != entity::entity_type::PLAYER) {
+      delete e;
+    }
   }
 }
 

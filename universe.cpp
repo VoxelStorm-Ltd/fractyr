@@ -107,11 +107,13 @@ void universe::restart() {
   srand(randomseed);
 
   delete current_world;
+  delete player.current_ship;
+  player.current_ship = nullptr;
+
   current_world = new world();
   current_world->preload_chunks();
 
   // world content setup
-  delete player.current_ship;
   player.current_ship = new playership(*current_world,
                                        current_world->get_chunk(Vector3i(1, 1, 5)),
                                        Vector3f(chunk::size / 3, chunk::size / 3, chunk::size / 3));
