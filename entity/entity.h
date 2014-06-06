@@ -52,6 +52,7 @@ public:
 
   virtual void update();
   void move(Vector3f const &direction);
+  void move_force(Vector3f const &direction);
   static void correct_point(Vector3i &chunk_coords, Vector3f &coords);
   static void correct_point(Vector3f &coords, chunk *&thischunk);
 

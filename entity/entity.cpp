@@ -156,6 +156,19 @@ void entity::move(Vector3f const &direction) {
   }
 }
 
+void entity::move_force(Vector3f const &direction) {
+  /// As normal move, but don't do any collision checking
+  Vector3f newposition(position + direction);
+  chunk *newparent = parent;
+  correct_point(newposition, newparent);
+  position = newposition;
+  if(parent != newparent) {
+    parent->remove_entity(this);
+    newparent->add_entity(this);
+    parent = newparent;
+  }
+}
+
 void entity::correct_point(Vector3i &chunk_coords, Vector3f &coords) {
   /// Take a pair of speculative coords that may be out of bounds and return a valid pair of coords and chunk coords
   if(__builtin_expect(coords.x > chunk::size, 0)) {      // branch prediction hint: unlikely (the usual case will not be chunk changes)
