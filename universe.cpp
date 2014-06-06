@@ -12,13 +12,15 @@
 #include "buffer_plasma.h"
 #include "buffer_enemy_grunt.h"
 #include "buffer_enemy_core.h"
+#include "buffer_shard.h"
+#include "chunk.h"
 #include "ship.h"
 #include "playership.h"
 #include "blaster.h"
 #include "plasma.h"
 #include "grunt.h"
 #include "core.h"
-#include "chunk.h"
+#include "particle.h"
 
 // loaders
 FTFont *font_load(  std::string const &filename, unsigned int size = 16);
@@ -167,7 +169,10 @@ void universe::init_buffers() {
   plasma::buf.setup();
   grunt::buf.init();
   grunt::buf.setup();
+  core::buf.init();
   core::buf.setup();
+  particle::buf.init();
+  particle::buf.setup();
 
   // initialise fonts
   delete font_title;
@@ -180,8 +185,11 @@ void universe::init_buffers() {
 
 void universe::init_shaders() {
   /// Load and initialise shader programs
+  buffer_chunk::load_shader();
   plasma::buf.load_shader();
   grunt::buf.load_shader();
+  core::buf.load_shader();
+  particle::buf.load_shader();
 }
 
 void universe::delete_buffers() {
@@ -192,6 +200,8 @@ void universe::delete_buffers() {
   }
   plasma::buf.destroy();
   grunt::buf.destroy();
+  core::buf.destroy();
+  particle::buf.destroy();
 }
 
 void universe::delete_shaders() {
@@ -199,6 +209,8 @@ void universe::delete_shaders() {
   buffer_chunk::destroy_shader();
   plasma::buf.destroy_shader();
   grunt::buf.destroy_shader();
+  core::buf.destroy_shader();
+  particle::buf.destroy_shader();
 }
 
 void universe::render() {
