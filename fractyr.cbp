@@ -943,6 +943,10 @@
 			<Option compile="1" />
 			<Option link="1" />
 		</Unit>
+		<Unit filename="resources/title.ttf">
+			<Option compile="1" />
+			<Option link="1" />
+		</Unit>
 		<Unit filename="shader_load.cpp" />
 		<Unit filename="soundstorm.cpp" />
 		<Unit filename="soundstorm.h" />
