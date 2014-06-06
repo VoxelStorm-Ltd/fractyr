@@ -13,8 +13,7 @@ void main() {
   const vec3 colour_spec = vec3(0.95, 0.92, 0.84) * 0.6;       // 2268 Pearly Gates
   //const vec3 colour_spec = vec3(1.00, 0.97, 0.89);       //  Pearly Gates normalised to 1
 
-  float lambertian = dot(lightdir, normalize(normal_frag));
-
+  float lambertian = max(dot(lightdir, normalize(normal_frag)), 0.0);
   float specular = 0.0;
   if(lambertian > 0.0) {
     float specangle = max(dot(reflectdir_frag, normalize(coords_camlocal_frag)), 0.0);

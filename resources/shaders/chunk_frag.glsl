@@ -20,7 +20,7 @@ void main() {
 
   const vec3 lightdir = vec3(0.267261, 0.534522, 0.801784);
 
-  float lambertian = dot(lightdir, normalize(normal_frag));
+  float lambertian = max(dot(lightdir, normalize(normal_frag)), 0.0);
 
   float specular = 0.0;
   if(lambertian > 0.0) {
