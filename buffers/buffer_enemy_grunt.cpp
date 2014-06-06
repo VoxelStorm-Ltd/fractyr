@@ -64,27 +64,84 @@ void buffer_enemy_grunt::setup() {
   std::vector<vertex> vbodata;
   std::vector<GLuint> ibodata;
 
-  vbodata.reserve(4 * 6);
-  ibodata.reserve(6 * 6);
+  unsigned int constexpr numcubes = 4;
+  vbodata.reserve(4 * 6 * numcubes);
+  ibodata.reserve(6 * 6 * numcubes);
 
-  float constexpr size = 3.0;
-  float constexpr size_half = size / 2.0;
+  Vector4f const bodycolour(     0.3, 0.3, 0.3, 1.0);
+  Vector4f const guncolour(      0.9, 0.0, 0.0, 1.0);
+  Vector4f const thrustercolour( 0.7, 0.7, 0.0, 1.0);
 
-  Vector3f const coord000(-size_half, -size_half, -size_half);
-  Vector3f const coord100(coord000 + Vector3f(size, 0.0f, 0.0f));
-  Vector3f const coord010(coord000 + Vector3f(0.0f, size, 0.0f));
-  Vector3f const coord110(coord000 + Vector3f(size, size, 0.0f));
+  //Body
+  cuboid(Vector3f(0.0, 0.0, 0.0), Vector3f(3.0, 0.5, 0.5), bodycolour, vbodata, ibodata);
+  cuboid(Vector3f(0.0, 0.0, 0.0), Vector3f(0.5, 3.0, 0.5), bodycolour, vbodata, ibodata);
 
-  Vector3f const coord001(-size_half, -size_half, size_half);
-  Vector3f const coord101(coord001 + Vector3f(size, 0.0f, 0.0f));
-  Vector3f const coord011(coord001 + Vector3f(0.0f, size, 0.0f));
-  Vector3f const coord111(coord001 + Vector3f(size, size, 0.0f));
+  //Guns
+  cuboid(Vector3f(-1.0, 0.0, -1.0), Vector3f(0.5, 0.5, 1.5), guncolour, vbodata, ibodata);
+  cuboid(Vector3f( 1.0, 0.0, -1.0), Vector3f(0.5, 0.5, 1.5), guncolour, vbodata, ibodata);
+
+  //Thrusters
+  cuboid(Vector3f(0.0, -1.0, 0.5), Vector3f(0.5, 0.5, 0.5), thrustercolour, vbodata, ibodata);
+  cuboid(Vector3f(0.0,  1.0, 0.5), Vector3f(0.5, 0.5, 0.5), thrustercolour, vbodata, ibodata);
+
+  vbodata.shrink_to_fit();
+  ibodata.shrink_to_fit();
+
+  #ifndef NDEBUG
+    std::cout << "Uploading " << vbodata.size() << " verts, " << ibodata.size() << " indices to plasma vbo ("
+              << (vbodata.size() * sizeof(vertex)) / 1024 << "KB, "
+              << (ibodata.size() * sizeof(vertex)) / 1024 << "KB)" << std::endl;
+  #endif
+
+  numverts = ibodata.size();
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBufferData(GL_ARRAY_BUFFER, vbodata.size() * sizeof(vertex), &vbodata[0], GL_STATIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, ibodata.size() * sizeof(GLuint), &ibodata[0], GL_STATIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+  initialised = true;
+}
+
+void buffer_enemy_grunt::render() const {
+  /// Render the buffers for this object in the appropriate way
+  glUseProgram(shader);
+  glBindBuffer(GL_ARRAY_BUFFER,         vbo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+  glEnableVertexAttribArray(attrib_coords);
+  glEnableVertexAttribArray(attrib_normal);
+  glEnableVertexAttribArray(attrib_colour);
+  glVertexAttribPointer(attrib_coords, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::coords)));
+  glVertexAttribPointer(attrib_normal, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::normal)));
+  glVertexAttribPointer(attrib_colour, 4, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::colour)));
+
+  glDrawElements(GL_TRIANGLES, numverts, GL_UNSIGNED_INT, 0);
+
+  glUseProgram(0);
+  glDisableVertexAttribArray(attrib_coords);
+  glDisableVertexAttribArray(attrib_normal);
+  glDisableVertexAttribArray(attrib_colour);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void buffer_enemy_grunt::cuboid(Vector3f const pos, Vector3f const size, Vector4f colour, std::vector<vertex> &vbodata, std::vector<GLuint> &ibodata) {
+  Vector3f const size_half(size/2.0);
+  Vector3f const coord000(-size_half + pos);
+  Vector3f const coord100(coord000 + Vector3f(size.x, 0.0f,   0.0f));
+  Vector3f const coord010(coord000 + Vector3f(0.0f,   size.y, 0.0f));
+  Vector3f const coord110(coord000 + Vector3f(size.x, size.y, 0.0f));
+
+  Vector3f const coord001(coord000 + Vector3f(0.0f,   0.0f,   size.z));
+  Vector3f const coord101(coord001 + Vector3f(size.x, 0.0f,   0.0f));
+  Vector3f const coord011(coord001 + Vector3f(0.0f,   size.y, 0.0f));
+  Vector3f const coord111(coord001 + Vector3f(size.x, size.y, 0.0f));
 
   Vector3f const normal0( 0.0, 0.0, -1.0);
   Vector3f const normal1(-1.0, 0.0,  0.0);
   Vector3f const normal2( 0.0, 1.0,  0.0);
 
-  Vector4f const colour(0.8, 0.0, 0.0, 1.0);
 
   // front face
   unsigned int offset = vbodata.size();
@@ -163,45 +220,4 @@ void buffer_enemy_grunt::setup() {
   ibodata.emplace_back(offset + 2);
   ibodata.emplace_back(offset + 1);
   ibodata.emplace_back(offset + 0);
-
-  vbodata.shrink_to_fit();
-  ibodata.shrink_to_fit();
-
-  #ifndef NDEBUG
-    std::cout << "Uploading " << vbodata.size() << " verts, " << ibodata.size() << " indices to plasma vbo ("
-              << (vbodata.size() * sizeof(vertex)) / 1024 << "KB, "
-              << (ibodata.size() * sizeof(vertex)) / 1024 << "KB)" << std::endl;
-  #endif
-
-  numverts = ibodata.size();
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, vbodata.size() * sizeof(vertex), &vbodata[0], GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, ibodata.size() * sizeof(GLuint), &ibodata[0], GL_STATIC_DRAW);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-  initialised = true;
-}
-
-void buffer_enemy_grunt::render() const {
-  /// Render the buffers for this object in the appropriate way
-  glUseProgram(shader);
-  glBindBuffer(GL_ARRAY_BUFFER,         vbo);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-  glEnableVertexAttribArray(attrib_coords);
-  glEnableVertexAttribArray(attrib_normal);
-  glEnableVertexAttribArray(attrib_colour);
-  glVertexAttribPointer(attrib_coords, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::coords)));
-  glVertexAttribPointer(attrib_normal, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::normal)));
-  glVertexAttribPointer(attrib_colour, 4, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::colour)));
-
-  glDrawElements(GL_TRIANGLES, numverts, GL_UNSIGNED_INT, 0);
-
-  glUseProgram(0);
-  glDisableVertexAttribArray(attrib_coords);
-  glDisableVertexAttribArray(attrib_normal);
-  glDisableVertexAttribArray(attrib_colour);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }

@@ -62,7 +62,7 @@ void grunt::update() {
     velocity.z += (rand()  /static_cast<float>(RAND_MAX) - 0.5) / 100.0;
 
     Quatf target_orientation = Quatf::fromMatrix(Matrix4f::createLookAt(Vector3f(0.0, 0.0, 0.0), aimpos, Vector3f(0.0, 0.0, 1.0)));
-    orientation = orientation.slerp(0.5, target_orientation);
+    orientation = orientation.slerp(0.05, target_orientation);
     orientation.normalise();
     orientation_conjugate = orientation.conjugate_copy();
 
