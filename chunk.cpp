@@ -60,9 +60,9 @@ bool chunk::get_is_solid(Vector3i const &chunk_coords, Vector3f const &local_coo
   //std::cout << "DEBUG: " << local_coords << std::endl;
   //std::cout << "DEBUG: " << coords_composite << std::endl;
 
-  float x0 = fmod(coords_composite.x * scale, 2.0) - 1.0;
-  float y0 = fmod(coords_composite.y * scale, 2.0) - 1.0;
-  float z0 = fmod(coords_composite.z * scale, 2.0) - 1.0;
+  float x0 = fmod(coords_composite.x * scale, 3.0) - 1.5;
+  float y0 = fmod(coords_composite.y * scale, 3.0) - 1.5;
+  float z0 = fmod(coords_composite.z * scale, 3.0) - 1.5;
 
   float x = x0;
   float y = y0;
