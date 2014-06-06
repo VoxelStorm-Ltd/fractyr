@@ -222,8 +222,6 @@ void chunk::setup() {
   ibodata.reserve(7500);
 
   // populate this chunk and its neigbours' particles so we get a seamless join
-  float constexpr point_density = 0.0006;   // points per cubic metre; 600 per 100m^3
-  unsigned int constexpr max_points = point_density * size * size * size;
   unsigned int num_points = 0;
   Vector3i offset;
   for(offset.x = -1; offset.x != 2; ++offset.x) {
