@@ -70,7 +70,7 @@ void buffer_enemy_grunt::setup() {
 
   Vector4f const bodycolour(     0.3, 0.3, 0.3, 1.0);
   Vector4f const guncolour(      0.9, 0.0, 0.0, 1.0);
-  Vector4f const thrustercolour( 0.7, 0.7, 0.0, 1.0);
+  Vector4f const thrustercolour( 0.8, 0.4, 0.0, 1.0);
 
   //Body
   cuboid(Vector3f(0.0, 0.0, 0.0), Vector3f(3.0, 0.5, 0.5), bodycolour, vbodata, ibodata);

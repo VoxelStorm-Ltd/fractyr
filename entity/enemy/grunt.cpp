@@ -5,6 +5,7 @@
 #include "playership.h"
 #include "world.h"
 #include "chunk.h"
+#include "particle.h"
 
 extern gameplayer player;
 
@@ -81,6 +82,19 @@ void grunt::update() {
     velocity = Vector3f(0.0, 0.0, 0.0);
   }
   enemy::update();
+}
+
+void grunt::destroy() {
+  /// Make an explosion
+  for(unsigned int p = 0; p != 20; ++p) {
+    new particle(parent_world,
+                 parent,
+                 position,
+                 orientation,
+                 Vector3f((rand() % 4) - 8,
+                          (rand() % 4) - 8,
+                          (rand() % 4) - 8));
+  }
 }
 
 float grunt::get_collision_damage() const {

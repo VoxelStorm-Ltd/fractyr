@@ -55,6 +55,7 @@ public:
   void move_force(Vector3f const &direction);
   static void correct_point(Vector3i &chunk_coords, Vector3f &coords);
   static void correct_point(Vector3f &coords, chunk *&thischunk);
+  virtual void destroy();
 
   Vector3f check_collision(Vector3f const &other_coords, float other_radius) const;
   virtual float get_collision_damage() const;

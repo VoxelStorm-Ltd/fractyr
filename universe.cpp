@@ -394,8 +394,8 @@ void universe::loop_main() {
 
       update();
 
-      if (player.current_ship) {
-        if (player.current_ship && player.current_ship->energy <= 0) {
+      if(player.current_ship) {
+        if(player.current_ship && player.current_ship->energy <= 0) {
           state = gamestate::LOST;
         }
       }
