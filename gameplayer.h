@@ -133,7 +133,9 @@ public:
   void input_graphics_nicest(    float amount = 1.0);
   void input_graphics_compromise(float amount = 1.0);
   void input_graphics_fastest(   float amount = 1.0);
-  void input_cheat(              float amount = 1.0);
+  #ifndef NDEBUG
+    void input_cheat(            float amount = 1.0);
+  #endif
 };
 
 #endif // GAMEPLAYER_H_INCLUDED

@@ -957,6 +957,8 @@
 		<Unit filename="vmath.h" />
 		<Unit filename="weapon/blaster.cpp" />
 		<Unit filename="weapon/blaster.h" />
+		<Unit filename="weapon/gruntblaster.cpp" />
+		<Unit filename="weapon/gruntblaster.h" />
 		<Unit filename="weapon/weapon.cpp" />
 		<Unit filename="weapon/weapon.h" />
 		<Unit filename="world.cpp" />

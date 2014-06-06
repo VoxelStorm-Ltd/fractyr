@@ -15,13 +15,13 @@ playership::~playership() {
 }
 
 void playership::update() {
-  if (energy < max_energy) {
-    energy++;
+  if(energy < max_energy) {
+    ++energy;
   }
   #ifndef NDEBUG
-  if (invincible) {
-    energy = max_energy;
-  }
+    if(invincible) {
+      energy = max_energy;
+    }
   #endif
   ship::update();
 }
