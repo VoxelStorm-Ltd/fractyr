@@ -46,8 +46,8 @@ chunk *world::get_chunk(Vector3i const &chunk_coords) {
 }
 
 void world::find_visible_chunks(Vector3i const &chunk_coords,
-                                              Quatf const &view_direction,
-                                              int range) {
+                                Quatf const &view_direction,
+                                int range) {
   /// Return a list of chunks visible in this direction from a given chunk, in optimal rendering order
   visible_chunks.clear();
   visible_chunks.reserve(pow((range * 2) + 1, 3));

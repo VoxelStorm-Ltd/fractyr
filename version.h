@@ -7,27 +7,26 @@ namespace AutoVersion{
 	static const char DATE[] = "06";
 	static const char MONTH[] = "06";
 	static const char YEAR[] = "2014";
-	static const char UBUNTU_VERSION_STYLE[] = "14.06";
+	static const char UBUNTU_VERSION_STYLE[] =  "14.06";
 	
 	//Software Status
-	static const char STATUS[] = "Alpha";
-	static const char STATUS_SHORT[] = "a";
+	static const char STATUS[] =  "Alpha";
+	static const char STATUS_SHORT[] =  "a";
 	
 	//Standard Version Type
-	static const long MAJOR = 2;
-	static const long MINOR = 1;
-	static const long BUILD = 1228;
-	static const long REVISION = 6557;
+	static const long MAJOR  = 2;
+	static const long MINOR  = 1;
+	static const long BUILD  = 1231;
+	static const long REVISION  = 6563;
 	
 	//Miscellaneous Version Types
-	static const long BUILDS_COUNT = 2309;
-	#define RC_FILEVERSION 2,1,1228,6557
-	#define RC_FILEVERSION_STRING "2, 1, 1228, 6557\0"
-	static const char FULLVERSION_STRING[] = "2.1.1228.6557";
+	static const long BUILDS_COUNT  = 2304;
+	#define RC_FILEVERSION 2,1,1231,6563
+	#define RC_FILEVERSION_STRING "2, 1, 1231, 6563\0"
+	static const char FULLVERSION_STRING [] = "2.1.1231.6563";
 	
 	//These values are to keep track of your versioning state, don't modify them.
-	static const long BUILD_HISTORY = 28;
-	
+	static const long BUILD_HISTORY  = 31;
 
 }
 #endif //VERSION_H

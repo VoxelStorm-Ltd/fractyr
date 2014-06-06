@@ -7,7 +7,7 @@
 class playership : public ship {
 public:
   #ifndef NDEBUG
-  bool invincible = false;
+    bool invincible = false;
   #endif
   static unsigned int constexpr max_energy = 1000;
 
