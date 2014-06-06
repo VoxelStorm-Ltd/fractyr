@@ -260,7 +260,9 @@ Vector3f world::check_collision(Vector3i const &chunk_coords,
   if(__builtin_expect(normal != Vector3f(0.0, 0.0, 0.0), 0)) {      // branch prediction hint: unlikely (the usual case will be no collision)
     return normal;
   }
-  // if we haven't collided, check any other chunks our radius overlaps onto
+  // TODO: if we haven't collided, check any other chunks our radius overlaps onto.
+  // Currently disabled because this breaks things.
+  /*
   if(coords.x + radius > chunk::size) {
     normal = get_chunk(chunk_coords + Vector3i(1, 0, 0))->check_collision(coords - chunk::size, radius);
   } else if(coords.x - radius < 0.0) {
@@ -276,6 +278,7 @@ Vector3f world::check_collision(Vector3i const &chunk_coords,
   } else if(coords.z - radius < 0.0) {
     normal = get_chunk(chunk_coords + Vector3i(0, 0, -1))->check_collision(coords + chunk::size, radius);
   }
+  */
   return normal;
 }
 
