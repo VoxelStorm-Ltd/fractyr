@@ -43,7 +43,7 @@ public:
   ///    9 - 8x  (4xSS, 2xMS)           GL_SAMPLES = 6
   ///   10 - 8x  (8xMS)                 GL_SAMPLES = 6
   ///   12 - 16x (8xMS, 8xCS)           GL_SAMPLES = 6
-  GLint antialiasing = 8;
+  GLint antialiasing = 1;
 
   graphicsleveltype graphicslevel = graphicsleveltype::NICEST;
 
