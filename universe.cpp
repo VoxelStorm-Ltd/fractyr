@@ -41,9 +41,12 @@ extern gameplayer player;
 extern soundstorm sound;
 extern GLFWwindow *window_main;
 extern oculusstorm *oculus;
-//extern FTFont *font_label;
+extern FTFont *font_title;
+extern FTFont *font_loading;
 
 // linked binary resource blob symbols using blob_loader.h
+// fonts
+BLOB_LOAD(title_ttf);
 // music
 BLOB_LOAD(music_main_intro_ogg);
 BLOB_LOAD(music_main_loop_ogg);
@@ -83,7 +86,7 @@ void universe::init() {
 
   set_graphicslevel(graphicsleveltype::NICEST);
   init_buffers();                               // needs to come before progress screen
-  render_progressscreen(0.0, "Loading...");
+  render_progressscreen(0.0, "Loading");
 
   restart();
 
@@ -140,7 +143,12 @@ void universe::init_buffers() {
   grunt::buf.setup();
 
   // initialise fonts
-  // TODO
+  delete font_title;
+  delete font_loading;
+  font_title   = nullptr;
+  font_loading = nullptr;
+  font_title   = font_load(BLOB(title_ttf), BLOB_SIZE(title_ttf), 70);
+  font_loading = font_load(BLOB(title_ttf), BLOB_SIZE(title_ttf), 24);
 }
 
 void universe::init_shaders() {
@@ -168,7 +176,7 @@ void universe::delete_shaders() {
 
 void universe::render() {
   /// Draw everything
-  glClearColor(0.5, 0.5, 0.5, 1.0);
+  glClearColor(0.92, 0.95, 1.00, 1.0);      // 2329 Kid Glove normalised to 1
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   // TODO: don't bother clearing colour buffer
 
@@ -209,14 +217,24 @@ void universe::render_progressscreen_hud(float progress, std::string const &mess
   glLoadIdentity();
   glDisable(GL_DEPTH_TEST);
 
-  //float const advance = font_label->Advance(message.c_str(), message.length());
-  //Vector2i messagepos((windowsize.x - advance) / 2.0, (windowsize.y * 0.25) + 10.0);
-  glColor4f(1.0, 1.0, 1.0, 1.0);
-  //font_label->Render(message.c_str(), message.length(), FTPoint(messagepos.x, messagepos.y), FTPoint(), FTGL::RENDER_FRONT);
-  glColor4f(0.0, 1.0, 0.0, 1.0);
+  float const font_title_advance   = font_title->Advance(message.c_str(), message.length());
+  float const font_loading_advance = font_loading->Advance(message.c_str(), message.length());
+  Vector2i const titlepos(  (windowsize.x - font_title_advance)   / 2.0, (windowsize.y * 0.60));
+  Vector2i const messagepos((windowsize.x - font_loading_advance) / 2.0, (windowsize.y * 0.25) + 10.0);
+  glColor4f(0.0, 0.0, 0.0, 1.0);
+  font_loading->Render(message.c_str(), message.length(), FTPoint(messagepos.x, messagepos.y), FTPoint(), FTGL::RENDER_FRONT);
+  font_title->Render("Fractyr", 7, FTPoint(titlepos.x, titlepos.y - 2), FTPoint(), FTGL::RENDER_FRONT);
+  glColor4f(0.9, 0.9, 0.0, 1.0);
+  font_title->Render("Fractyr", 7, FTPoint(titlepos.x, titlepos.y),     FTPoint(), FTGL::RENDER_FRONT);
+  glColor4f(1.0, 1.0, 0.0, 1.0);
   glBegin(GL_LINES);
   glVertex2i(windowsize.x * 0.25,                      (windowsize.y * 0.25) - 10.0);
   glVertex2i(windowsize.x * (0.25 + (progress * 0.5)), (windowsize.y * 0.25) - 10.0);
+  glEnd();
+  glColor4f(0.0, 0.0, 0.0, 1.0);
+  glBegin(GL_LINES);
+  glVertex2i(windowsize.x * 0.25,                      (windowsize.y * 0.25) - 11.0);
+  glVertex2i(windowsize.x * (0.25 + (progress * 0.5)), (windowsize.y * 0.25) - 11.0);
   glEnd();
 
   glMatrixMode(GL_PROJECTION);

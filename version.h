@@ -14,19 +14,19 @@ namespace AutoVersion{
 	static const char STATUS_SHORT[] =  "a";
 	
 	//Standard Version Type
-	static const long MAJOR  = 1;
-	static const long MINOR  = 10;
-	static const long BUILD  = 1096;
-	static const long REVISION  = 5870;
+	static const long MAJOR  = 2;
+	static const long MINOR  = 0;
+	static const long BUILD  = 1117;
+	static const long REVISION  = 5976;
 	
 	//Miscellaneous Version Types
-	static const long BUILDS_COUNT  = 2009;
-	#define RC_FILEVERSION 1,10,1096,5870
-	#define RC_FILEVERSION_STRING "1, 10, 1096, 5870\0"
-	static const char FULLVERSION_STRING [] = "1.10.1096.5870";
+	static const long BUILDS_COUNT  = 2044;
+	#define RC_FILEVERSION 2,0,1117,5976
+	#define RC_FILEVERSION_STRING "2, 0, 1117, 5976\0"
+	static const char FULLVERSION_STRING [] = "2.0.1117.5976";
 	
 	//These values are to keep track of your versioning state, don't modify them.
-	static const long BUILD_HISTORY  = 96;
+	static const long BUILD_HISTORY  = 17;
 	
 
 }

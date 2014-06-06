@@ -10,7 +10,8 @@
 // globals
 GLFWwindow *window_main = nullptr;              // the main game window
 oculusstorm *oculus     = nullptr;              // oculus rift controller
-//FTFont *font_label      = nullptr;              // global font definitions
+FTFont *font_title      = nullptr;              // global font definitions
+FTFont *font_loading    = nullptr;
 // initialisation order important here:
 soundstorm sound;                               // audio manager
 gameplayer player;                              // player state and configuration
