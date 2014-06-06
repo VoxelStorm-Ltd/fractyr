@@ -123,6 +123,7 @@ Vector3f chunk::check_collision(Vector3f const &coords, float radius) {
   if(__builtin_expect(!con.find_voronoi_cell(coords.x, coords.y, coords.z, result.x, result.y, result.z, cell_id), 0)) {  // branch prediction: likely found
     return Vector3f(0.0, 0.0, 0.0);
   }
+  //std::cout << "DEBUG: Checking solidity of: " << result << std::endl;
   if(__builtin_expect(!get_is_solid(result), 1)) {  // branch prediction: likely not solid
     return Vector3f(0.0, 0.0, 0.0);
   }
@@ -236,6 +237,7 @@ void chunk::setup() {
           Vector3f const cell_point((static_cast<float>(rand()) * size / RAND_MAX) + chunk_offset.x,
                                     (static_cast<float>(rand()) * size / RAND_MAX) + chunk_offset.y,
                                     (static_cast<float>(rand()) * size / RAND_MAX) + chunk_offset.z);
+          //std::cout << "DEBUG: making point " << static_cast<Vector3i>(cell_point) << std::endl;
           if(cell_point.x < -size         * chunk_margin  ||
              cell_point.x >  size + (size * chunk_margin) ||
              cell_point.y < -size         * chunk_margin  ||

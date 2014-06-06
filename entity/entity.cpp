@@ -91,7 +91,11 @@ void entity::move(Vector3f const &direction) {
   Vector3f newposition(position + direction);
   chunk *newparent = parent;
 
+  //std::cout << "DEBUG: Entity attempting to move to: " << static_cast<Vector3i>(newposition) << std::endl;
+
   correct_point(newposition, newparent);
+
+  //std::cout << "DEBUG: Corrected to: " << static_cast<Vector3i>(newposition) << std::endl;
 
   Vector3f const &collision_normal(parent_world.check_collision(newparent->coords, newposition, radius));
   if(__builtin_expect(collision_normal != Vector3f(0.0f, 0.0f, 0.0f), 0)) {     // branch prediction hint: unlikely (the usual case will be no collision)
@@ -101,8 +105,8 @@ void entity::move(Vector3f const &direction) {
     }
     #endif // NDEBUG
     // reflect our velocity by the collision vector
-    velocity = direction - (collision_normal  * ((direction.dotProduct(collision_normal) * 2) / collision_normal.lengthSq()));
-
+    //velocity = direction - (collision_normal  * ((direction.dotProduct(collision_normal) * 2) / collision_normal.lengthSq()));
+    velocity = Vector3f(0.0f, 0.0f, 0.0f);
     // apply damping
     // TODO
 
@@ -114,7 +118,7 @@ void entity::move(Vector3f const &direction) {
   if(parent != newparent) {
     parent->remove_entity(this);
     newparent->add_entity(this);
-    //std::cout << "DEBUG: entity moved chunks from " << parent->coords << " to " << newparent->coords << std::endl;
+    std::cout << "DEBUG: entity moved chunks from " << parent->coords << " to " << newparent->coords << std::endl;
     parent = newparent;
   }
 }
