@@ -125,14 +125,15 @@ void entity::move(Vector3f const &direction) {
   // reflect our velocity by the collision vector
   if (__builtin_expect(test_points_collided != 0 && test_dir_sum != Vector3f(0.0, 0.0, 0.0), 0)) { // If none or all test points are colliding, don't do a collision.
     Vector3f collision_normal = -test_dir_sum / test_points_collided;
+    collision_normal.normalise();
     #ifndef NDEBUG
     if(!player.noclip) {
       if (this->get_entity_type() == entity_type::PLAYER) {
         //std::cout << "DEBUG: " << test_points_collided << ": " << test_dir_sum << " collision!  Normal " << collision_normal << std::endl;
       }
     #endif // NDEBUG
-      velocity = direction - (collision_normal  * ((direction.dotProduct(collision_normal) * 2) / collision_normal.lengthSq()));
-      velocity *= 0.9;
+      velocity = direction - (collision_normal  * ((direction.dotProduct(collision_normal) * 2)));
+      velocity *= 0.5;
       //velocity = Vector3f(0.0, 0.0, 0.0);
     #ifndef NDEBUG
     }
@@ -142,7 +143,7 @@ void entity::move(Vector3f const &direction) {
     // apply damping
     // TODO
     newparent = parent;
-    newposition = position + velocity;
+    newposition = position + velocity + collision_normal;
     correct_point(newposition, newparent);
   }
   position = newposition;
