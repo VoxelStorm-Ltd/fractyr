@@ -15,7 +15,8 @@ public:
     UNKNOWN,
     BULLET,
     ENEMY,
-    PLAYER
+    PLAYER,
+    CORE
   };
 protected:
   world &parent_world;                    // what world we're in

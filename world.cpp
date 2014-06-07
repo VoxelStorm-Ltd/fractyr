@@ -355,6 +355,11 @@ void world::update() {
   for(auto it = entities.begin(); it != entities.end();) {
     entity *ent = *it;
     if(ent->energy <= 0 && ent != player.current_ship) {
+
+      if (ent->get_entity_type() == entity::entity_type::CORE) {
+        player.current_ship->cores_destroyed++;
+        std::cout << "DEBUG: Core destroyed!" << std::endl;
+      }
       //std::cout << "DEBUG: Removing entity: " << ent << std::endl;
       (*it)->destroy();
       it = entities.erase(it);

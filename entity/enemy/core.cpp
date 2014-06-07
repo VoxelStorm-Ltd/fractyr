@@ -49,3 +49,7 @@ void core::update() {
 float core::get_collision_damage() const {
   return 100.0;
 }
+
+entity::entity_type core::get_entity_type() const {
+  return entity::entity_type::CORE;
+}

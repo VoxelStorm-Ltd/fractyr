@@ -71,7 +71,8 @@ public:
   static unsigned int constexpr numgrunts = 300;
   static unsigned int constexpr numcores = 20;
 
-  static unsigned int constexpr fadetime = 120;
+  static unsigned int constexpr fadetime    = 120;
+  static unsigned int constexpr fadetimewon = 300;
 
   universe();
   ~universe();
@@ -88,6 +89,7 @@ private:
   void loop_menu();
   void loop_fade_in();
   void loop_fade_out();
+  void loop_fade_out_won();
 public:
   void loop_main();
 private:

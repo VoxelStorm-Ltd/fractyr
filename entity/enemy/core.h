@@ -23,6 +23,7 @@ public:
   void update() override final;
 
   float get_collision_damage() const override;
+  virtual entity::entity_type get_entity_type() const override;
 };
 
 #endif // CORE_H_INCLUDED

@@ -478,7 +478,6 @@ void universe::loop_fade_in() {
   }
 }
 
-
 void universe::loop_fade_out() {
   for (unsigned int f = 0; f != fadetime; ++f) {
     if(oculus->enabled) {
@@ -528,6 +527,55 @@ void universe::loop_fade_out() {
   }
 }
 
+void universe::loop_fade_out_won() {
+  for (unsigned int f = 0; f != fadetimewon; ++f) {
+    if(oculus->enabled) {
+      // render once for each eye
+      player.setup_render_oculus_left();
+      render();
+      player.render_hud();
+      player.setup_render_oculus_right();
+      render();
+      player.render_hud();
+    } else {
+      player.setup_render_perspective();
+      render();
+      player.render_hud();
+    }
+
+    Vector2i const windowsize(player.get_windowsize());
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    glOrtho(0, windowsize.x, 0, windowsize.y, -1, 1);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    glDisable(GL_DEPTH_TEST);
+
+    glColor4f(1.0, 1.0, 0.0, f/static_cast<float>(fadetimewon));
+    glBegin(GL_QUADS);
+    glVertex2i(0,            0);
+    glVertex2i(windowsize.x, 0);
+    glVertex2i(windowsize.x, windowsize.y);
+    glVertex2i(0,            windowsize.y);
+    glEnd();
+
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    glEnable(GL_DEPTH_TEST);
+
+    glfwSwapBuffers(window_main);
+
+    // fps cap
+    std::this_thread::sleep_until(timenexttickstart);
+    timenexttickstart = std::chrono::high_resolution_clock::now() + timestep_chrono;
+  }
+}
+
 void universe::loop_main() {
   /// the main rendering loop
   //loop_menu();
@@ -542,8 +590,11 @@ void universe::loop_main() {
       update();
 
       if(player.current_ship) {
-        if(player.current_ship && player.current_ship->energy <= 0) {
+        if(player.current_ship->energy <= 0) {
           state = gamestate::LOST;
+        }
+        if(player.current_ship->cores_destroyed >= 5) {
+          state = gamestate::WON;
         }
       }
 
@@ -605,7 +656,9 @@ void universe::loop_main() {
       break;
     case gamestate::WON:
       std::cout << "Win." << std::endl;
-      restart();
+      loop_fade_out_won();
+      replace_entities();
+      loop_fade_in();
       state = gamestate::RUNNING;
       break;
     case gamestate::LOST:

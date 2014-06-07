@@ -10,6 +10,7 @@ public:
     bool invincible = false;
   #endif
   static unsigned int constexpr max_energy = 1000;
+  unsigned int cores_destroyed = 0;
 
   playership(world &parent_world,
              chunk *parent_chunk,
