@@ -68,6 +68,10 @@ public:
 
   world *current_world = nullptr;                       // the current level
 
+  static unsigned int constexpr numgrunts = 300;
+  static unsigned int constexpr numcores = 20;
+
+
   universe();
   ~universe();
 
@@ -76,6 +80,7 @@ private:
   void init_graphics(Vector2i &windowsize);
 public:
   void restart();
+  void replace_entities();
 
 private:
   // main program loops

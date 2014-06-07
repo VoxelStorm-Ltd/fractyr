@@ -2,6 +2,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <FTGL/ftgl.h>
+#include <random>
 #include "platform_defines.h"
 #include "blob_loader.h"
 #include "gameplayer.h"
@@ -17,6 +18,7 @@
 #include "ship.h"
 #include "playership.h"
 #include "blaster.h"
+#include "gruntblaster.h"
 #include "plasma.h"
 #include "grunt.h"
 #include "core.h"
@@ -107,16 +109,13 @@ void universe::restart() {
   srand(randomseed);
 
   delete current_world;
-  delete player.current_ship;
   player.current_ship = nullptr;
 
   current_world = new world();
   current_world->preload_chunks();
 
   // world content setup
-  player.current_ship = new playership(*current_world,
-                                       current_world->get_chunk(Vector3i(1, 1, 5)),
-                                       Vector3f(chunk::size / 3, chunk::size / 3, chunk::size / 3));
+  replace_entities();
   // slide the player ship down until we're not in a solid surface
   /*
   while(player.current_ship->check_collision(player.current_ship->get_position(), 4.0) != Vector3f(0.0, 0.0, 0.0)) {
@@ -147,6 +146,49 @@ void universe::restart() {
   //sound.music_queue(1, 3);
   sound.set_music_volume(0, 1.0);
   sound.set_music_volume(1, 0.0);
+}
+
+// Only replace the entities without rebuilding the entire world.
+void universe::replace_entities() {
+  // Destroy any dead (non-player) entities
+  std::cout << "DEBUG: Clearing entities" << std::endl;
+  current_world->clear_entities();
+  std::cout << "DEBUG: Placing player" << std::endl;
+  player.current_ship = new playership(*current_world,
+                                       current_world->get_chunk(Vector3i(1, 1, 5)),
+                                       Vector3f(chunk::size / 3, chunk::size / 3, chunk::size / 3));
+  player.current_ship->add_weapon(new blaster(player.current_ship));
+
+  std::default_random_engine enemygen;
+  enemygen.seed(randomseed);
+  std::uniform_int_distribution<unsigned int> enemy_chunk_pos_dist(0, world::size);
+  std::uniform_real_distribution<float> enemy_local_pos_dist(0, chunk::size);
+
+  std::cout << "DEBUG: Placing grunts" << std::endl;
+  // Place grunts
+  for(unsigned int i = 0; i != numgrunts; ++i) {
+    for(unsigned int tries = 10; tries != 0; --tries) {
+      chunk *gruntchunk = current_world->get_chunk(Vector3i(enemy_chunk_pos_dist(enemygen), enemy_chunk_pos_dist(enemygen), enemy_chunk_pos_dist(enemygen)));
+      Vector3f gruntpos = Vector3f(enemy_local_pos_dist(enemygen), enemy_local_pos_dist(enemygen), enemy_local_pos_dist(enemygen));
+      if(!gruntchunk->get_is_solid(gruntpos)) {
+        grunt *grunt1 = new grunt(*current_world, gruntchunk, gruntpos, Quatf::fromEulerAngles(0.0, 0.0, 0.0), 1.0);
+        grunt1->add_weapon(new gruntblaster(grunt1));
+        break;
+      }
+    }
+  }
+
+  // And cores
+  for(unsigned int i = 0; i != numcores; ++i) {
+    for(unsigned int tries = 50; tries != 0; --tries) {
+      chunk *corechunk = current_world->get_chunk(Vector3i(enemy_chunk_pos_dist(enemygen), enemy_chunk_pos_dist(enemygen), enemy_chunk_pos_dist(enemygen)));
+      Vector3f corepos = Vector3f(enemy_local_pos_dist(enemygen), enemy_local_pos_dist(enemygen), enemy_local_pos_dist(enemygen));
+      if(!corechunk->get_is_solid(corepos)) {
+        new core(*current_world, corechunk, corepos, Quatf::fromEulerAngles(0.0, 0.0, 0.0), 1.0);
+        break;
+      }
+    }
+  }
 }
 
 void universe::init_buffers() {
@@ -469,7 +511,7 @@ void universe::loop_main() {
       break;
     case gamestate::LOST:
       std::cout << "Lost." << std::endl;
-      restart();
+      replace_entities();
       state = gamestate::RUNNING;
       break;
     case gamestate::MENU:

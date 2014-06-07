@@ -28,57 +28,6 @@ chunk::chunk(Vector3i const &chunk_coords, world &parent)
         ideal_points_per_block) {                             // the initial memory allocation for each block (number of particles){
   /// Default constructor
 
-  // generate enemies
-  float gruntscale = 1;// + static_cast<float>((chunk_coords - Vector3i(world::size/2.0, world::size/2.0, world::size/2.0)).length()) / (world::size / 16);
-  //std::cout << "DEBUG: Spawning grunt with scale: " << gruntscale << std::endl;
-
-
-  //Make ~1 in 20 chunks have a core in
-  if (rand() % 20) {
-    Vector3f gruntpos = Vector3f(size/2.0, size/2.0, size/2.0);
-    if(!get_is_solid(gruntpos)) {
-      grunt *grunt1 = new grunt(parent, this, gruntpos, Quatf::fromEulerAngles(0.0, 0.0, 0.0), gruntscale);
-      grunt1->add_weapon(new gruntblaster(grunt1));
-    }
-  } else {
-    Vector3f corepos = Vector3f(size/2.0, size/2.0, size/2.0);
-    if(!get_is_solid(corepos)) {
-      core *core1 = new core(parent, this, corepos, Quatf::fromEulerAngles(0.0, 0.0, 0.0), gruntscale);
-    }
-
-    // surround it by 6 grunts
-    Vector3f gruntpos = Vector3f(size/2.0, size/2.0, size/3.0);
-    if(!get_is_solid(gruntpos)) {
-      grunt *grunt1 = new grunt(parent, this, gruntpos, Quatf::fromEulerAngles(0.0, 0.0, 0.0), gruntscale);
-      grunt1->add_weapon(new gruntblaster(grunt1));
-    }
-    gruntpos = Vector3f(size/2.0, size/2.0, 2.0*size/3.0);
-    if(!get_is_solid(gruntpos)) {
-      grunt *grunt1 = new grunt(parent, this, gruntpos, Quatf::fromEulerAngles(0.0, 0.0, 0.0), gruntscale);
-      grunt1->add_weapon(new gruntblaster(grunt1));
-    }
-    gruntpos = Vector3f(size/2.0, size/3.0, size/2.0);
-    if(!get_is_solid(gruntpos)) {
-      grunt *grunt1 = new grunt(parent, this, gruntpos, Quatf::fromEulerAngles(0.0, 0.0, 0.0), gruntscale);
-      grunt1->add_weapon(new gruntblaster(grunt1));
-    }
-    gruntpos = Vector3f(size/2.0, 2.0*size/3.0, size/2.0);
-    if(!get_is_solid(gruntpos)) {
-      grunt *grunt1 = new grunt(parent, this, gruntpos, Quatf::fromEulerAngles(0.0, 0.0, 0.0), gruntscale);
-      grunt1->add_weapon(new gruntblaster(grunt1));
-    }
-    gruntpos = Vector3f(size/3.0, size/2.0, size/2.0);
-    if(!get_is_solid(gruntpos)) {
-      grunt *grunt1 = new grunt(parent, this, gruntpos, Quatf::fromEulerAngles(0.0, 0.0, 0.0), gruntscale);
-      grunt1->add_weapon(new gruntblaster(grunt1));
-    }
-    gruntpos = Vector3f(2.0 * size/3.0, size/2.0, size/2.0);
-    if(!get_is_solid(gruntpos)) {
-      grunt *grunt1 = new grunt(parent, this, gruntpos, Quatf::fromEulerAngles(0.0, 0.0, 0.0), gruntscale);
-      grunt1->add_weapon(new gruntblaster(grunt1));
-    }
-  }
-
   setup_buffers();
 }
 

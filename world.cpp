@@ -330,6 +330,15 @@ void world::clear_chunks() {
   chunks.clear();
 }
 
+void world::clear_entities() {
+  /// Clears all entities including the player ship.
+  for(auto ent: entities) {
+    //std::cout << "DEBUG: Removing entity: " << ent << std::endl;
+    ent->get_parent()->remove_entity(ent);
+  }
+  entities.clear();
+}
+
 void world::update() {
   /// Update visible chunks
   for (unsigned int i = 0; i < entities.size(); ++i) { // Not using a foreach/iterator here because entities can be created during this loop if updating an entity causes a new chunk to be created.

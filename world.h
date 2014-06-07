@@ -31,6 +31,7 @@ public:
   void setup_buffers();
   void preload_chunks();
   void clear_chunks();
+  void clear_entities();
 
   // update
   void update();
