@@ -5,6 +5,7 @@
 #include "playership.h"
 #include "world.h"
 #include "chunk.h"
+#include "particle.h"
 
 extern gameplayer player;
 
@@ -44,6 +45,19 @@ void core::update() {
   orientation *= Quatf::fromAxisRot(Vector3f(0.0, 0.0, 1.0), 1.0);    // spin fast
   orientation_conjugate = orientation.conjugate_copy();
   enemy::update();
+}
+
+void core::destroy() {
+  /// Make a big explosion
+  for(unsigned int p = 0; p != 100; ++p) {
+    new particle(parent_world,
+                 parent,
+                 position,
+                 orientation,
+                 velocity + Vector3f((static_cast<float>(rand()) / RAND_MAX) - 0.5,
+                                     (static_cast<float>(rand()) / RAND_MAX) - 0.5,
+                                     (static_cast<float>(rand()) / RAND_MAX) - 0.5) * 0.5);
+  }
 }
 
 float core::get_collision_damage() const {
