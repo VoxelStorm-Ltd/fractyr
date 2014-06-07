@@ -257,6 +257,7 @@ void universe::render() {
   }
   player.current_ship->render_from();
   render_energy_hud(player.current_ship->energy / playership::max_energy);
+  render_cores_hud(player.current_ship->cores_destroyed);
 }
 
 void universe::render_progressscreen(float progress, std::string const &message) {
@@ -343,6 +344,35 @@ void universe::render_energy_hud(float energy) {
   glEnable(GL_DEPTH_TEST);
 }
 
+void universe::render_cores_hud(unsigned int cores) {
+  Vector2i const windowsize(player.get_windowsize());
+
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glLoadIdentity();
+  glOrtho(0, windowsize.x, 0, windowsize.y, -1, 1);
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+  glLoadIdentity();
+  glDisable(GL_DEPTH_TEST);
+
+  glColor4f(1.0, 1.0, 0.0, 0.5);
+
+  for (unsigned int i = 0; i < cores; ++i) {
+    glBegin(GL_QUADS);
+    glVertex2i(windowsize.x * 0.25 + (20 * i),      15.0);
+    glVertex2i(windowsize.x * 0.25 + (20 * i) + 10, 15.0);
+    glVertex2i(windowsize.x * 0.25 + (20 * i) + 10, 25.0);
+    glVertex2i(windowsize.x * 0.25 + (20 * i),      25.0);
+    glEnd();
+  }
+
+  glMatrixMode(GL_PROJECTION);
+  glPopMatrix();
+  glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+  glEnable(GL_DEPTH_TEST);
+}
 void universe::set_graphicslevel(graphicsleveltype newlevel) {
   /// Adjust the graphics settings
   if(newlevel != graphicslevel) {         // reinitialise the window, if necessary

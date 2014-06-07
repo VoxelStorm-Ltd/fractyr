@@ -105,6 +105,7 @@ public:
   void render_progressscreen(    float progress, std::string const &message = std::string("Loading..."));
   void render_progressscreen_hud(float progress, std::string const &message = std::string("Loading..."));
   void render_energy_hud(float energy);
+  void render_cores_hud(unsigned int cores);
   void set_graphicslevel(graphicsleveltype newlevel);
   void toggle_fullscreen();
   void reinitialise_window();
