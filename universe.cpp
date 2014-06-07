@@ -367,6 +367,17 @@ void universe::render_cores_hud(unsigned int cores) {
     glEnd();
   }
 
+  glColor4f(1.0, 1.0, 0.0, 1.0);
+  for (unsigned int i = cores; i < cores_to_win; ++i) {
+    glBegin(GL_LINE_STRIP);
+    glVertex2i(windowsize.x * 0.25 + (20 * i),      15.0);
+    glVertex2i(windowsize.x * 0.25 + (20 * i) + 10, 15.0);
+    glVertex2i(windowsize.x * 0.25 + (20 * i) + 10, 25.0);
+    glVertex2i(windowsize.x * 0.25 + (20 * i),      25.0);
+    glVertex2i(windowsize.x * 0.25 + (20 * i),      15.0);
+    glEnd();
+  }
+
   glMatrixMode(GL_PROJECTION);
   glPopMatrix();
   glMatrixMode(GL_MODELVIEW);

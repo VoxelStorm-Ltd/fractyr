@@ -70,6 +70,7 @@ public:
 
   static unsigned int constexpr numgrunts = 300;
   static unsigned int constexpr numcores = 20;
+  static unsigned int constexpr cores_to_win = 5;   // number of cores required to win
 
   static unsigned int constexpr fadetime    = 120;
   static unsigned int constexpr fadetimewon = 300;
