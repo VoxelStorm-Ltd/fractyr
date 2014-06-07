@@ -124,8 +124,6 @@ void universe::restart() {
   }
   */
 
-  player.current_ship->add_weapon(new blaster(player.current_ship));
-
   glfwSetInputMode(            window_main, GLFW_CURSOR, GLFW_CURSOR_NORMAL);     // release the cursor
   glfwSetCursorPosCallback(    window_main, callback_mousepos);
   glfwSetMouseButtonCallback(  window_main, callback_mousebutton);
@@ -146,6 +144,7 @@ void universe::restart() {
   //sound.music_queue(1, 3);
   sound.set_music_volume(0, 1.0);
   sound.set_music_volume(1, 0.0);
+  loop_fade_in();
 }
 
 // Only replace the entities without rebuilding the entire world.
@@ -245,6 +244,7 @@ void universe::delete_shaders() {
   core::buf.destroy_shader();
   particle::buf.destroy_shader();
 }
+
 
 void universe::render() {
   /// Draw everything
@@ -429,6 +429,105 @@ void universe::loop_menu() {
   /// The between-game menu
 }
 
+void universe::loop_fade_in() {
+  for (unsigned int f = 0; f != fadetime; ++f) {
+    if(oculus->enabled) {
+      // render once for each eye
+      player.setup_render_oculus_left();
+      render();
+      player.render_hud();
+      player.setup_render_oculus_right();
+      render();
+      player.render_hud();
+    } else {
+      player.setup_render_perspective();
+      render();
+      player.render_hud();
+    }
+
+    Vector2i const windowsize(player.get_windowsize());
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    glOrtho(0, windowsize.x, 0, windowsize.y, -1, 1);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    glDisable(GL_DEPTH_TEST);
+
+    glColor4f(0.92, 0.95, 1.00, 1.0-f/static_cast<float>(fadetime));
+    glBegin(GL_QUADS);
+    glVertex2i(0.0,          0.0);
+    glVertex2i(windowsize.x, 0.0);
+    glVertex2i(windowsize.x, windowsize.y);
+    glVertex2i(0.0,          windowsize.y);
+    glEnd();
+
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    glEnable(GL_DEPTH_TEST);
+
+    glfwSwapBuffers(window_main);
+
+    // fps cap
+    std::this_thread::sleep_until(timenexttickstart);
+    timenexttickstart = std::chrono::high_resolution_clock::now() + timestep_chrono;
+  }
+}
+
+
+void universe::loop_fade_out() {
+  for (unsigned int f = 0; f != fadetime; ++f) {
+    if(oculus->enabled) {
+      // render once for each eye
+      player.setup_render_oculus_left();
+      render();
+      player.render_hud();
+      player.setup_render_oculus_right();
+      render();
+      player.render_hud();
+    } else {
+      player.setup_render_perspective();
+      render();
+      player.render_hud();
+    }
+
+    Vector2i const windowsize(player.get_windowsize());
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    glOrtho(0, windowsize.x, 0, windowsize.y, -1, 1);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    glDisable(GL_DEPTH_TEST);
+
+    glColor4f(0.92, 0.95, 1.00, f/static_cast<float>(fadetime));
+    glBegin(GL_QUADS);
+    glVertex2i(0,            0);
+    glVertex2i(windowsize.x, 0);
+    glVertex2i(windowsize.x, windowsize.y);
+    glVertex2i(0,            windowsize.y);
+    glEnd();
+
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    glEnable(GL_DEPTH_TEST);
+
+    glfwSwapBuffers(window_main);
+
+    // fps cap
+    std::this_thread::sleep_until(timenexttickstart);
+    timenexttickstart = std::chrono::high_resolution_clock::now() + timestep_chrono;
+  }
+}
+
 void universe::loop_main() {
   /// the main rendering loop
   //loop_menu();
@@ -511,7 +610,9 @@ void universe::loop_main() {
       break;
     case gamestate::LOST:
       std::cout << "Lost." << std::endl;
+      loop_fade_out();
       replace_entities();
+      loop_fade_in();
       state = gamestate::RUNNING;
       break;
     case gamestate::MENU:
