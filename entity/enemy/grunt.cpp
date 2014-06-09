@@ -42,7 +42,7 @@ void grunt::update() {
   /// Update this enemy's AI actions
   // TODO: The tracking gets confused if (I think) the player crosses the z axis, slerp should deal with this fine but isn't for some reason.
 
-  Vector3f aimpos = get_offset(*player.current_ship);
+  Vector3f aimpos = -get_offset(*player.current_ship);
 
   #ifndef NDEBUG
     if(player.invisible) {
