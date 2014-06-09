@@ -341,11 +341,11 @@ void world::clear_entities() {
 
 void world::update() {
   /// Update visible chunks
-  for (unsigned int i = 0; i < entities.size(); ++i) { // Not using a foreach/iterator here because entities can be created during this loop if updating an entity causes a new chunk to be created.
+  for(unsigned int i = 0; i < entities.size(); ++i) { // Not using a foreach/iterator here because entities can be created during this loop if updating an entity causes a new chunk to be created.
     entities[i]->update();
   }
 
-  for (auto thischunk: visible_chunks) {
+  for(auto thischunk: visible_chunks) {
     thischunk->update();
   }
 
@@ -355,8 +355,7 @@ void world::update() {
   for(auto it = entities.begin(); it != entities.end();) {
     entity *ent = *it;
     if(ent->energy <= 0 && ent != player.current_ship) {
-
-      if (ent->get_entity_type() == entity::entity_type::CORE) {
+      if(ent->get_entity_type() == entity::entity_type::CORE) {
         player.current_ship->cores_destroyed++;
         std::cout << "DEBUG: Core destroyed!" << std::endl;
       }
