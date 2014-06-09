@@ -340,13 +340,22 @@ void world::clear_entities() {
 }
 
 void world::update() {
-  /// Update visible chunks
-  for (unsigned int i = 0; i < entities.size(); ++i) { // Not using a foreach/iterator here because entities can be created during this loop if updating an entity causes a new chunk to be created.
-    entities[i]->update();
-  }
-
+  /// Update visible chunks and entities.
   for (auto thischunk: visible_chunks) {
     thischunk->update();
+  }
+
+  for (unsigned int i = 0; i < entities.size(); ++i) { // Not using a foreach/iterator here because entities can be created during this loop if updating an entity causes a new chunk to be created.
+    entity *ent = entities[i];
+    ent->update();
+
+    if(__builtin_expect(ent->energy <= 0 && ent != player.current_ship, 0)) {
+      ent->destroy();
+      if (ent->get_entity_type() == entity::entity_type::CORE) {
+        player.current_ship->cores_destroyed++;
+        std::cout << "DEBUG: Core destroyed!" << std::endl;
+      }
+    }
   }
 
   //std::cout << "DEBUG: Player coords: " << player.current_ship->get_world_position() << std::endl;
@@ -354,14 +363,8 @@ void world::update() {
   // Destroy any dead (non-player) entities
   for(auto it = entities.begin(); it != entities.end();) {
     entity *ent = *it;
-    if(ent->energy <= 0 && ent != player.current_ship) {
-
-      if (ent->get_entity_type() == entity::entity_type::CORE) {
-        player.current_ship->cores_destroyed++;
-        std::cout << "DEBUG: Core destroyed!" << std::endl;
-      }
+    if(__builtin_expect(ent->energy <= 0 && ent != player.current_ship, 0)) {
       //std::cout << "DEBUG: Removing entity: " << ent << std::endl;
-      (*it)->destroy();
       it = entities.erase(it);
       ent->get_parent()->remove_entity(ent);
       delete ent;
