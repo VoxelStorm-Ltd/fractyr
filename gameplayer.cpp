@@ -254,12 +254,12 @@ void gameplayer::setup_input() {
   #endif
   bind(controlbinding::controltype::MOUSE_SCROLL, 0,                 &gameplayer::input_zoom,                true, 0.0, -1.0);
   bind(controlbinding::controltype::MOUSE_BUTTON, 0,                 &gameplayer::input_fire1,               true);
-  bind(controlbinding::controltype::MOUSE_BUTTON, 1,                 &gameplayer::input_fire2,               true);
+  //bind(controlbinding::controltype::MOUSE_BUTTON, 1,                 &gameplayer::input_fire2,               true);
 
   if(gamepad != -1) {
     // gamepad / joystick bindings only if we actually have one connected, so we don't need runtime checks
     bind(controlbinding::controltype::JOYSTICK_BUTTON,    0,  &gameplayer::input_fire1);
-    bind(controlbinding::controltype::JOYSTICK_BUTTON,    1,  &gameplayer::input_fire2);
+    //bind(controlbinding::controltype::JOYSTICK_BUTTON,    1,  &gameplayer::input_fire2);
     bind(controlbinding::controltype::JOYSTICK_BUTTON,    2,  &gameplayer::input_move_forward);
     bind(controlbinding::controltype::JOYSTICK_BUTTON,    3,  &gameplayer::input_move_back);
     bind(controlbinding::controltype::JOYSTICK_AXIS_FULL, 0,  &gameplayer::input_roll_right,   true, 0.0, 1.0);
