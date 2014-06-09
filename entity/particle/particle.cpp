@@ -18,7 +18,7 @@ particle::~particle() {
 }
 
 void particle::collided_with(entity *other __attribute__((unused))) {
-  energy = 0; // Destroy this bullet.
+  energy = 0; // Destroy this particle.
 }
 
 entity::entity_type particle::get_entity_type() const {

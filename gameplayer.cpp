@@ -431,7 +431,7 @@ void gameplayer::input_fire1(float amount __attribute__((__unused__))) {
   current_ship->fire(0);
 }
 void gameplayer::input_fire2(float amount __attribute__((__unused__))) {
-  current_ship->fire(1);
+  //current_ship->fire(1);
 }
 void gameplayer::input_toggle_fullscreen(float amount __attribute__((__unused__))) {
   root.toggle_fullscreen();
