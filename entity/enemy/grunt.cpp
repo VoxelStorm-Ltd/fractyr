@@ -42,19 +42,7 @@ void grunt::update() {
   /// Update this enemy's AI actions
   // TODO: The tracking gets confused if (I think) the player crosses the z axis, slerp should deal with this fine but isn't for some reason.
 
-  Vector3f aimpos = player.current_ship->get_world_position() - get_world_position();
-  aimpos += (player.current_ship->get_velocity() - velocity) * (aimpos.length() / (weapons[0]->get_shot_speed() * 2.0));
-
-  float constexpr worldsize = world::size * chunk::size;
-  float constexpr halfworld = worldsize / 2.0;
-
-  // Wrap aim position around the world.
-  if(aimpos.x >  halfworld) aimpos.x -= worldsize;
-  if(aimpos.y >  halfworld) aimpos.y -= worldsize;
-  if(aimpos.z >  halfworld) aimpos.z -= worldsize;
-  if(aimpos.x < -halfworld) aimpos.x += worldsize;
-  if(aimpos.y < -halfworld) aimpos.y += worldsize;
-  if(aimpos.z < -halfworld) aimpos.z += worldsize;
+  Vector3f aimpos = get_offset(*player.current_ship);
 
   #ifndef NDEBUG
     if(player.invisible) {
@@ -65,7 +53,8 @@ void grunt::update() {
     }
   #endif
 
-  if(aimpos.lengthSq() < 10000) {
+  if(__builtin_expect(aimpos.lengthSq() < 10000, 0)) {
+    aimpos += (player.current_ship->get_velocity() - velocity) * (aimpos.length() / (weapons[0]->get_shot_speed() * 2.0));
     velocity.x += (rand() / static_cast<float>(RAND_MAX) - 0.5) / 100.0;
     velocity.y += (rand() / static_cast<float>(RAND_MAX) - 0.5) / 100.0;
     velocity.z += (rand()  /static_cast<float>(RAND_MAX) - 0.5) / 100.0;
