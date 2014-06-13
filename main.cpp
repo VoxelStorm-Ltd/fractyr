@@ -18,7 +18,7 @@ gameplayer player;                              // player state and configuratio
 universe root;                                  // the container for everything physical
 
 std::string get_version();
-
+¤
 int main() {
   std::cout << "Fractyr version " << get_version() << " "
   #ifdef NDEBUG
