@@ -23,27 +23,38 @@
 
 // full symbol expansion
 #ifdef PLATFORM_WINDOWS
-  #define BLOB(name)       binary_resources_##name##_start
-#else
-  #define BLOB(name)      _binary_resources_##name##_start
-#endif
+  #define BLOB(name) binary_resources_##name##_start
+#else // PLATFORM_WINDOWS
+  #ifdef PLATFORM_MACOS
+    #define BLOB(name) _binary_resources_##name##_x
+  #else // PLATFORM_MACOS
+    #define BLOB(name) _binary_resources_##name##_start
+  #endif // PLATFORM_MACOS
+#endif // PLATFORM_WINDOWS
 
 // loader
 #ifdef PLATFORM_WINDOWS
-  #define BLOB_LOAD(name) extern unsigned char const  binary_resources_##name##_start[]; \
-                          extern unsigned char const  binary_resources_##name##_end[]; \
-                          extern unsigned char const  binary_resources_##name##_size[];
-#else
-  #define BLOB_LOAD(name) extern unsigned char const _binary_resources_##name##_start[]; \
-                          extern unsigned char const _binary_resources_##name##_end[]; \
-                          extern unsigned char const _binary_resources_##name##_size[];
-#endif
-
+  #define BLOB_LOAD(name) extern unsigned char const binary_resources_##name##_start[]; \
+                          extern unsigned char const binary_resources_##name##_end[]; \
+                          extern unsigned char const binary_resources_##name##_size[];
+#else // PLATFORM_WINDOWS
+  #ifdef PLATFORM_MACOS
+    #define BLOB_LOAD(name) extern unsigned char _binary_resources_##name##_x[]; \
+                            extern unsigned int  _binary_resources_##name##_len_x;
+  #else // PLATFORM_MACOS
+    #define BLOB_LOAD(name) extern unsigned char const _binary_resources_##name##_start[]; \
+                            extern unsigned char const _binary_resources_##name##_end[]; \
+                            extern unsigned char const _binary_resources_##name##_size[];
+  #endif // PLATFORM_MACOS
+#endif // PLATFORM_WINDOWS
 // size pointer int converter
 #ifdef PLATFORM_WINDOWS
-  #define BLOB_SIZE(name) reinterpret_cast<uintptr_t>( &binary_resources_##name##_size)
-#else
-  #define BLOB_SIZE(name) reinterpret_cast<uintptr_t>(&_binary_resources_##name##_size)
-#endif
-
+  #define BLOB_SIZE(name) reinterpret_cast<uintptr_t>(&binary_resources_##name##_size)
+#else // PLATFORM_WINDOWS
+  #ifdef PLATFORM_MACOS
+    #define BLOB_SIZE(name) _binary_resources_##name##_len_x
+  #else // PLATFORM_MACOS
+    #define BLOB_SIZE(name) reinterpret_cast<uintptr_t>(&_binary_resources_##name##_size)
+  #endif // PLATFORM_MACOS
+#endif // PLATFORM_WINDOWS
 #endif // BLOB_LOADER_H_INCLUDED
