@@ -465,6 +465,7 @@
 				<Linker>
 					<Add option="-static-libgcc" />
 					<Add option="-static-libstdc++" />
+					<Add library="lib/linux64/libvoro++.a" />
 					<Add library="lib/linux64/libboost_system-gcc49-mt-sd-1_55.a" />
 					<Add library="lib/linux64/libboost_filesystem-gcc49-mt-sd-1_55.a" />
 					<Add library="lib/linux64/libboost_thread-gcc49-mt-sd-1_55.a" />
@@ -569,6 +570,7 @@
 					<Add option="-fuse-linker-plugin" />
 					<Add option="-flto" />
 					<Add option="-funsafe-math-optimizations" />
+					<Add library="lib/linux64/libvoro++.a" />
 					<Add library="lib/linux64/libboost_system-gcc49-mt-s-1_55.a" />
 					<Add library="lib/linux64/libboost_filesystem-gcc49-mt-s-1_55.a" />
 					<Add library="lib/linux64/libboost_thread-gcc49-mt-s-1_55.a" />
