@@ -703,7 +703,6 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 				</Compiler>
 				<Linker>
-					<Add option="-s" />
 					<Add option="-static" />
 					<Add option="-static-libgcc" />
 					<Add option="-static-libstdc++" />
@@ -844,7 +843,6 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 				</Compiler>
 				<Linker>
-					<Add option="-s" />
 					<Add option="-static-libgcc" />
 					<Add option="-static-libstdc++" />
 					<Add option="-fprofile-arcs" />
@@ -880,7 +878,7 @@
 					<Add library="c++" />
 				</Linker>
 				<ExtraCommands>
-					<Add after='strip -spv &quot;$(TARGET_OUTPUT_FILE)&quot;' />
+					<Add after='strip -SXx &quot;$(TARGET_OUTPUT_FILE)&quot;' />
 				</ExtraCommands>
 			</Target>
 		</Build>
