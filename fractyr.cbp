@@ -878,7 +878,8 @@
 					<Add library="c++" />
 				</Linker>
 				<ExtraCommands>
-					<Add after='strip -SXx &quot;$(TARGET_OUTPUT_FILE)&quot;' />
+					<Add after='strip -SXx &quot;$(TARGET_OUTPUT_FILE)&quot;;' />
+					<Add after="resources/osx_package.sh" />
 				</ExtraCommands>
 			</Target>
 		</Build>
