@@ -971,6 +971,7 @@
 		<Unit filename="oculusstorm.cpp" />
 		<Unit filename="oculusstorm.h" />
 		<Unit filename="platform_defines.h" />
+		<Unit filename="resources/compile_blob.sh" />
 		<Unit filename="resources/music_main_intro.ogg">
 			<Option compile="1" />
 			<Option link="1" />
@@ -979,6 +980,7 @@
 			<Option compile="1" />
 			<Option link="1" />
 		</Unit>
+		<Unit filename="resources/osx_package.sh" />
 		<Unit filename="resources/shaders/chunk_frag.glsl">
 			<Option compile="1" />
 			<Option link="1" />
