@@ -980,6 +980,7 @@
 			<Option compile="1" />
 			<Option link="1" />
 		</Unit>
+		<Unit filename="resources/osx_app/Fractyr.app/Contents/Info.plist" />
 		<Unit filename="resources/osx_package.sh" />
 		<Unit filename="resources/shaders/chunk_frag.glsl">
 			<Option compile="1" />
@@ -1009,6 +1010,7 @@
 			<Option compile="1" />
 			<Option link="1" />
 		</Unit>
+		<Unit filename="resources/voxelstorm.ico" />
 		<Unit filename="shader_load.cpp" />
 		<Unit filename="soundstorm.cpp" />
 		<Unit filename="soundstorm.h" />
