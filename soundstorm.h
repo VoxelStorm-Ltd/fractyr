@@ -203,10 +203,10 @@ public:
   unsigned int music_load(unsigned char const *buffer, size_t buffersize);
 
   // playback control
-  soundgroup play(     unsigned int effect_id, Vector3f const &position, Vector3f const &velocity, float volume = 1.0, float seek_start = 0.0, float seek_end = 0.0, float seek_speed = 1.0);
-  soundgroup play(     Vector3f const &position, Vector3f const &velocity, soundeffect *effect,    float volume = 1.0, float seek_start = 0.0, float seek_end = 0.0, float seek_speed = 1.0);
-  soundgroup play_loop(unsigned int effect_id, Vector3f const &position, Vector3f const &velocity, float volume = 1.0, float seek_start = 0.0, float seek_end = 0.0, float seek_speed = 1.0);
-  soundgroup play_loop(Vector3f const &position, Vector3f const &velocity, soundeffect *effect,    float volume = 1.0, float seek_start = 0.0, float seek_end = 0.0, float seek_speed = 1.0);
+  void play(     unsigned int effect_id, Vector3f const &position, Vector3f const &velocity, float volume = 1.0, float seek_start = 0.0, float seek_end = 0.0, float seek_speed = 1.0, soundgroup *thissoundgroup = nullptr);
+  void play(     Vector3f const &position, Vector3f const &velocity, soundeffect *effect,    float volume = 1.0, float seek_start = 0.0, float seek_end = 0.0, float seek_speed = 1.0, soundgroup *thissoundgroup = nullptr);
+  void play_loop(unsigned int effect_id, Vector3f const &position, Vector3f const &velocity, float volume = 1.0, float seek_start = 0.0, float seek_end = 0.0, float seek_speed = 1.0, soundgroup *thissoundgroup = nullptr);
+  void play_loop(Vector3f const &position, Vector3f const &velocity, soundeffect *effect,    float volume = 1.0, float seek_start = 0.0, float seek_end = 0.0, float seek_speed = 1.0, soundgroup *thissoundgroup = nullptr);
   music *music_queue(unsigned int deck_id, unsigned int music_id);
   void set_music_volume(unsigned int deck_id, float newvolume);
   void fade_music_volume(unsigned int deck_id, float newvolume, float seconds_to_take);

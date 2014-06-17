@@ -719,79 +719,90 @@ unsigned int soundstorm::music_load(unsigned char const *buffer, size_t buffersi
   return tracknum;
 }
 
-soundstorm::soundgroup soundstorm::play(unsigned int effect_id,
-                                        Vector3f const &position,
-                                        Vector3f const &velocity,
-                                        float volume,
-                                        float seek_start,
-                                        float seek_end,
-                                        float seek_speed) {
+void soundstorm::play(unsigned int effect_id,
+                      Vector3f const &position,
+                      Vector3f const &velocity,
+                      float volume,
+                      float seek_start,
+                      float seek_end,
+                      float seek_speed,
+                      soundgroup *thissoundgroup) {
   /// Add a sound effect by id to the currently playing list with the specified parameters
-  soundeffect *thiseffect = get_effect(effect_id);
-  // if both effect_id and the pointer address aren't printed before calling play, this crashes in release build with lto.  WHY!?
-  std::cout << "WE CONJURE THE SPIRITS OF THE COMPUTER WITH OUR SPELLS " << effect_id << thiseffect << std::endl;
-  return play(position, velocity, thiseffect, volume, seek_start, seek_end, seek_speed);
+  play(position, velocity, get_effect(effect_id), volume, seek_start, seek_end, seek_speed, thissoundgroup);
 }
 
-soundstorm::soundgroup soundstorm::play(Vector3f const &position,
-                                        Vector3f const &velocity,
-                                        soundeffect *effect,
-                                        float volume,
-                                        float seek_start,
-                                        float seek_end,
-                                        float seek_speed) {
+void soundstorm::play(Vector3f const &position,
+                      Vector3f const &velocity,
+                      soundeffect *effect,
+                      float volume,
+                      float seek_start,
+                      float seek_end,
+                      float seek_speed,
+                      soundgroup *thissoundgroup) {
   /// Add a sound effect to the currently playing list with the specified parameters
   // parameters reordered to avoid call ambiguity
   #ifndef NDEBUG
     if(!effect) {   // null check only in debug mode
       std::cout << "SoundStorm: Error: Called " << __PRETTY_FUNCTION__ << " with null effect!" << std::endl;
-      return soundgroup();
+      return;
     }
   #endif
-  soundgroup thissoundgroup;
   for(unsigned int channelnum = 0; channelnum != channels; ++channelnum) {
     sound *thissound = new sound(effect, position, velocity, volume, seek_start, seek_end, seek_speed, nullptr, channelnum);
     playing.push_back(thissound);
-    thissoundgroup.push_back(thissound);
+    if(thissoundgroup) {
+      thissoundgroup->push_back(thissound);
+    }
   }
   #ifdef DEBUG_SOUNDSTORM
     std::cout << "SoundStorm: DEBUG: playing sound at " << position << " volume " << volume << ", " << playing.size() << " sounds total" << std::endl;
   #endif
-  return thissoundgroup;
 }
 
-soundstorm::soundgroup soundstorm::play_loop(unsigned int effect_id,
-                                             Vector3f const &position,
-                                             Vector3f const &velocity,
-                                             float volume,
-                                             float seek_start,
-                                             float seek_end,
-                                             float seek_speed) {
+void soundstorm::play_loop(unsigned int effect_id,
+                           Vector3f const &position,
+                           Vector3f const &velocity,
+                           float volume,
+                           float seek_start,
+                           float seek_end,
+                           float seek_speed,
+                           soundgroup *thissoundgroup) {
   /// Add a sound effect by id set to repeat indefinitely to the currently playing list with the specified parameters
-  return play_loop(position, velocity, get_effect(effect_id), volume, seek_start, seek_end, seek_speed);
+  return play_loop(position, velocity, get_effect(effect_id), volume, seek_start, seek_end, seek_speed, thissoundgroup);
 }
 
-soundstorm::soundgroup soundstorm::play_loop(Vector3f const &position,
-                                             Vector3f const &velocity,
-                                             soundeffect *effect,
-                                             float volume,
-                                             float seek_start,
-                                             float seek_end,
-                                             float seek_speed) {
+void soundstorm::play_loop(Vector3f const &position,
+                           Vector3f const &velocity,
+                           soundeffect *effect,
+                           float volume,
+                           float seek_start,
+                           float seek_end,
+                           float seek_speed,
+                           soundgroup *thissoundgroup) {
   /// Add a sound effect set to repeat indefinitely to the currently playing list with the specified parameters
   // parameters reordered to avoid call ambiguity
   #ifndef NDEBUG
     if(!effect) {   // null check only in debug mode
       std::cout << "SoundStorm: Error: Called " << __PRETTY_FUNCTION__ << " with null effect!" << std::endl;
-      return soundgroup();
+      return;
     }
   #endif
-  soundgroup const &thissoundgroup = play(position, velocity, effect, volume, seek_start, seek_end, seek_speed);
+  bool nullsoundgroup;
+  if(thissoundgroup) {
+    nullsoundgroup = false;
+  } else {
+    nullsoundgroup = true;
+    thissoundgroup = new soundgroup;
+  }
+  play(position, velocity, effect, volume, seek_start, seek_end, seek_speed, thissoundgroup);
   // make each their own successor, looping with the same start and end
-  for(auto const &thissound : thissoundgroup) {
+  for(auto const &thissound : *thissoundgroup) {
     thissound->next_sound = thissound;
   }
-  return thissoundgroup;
+  if(nullsoundgroup) {
+    delete thissoundgroup;
+    thissoundgroup = nullptr;
+  }
 }
 
 soundstorm::music *soundstorm::music_queue(unsigned int deck_id, unsigned int music_id) {
