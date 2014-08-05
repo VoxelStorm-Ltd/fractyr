@@ -108,6 +108,8 @@ public:
     OggVorbis_File *oggfile = nullptr;                // the internal ogg vorbis handle
   };
 
+  bool enabled = false;                               // whether to use the sound system - if disabled, all play functions exit early
+
 private:
   unsigned int channels = 2;                          // output channels
   float samplerate = 44100.0;                         // output sample rate

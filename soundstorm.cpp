@@ -39,8 +39,12 @@ soundstorm::soundstorm() try
     std::cout << "SoundStorm: Error: sound engine claims not to exist." << std::endl;
     return;
   }
+  ears.resize(2);         // safe default number of ears, in case we exit initialisation early
+  decks.resize(numdecks);
   // select an appropriate sound device
+  unsigned int num_devices = 0;
   for(portaudio::System::DeviceIterator it = audio_system->devicesBegin(); it != audio_system->devicesEnd(); ++it) {
+    ++num_devices;
     if(*it == audio_system->defaultOutputDevice()) {
       std::cout << " *";
     } else {
@@ -72,14 +76,23 @@ soundstorm::soundstorm() try
     }
     std::cout << std::endl;
   }
+  if(num_devices == 0) {
+    std::cout << "SoundStorm: no audio devices found!  Cancelling initialisation." << std::endl;
+    enabled = false;
+    return;
+  }
   audio_device = &audio_system->defaultOutputDevice();
 
   if(channels > static_cast<unsigned int>(audio_device->maxOutputChannels())) {
     // clamp number of channels in case we're asking for too many
     channels = audio_device->maxOutputChannels();
   }
+  if(channels < 2) {
+    channels = 2;   // but also clamp to a minimum of 2, since the engine assumes stereo separation
+    enabled = false;
+    return;
+  }
   ears.resize(channels);
-  decks.resize(numdecks);
   for(deck &thisdeck : decks) {
     // initialise deck output buffers to zero
     thisdeck.buffer_l[0].resize(deck_buffer_size, 0.0);
@@ -113,7 +126,7 @@ soundstorm::soundstorm() try
     &soundstorm::mixer);                                      // member function to call
 
   stream->start();                                            // start the stream
-
+  enabled = true;
 } catch(portaudio::PaException const &e) {
   std::cout << "SoundStorm: PortAudio exception: " << e.paErrorText() << std::endl;
 } catch(portaudio::PaCppException const &e) {
@@ -646,6 +659,7 @@ void soundstorm::set_listener_position_and_rotation(Vector3f const &newposition,
 
 void soundstorm::update_ears() {
   /// Update the "ear" positions for each channel
+  // Note: expects at least 2 ears at any given point!
   ears[channel_type::LEFT].position.assign(-ear_offset, 0.0, 0.0);
   ears[channel_type::RIGHT].position.assign(ear_offset, 0.0, 0.0);
   for(auto &thisear : ears) {
@@ -708,6 +722,7 @@ unsigned int soundstorm::load(unsigned char const *buffer, size_t buffersize, fl
 }
 
 unsigned int soundstorm::music_load(unsigned char const *buffer, size_t buffersize) {
+  /// Load a piece of music from a buffer into the librarym and return its new library id
   unsigned int const tracknum = music_library.size();
   music_buffer *thismusic = new music_buffer;
   thismusic->buffer = buffer;
@@ -740,6 +755,9 @@ void soundstorm::play(Vector3f const &position,
                       float seek_speed,
                       soundgroup *thissoundgroup) {
   /// Add a sound effect to the currently playing list with the specified parameters
+  if(!enabled) {
+    return;
+  }
   // parameters reordered to avoid call ambiguity
   #ifndef NDEBUG
     if(!effect) {   // null check only in debug mode
@@ -781,6 +799,9 @@ void soundstorm::play_loop(Vector3f const &position,
                            soundgroup *thissoundgroup) {
   /// Add a sound effect set to repeat indefinitely to the currently playing list with the specified parameters
   // parameters reordered to avoid call ambiguity
+  if(!enabled) {
+    return;
+  }
   #ifndef NDEBUG
     if(!effect) {   // null check only in debug mode
       std::cout << "SoundStorm: Error: Called " << __PRETTY_FUNCTION__ << " with null effect!" << std::endl;
@@ -807,6 +828,9 @@ void soundstorm::play_loop(Vector3f const &position,
 
 soundstorm::music *soundstorm::music_queue(unsigned int deck_id, unsigned int music_id) {
   /// Queue an item from the music library to play next on the specified deck
+  if(!enabled) {
+    return nullptr;
+  }
   #ifndef NDEBUG
     if(deck_id >= decks.size()) {   // safety check only in debug mode
       std::cout << "SoundStorm: Error: Called " << __PRETTY_FUNCTION__ << " with deck_id " << deck_id << " exceeding available decks!" << std::endl;
