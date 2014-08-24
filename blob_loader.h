@@ -11,8 +11,6 @@
 ///
 /// To load (in every translation unit it's referred to):
 ///   BLOB_LOAD(chintzy_ttf);
-///   BLOB_LOAD(chintzy_ttf);
-///   BLOB_LOAD(chintzy_ttf);
 ///
 /// To access:
 ///   font_score = font_load3d(BLOB(chintzy_ttf), BLOB_SIZE(chintzy_ttf));
