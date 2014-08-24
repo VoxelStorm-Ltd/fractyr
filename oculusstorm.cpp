@@ -10,7 +10,7 @@ oculusstorm::oculusstorm(float farplane, float nearplane)
     ipd(6.4),
     ipd_half(3.2),
     aspectratio(1280.0 / (2.0 * 800.0)),
-    nearplane(nearplane),
+    nearplane(nearplane == 0.0 ? 0.2 : nearplane),    // 20cm default clip plane
     farplane(farplane),
     manager(nullptr),
     device(nullptr),
