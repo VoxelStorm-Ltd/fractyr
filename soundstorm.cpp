@@ -71,7 +71,7 @@ soundstorm::soundstorm() try
     if(it->isOutputOnlyDevice()) {
       std::cout << " [out only]";
     }
-    if(it->isOutputOnlyDevice()) {
+    if(it->isFullDuplexDevice()) {
       std::cout << " [fd]";
     }
     std::cout << std::endl;
