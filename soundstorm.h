@@ -126,7 +126,7 @@ private:
 
   portaudio::AutoSystem audio_system_auto;
   portaudio::System *audio_system = nullptr;
-  portaudio::Device *audio_device = nullptr;
+  portaudio::Device const *audio_device = nullptr;
 
   //portaudio::DirectionSpecificStreamParameters *stream_in_params  = nullptr;
   portaudio::DirectionSpecificStreamParameters *stream_out_params = nullptr;

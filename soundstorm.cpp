@@ -5,7 +5,7 @@
 #ifndef NDEBUG
   #include <cassert>
 #endif
-//#include <boost/thread.hpp>
+#include <boost/range/iterator_range.hpp>
 #include <thread>
 #include <chrono>
 #include <portaudiocpp/PortAudioCpp.hxx>
@@ -43,35 +43,35 @@ soundstorm::soundstorm() try
   decks.resize(numdecks);
   // select an appropriate sound device
   unsigned int num_devices = 0;
-  for(portaudio::System::DeviceIterator it = audio_system->devicesBegin(); it != audio_system->devicesEnd(); ++it) {
+  for(auto const &it : boost::make_iterator_range(audio_system->devicesBegin(), audio_system->devicesEnd())) {
     ++num_devices;
-    if(*it == audio_system->defaultOutputDevice()) {
+    if(it == audio_system->defaultOutputDevice()) {
       std::cout << " *";
     } else {
       std::cout << "  ";
     }
-    std::cout << it->index() << " " << it->name();
-    std::cout << " Ch " << it->maxInputChannels() << "in " << it->maxOutputChannels() << "out " << it->defaultSampleRate() << "Hz";
-    //std::cout << " latency in/out " << it->defaultLowInputLatency() << "/" << it->defaultLowOutputLatency() << " to " << it->defaultHighInputLatency() << "/" << it->defaultHighOutputLatency() << " out" << std::endl;
-    if(it->isSystemDefaultInputDevice()) {
+    std::cout << it.index() << " " << it.name();
+    std::cout << " Ch " << it.maxInputChannels() << "in " << it.maxOutputChannels() << "out " << it.defaultSampleRate() << "Hz";
+    //std::cout << " latency in/out " << it.defaultLowInputLatency() << "/" << it.defaultLowOutputLatency() << " to " << it.defaultHighInputLatency() << "/" << it.defaultHighOutputLatency() << " out" << std::endl;
+    if(it.isSystemDefaultInputDevice()) {
       std::cout << " [sysdef in]";
     }
-    if(it->isSystemDefaultOutputDevice()) {
+    if(it.isSystemDefaultOutputDevice()) {
       std::cout << " [sysdef out]";
     }
-    if(it->isHostApiDefaultInputDevice()) {
+    if(it.isHostApiDefaultInputDevice()) {
       std::cout << " [apidef in]";
     }
-    if(it->isHostApiDefaultOutputDevice()) {
+    if(it.isHostApiDefaultOutputDevice()) {
       std::cout << " [apidef out]";
     }
-    if(it->isInputOnlyDevice()) {
+    if(it.isInputOnlyDevice()) {
       std::cout << " [in only]";
     }
-    if(it->isOutputOnlyDevice()) {
+    if(it.isOutputOnlyDevice()) {
       std::cout << " [out only]";
     }
-    if(it->isFullDuplexDevice()) {
+    if(it.isFullDuplexDevice()) {
       std::cout << " [fd]";
     }
     std::cout << std::endl;
@@ -591,10 +591,10 @@ unsigned int soundstorm::get_device_current() {
 
 void soundstorm::set_device(unsigned int new_device_index) {
   /// Switch to a different output device
-  for(portaudio::System::DeviceIterator it = audio_system->devicesBegin(); it != audio_system->devicesEnd(); ++it) {
-    if(it->index() == static_cast<int>(new_device_index)) {
-      audio_device = &(*it);
-      std::cout << "SoundStorm: switched to device " << it->name() << std::endl;
+    for(auto const &it : boost::make_iterator_range(audio_system->devicesBegin(), audio_system->devicesEnd())) {
+    if(it.index() == static_cast<int>(new_device_index)) {
+      audio_device = &it;
+      std::cout << "SoundStorm: switched to device " << it.name() << std::endl;
       return;
     }
   }
@@ -703,7 +703,7 @@ unsigned int soundstorm::load(unsigned char const *buffer, size_t buffersize, fl
   thiseffect->buffer = reinterpret_cast<float const*>(buffer);    // treat the buffer as one of 32bit floats
   thiseffect->buffersize = buffersize / sizeof(float);            // convert to our size in samples
   thiseffect->hdr_scale = hdr_scale;
-  effect_library.push_back(thiseffect);
+  effect_library.emplace_back(thiseffect);
   #ifdef DEBUG_SOUNDSTORM
     // do some analysis
     float min = 0.0;
@@ -727,7 +727,7 @@ unsigned int soundstorm::music_load(unsigned char const *buffer, size_t buffersi
   music_buffer *thismusic = new music_buffer;
   thismusic->buffer = buffer;
   thismusic->buffersize = buffersize;
-  music_library.push_back(thismusic);
+  music_library.emplace_back(thismusic);
   #ifdef DEBUG_SOUNDSTORM
     std::cout << "SoundStorm: DEBUG: loaded music " << tracknum << " from buffer, size " << buffersize << std::endl;
   #endif
@@ -767,9 +767,9 @@ void soundstorm::play(Vector3f const &position,
   #endif
   for(unsigned int channelnum = 0; channelnum != channels; ++channelnum) {
     sound *thissound = new sound(effect, position, velocity, volume, seek_start, seek_end, seek_speed, nullptr, channelnum);
-    playing.push_back(thissound);
+    playing.emplace_back(thissound);
     if(thissoundgroup) {
-      thissoundgroup->push_back(thissound);
+      thissoundgroup->emplace_back(thissound);
     }
   }
   #ifdef DEBUG_SOUNDSTORM

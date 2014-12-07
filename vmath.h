@@ -558,8 +558,8 @@ class Vector2 {
      * @return Pointer to internally stored (in management of class Vector2<T>)
      * used for passing Vector2<T> values to gl*2[fd] functions.
      */
-    inline constexpr operator T*() {
-      return (T*)this;
+    inline operator T*() {
+      return reinterpret_cast<T*>(this);
     }
     /**
      * Conversion to pointer operator
@@ -567,7 +567,7 @@ class Vector2 {
      * used for passing Vector2<T> values to gl*2[fd] functions.
      */
     inline constexpr operator const T*() const {
-      return (T const*)this;
+      return reinterpret_cast<T const*>(this);
     }
 
     //-------------[ output operator ]------------------------
@@ -1152,8 +1152,8 @@ class Vector3 {
      * @return Pointer to internally stored (in management of class Vector3<T>)
      * used for passing Vector3<T> values to gl*3[fd] functions.
      */
-    inline constexpr operator T*() {
-      return (T*)this;
+    inline operator T*() {
+      return reinterpret_cast<T*>(this);
     }
 
     /**
@@ -1162,7 +1162,7 @@ class Vector3 {
      * used for passing Vector3<T> values to gl*3[fd] functions.
      */
     inline constexpr operator const T*() const {
-      return (T const*)this;
+      return reinterpret_cast<T const*>(this);
     }
 
     //-------------[ output ]------------------------------------
@@ -1670,8 +1670,8 @@ class Vector4 {
      * @return Pointer to internally stored (in management of class Vector4<T>)
      * used for passing Vector4<T> values to gl*4[fd] functions.
      */
-    inline constexpr operator T*() {
-      return (T*)this;
+    inline operator T*() {
+      return reinterpret_cast<T*>(this);
     }
 
     /**
@@ -1680,7 +1680,7 @@ class Vector4 {
      * used for passing Vector4<T> values to gl*4[fd] functions.
      */
     inline constexpr operator const T*() const {
-      return (T const*)this;
+      return reinterpret_cast<T const*>(this);
     }
 
     //-------------[ output operator ]------------------------
@@ -2162,7 +2162,7 @@ class Matrix3 {
      * used for passing Matrix3<T> values to gl*[fd]v functions.
      */
     inline operator T*() {
-      return (T*)data;
+      return reinterpret_cast<T*>(data);
     }
 
     /**
@@ -2170,8 +2170,8 @@ class Matrix3 {
      * @return Constant Pointer to internally stored (in management of class Matrix3<T>)
      * used for passing Matrix3<T> values to gl*[fd]v functions.
      */
-    inline operator const T*() const {
-      return (T const*)data;
+    inline constexpr operator const T*() const {
+      return reinterpret_cast<T const*>(data);
     }
 
     //----------[ output operator ]----------------------------
@@ -2892,7 +2892,7 @@ class Matrix4 {
      * used for passing Matrix4<T> values to gl*[fd]v functions.
      */
     inline operator T*() {
-      return (T*)data;
+      return reinterpret_cast<T*>(data);
     }
 
     /**
@@ -2900,8 +2900,8 @@ class Matrix4 {
      * @return Constant Pointer to internally stored (in management of class Matrix4<T>)
      * used for passing Matrix4<T> values to gl*[fd]v functions.
      */
-    inline operator const T*() const {
-      return (T const*)data;
+    inline constexpr operator const T*() const {
+      return reinterpret_cast<T const*>(data);
     }
 
     //----------[ output operator ]----------------------------
