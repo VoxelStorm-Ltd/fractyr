@@ -494,7 +494,7 @@ class Vector2 {
      * @return length of vector
      */
     inline T constexpr length() const {
-      return (T) std::sqrt(x * x + y * y);
+      return static_cast<T>(std::sqrt(x * x + y * y));
     }
 
     /**
@@ -532,7 +532,7 @@ class Vector2 {
      * @param aa Angle (in degrees) to be rotated.
      */
     inline void rotate(T aa) {
-      rotate_rad(deg2rad(-aa));
+      rotate_rad(deg2rad(aa));
     }
 
     /**
@@ -540,10 +540,10 @@ class Vector2 {
      * @param aa Angle (in radians) to be rotated.
      */
     inline void rotate_rad(T aa) {
-      T a = std::cos(-aa);
-      T b = std::sin(-aa);
-      T nx = x * a - y * b;
-      T ny = x * b + y * a;
+      T const a = std::cos(-aa);
+      T const b = std::sin(-aa);
+      T const nx = x * a - y * b;
+      T const ny = x * b + y * a;
       x = nx;
       y = ny;
     }
@@ -1085,7 +1085,7 @@ class Vector3 {
      * @return length of vector
      */
     inline T constexpr length() const {
-      return (T) std::sqrt(x * x + y * y + z * z);
+      return static_cast<T>(std::sqrt(x * x + y * y + z * z));
     }
 
     /**
@@ -1633,7 +1633,7 @@ class Vector4 {
      * @return length of vector
      */
     inline T constexpr length() const {
-      return (T) std::sqrt(x * x + y * y + z * z + w * w);
+      return static_cast<T>(std::sqrt(x * x + y * y + z * z + w * w));
     }
 
     /**
@@ -2362,22 +2362,22 @@ class Matrix4 {
       return Matrix4<T>({static_cast<T>( std::cos(zRads) * std::cos(yRads)),
                          static_cast<T>(-std::sin(zRads) * std::cos(xRads) + std::cos(zRads) * std::sin(yRads) * std::sin(xRads)),
                          static_cast<T>( std::sin(zRads) * std::sin(xRads) + std::cos(zRads) * std::sin(yRads) * std::cos(xRads)),
-                         T(0),
+                         static_cast<T>(0),
 
                          static_cast<T>( std::sin(zRads) * std::cos(yRads)),
                          static_cast<T>( std::cos(zRads) * std::cos(xRads) + std::sin(zRads) * std::sin(yRads) * std::sin(xRads)),
                          static_cast<T>(-std::cos(zRads) * std::sin(xRads) + std::sin(zRads) * std::sin(yRads) * std::cos(xRads)),
-                         T(0),
+                         static_cast<T>(0),
 
                          static_cast<T>(-std::sin(yRads)),
                          static_cast<T>( std::cos(yRads) * std::sin(xRads)),
                          static_cast<T>( std::cos(yRads) * std::cos(xRads)),
-                         T(0),
+                         static_cast<T>(0),
 
-                         T(0),
-                         T(0),
-                         T(0),
-                         T(1)});
+                         static_cast<T>(0),
+                         static_cast<T>(0),
+                         static_cast<T>(0),
+                         static_cast<T>(1)});
     }
 
     /**
@@ -2400,22 +2400,22 @@ class Matrix4 {
       return Matrix4<T>({static_cast<T>(axis.x * axis.x - std::cos(angle) + std::cos(angle)),
                          static_cast<T>(axis.y * axis.x - std::cos(angle) - std::sin(angle) * axis.z),
                          static_cast<T>(axis.z * axis.x - std::cos(angle) + std::sin(angle) * axis.y),
-                         T(0),
+                         static_cast<T>(0),
 
                          static_cast<T>(axis.x * axis.y - std::cos(angle) + std::sin(angle) * axis.z),
                          static_cast<T>(axis.y * axis.y - std::cos(angle) + std::cos(angle)),
                          static_cast<T>(axis.z * axis.y - std::cos(angle) - std::sin(angle) * axis.x),
-                         T(0),
+                         static_cast<T>(0),
 
                          static_cast<T>(axis.x * axis.z - std::cos(angle) - std::sin(angle) * axis.y),
                          static_cast<T>(axis.y * axis.z - std::cos(angle) + std::sin(angle) * axis.x),
                          static_cast<T>(axis.z * axis.z - std::cos(angle) + std::cos(angle)),
-                         T(0),
+                         static_cast<T>(0),
 
-                         T(0),
-                         T(0),
-                         T(0),
-                         T(1)});
+                         static_cast<T>(0),
+                         static_cast<T>(0),
+                         static_cast<T>(0),
+                         static_cast<T>(1)});
     }
 
     /// Creates translation matrix
@@ -2427,10 +2427,10 @@ class Matrix4 {
      * @param w for W-coordinate translation (implicitly set to 1)
      */
     inline static Matrix4<T> constexpr createTranslation(T x, T y, T z, T w = 1) {
-      return Matrix4<T>({T(1), T(0), T(0), T(0),
-                         T(0), T(1), T(0), T(0),
-                         T(0), T(0), T(1), T(0),
-                         x,    y,    z,    w});
+      return Matrix4<T>({static_cast<T>(1), static_cast<T>(0), static_cast<T>(0), static_cast<T>(0),
+                         static_cast<T>(0), static_cast<T>(1), static_cast<T>(0), static_cast<T>(0),
+                         static_cast<T>(0), static_cast<T>(0), static_cast<T>(1), static_cast<T>(0),
+                         x,                 y,                 z,                 w});
     }
 
     /**
@@ -2442,10 +2442,10 @@ class Matrix4 {
      * @return Transform matrix 4x4 with scale transformation.
      */
     inline static Matrix4<T> constexpr createScale(T sx, T sy, T sz) {
-      return Matrix4<T>({sx,   T(0), T(0), T(0),
-                         T(0), sy,   T(0), T(0),
-                         T(0), T(0), sz,   T(0),
-                         T(0), T(0), T(0), T(1)});
+      return Matrix4<T>({sx,                static_cast<T>(0), static_cast<T>(0), static_cast<T>(0),
+                         static_cast<T>(0), sy,                static_cast<T>(0), static_cast<T>(0),
+                         static_cast<T>(0), static_cast<T>(0), sz,                static_cast<T>(0),
+                         static_cast<T>(0), static_cast<T>(0), static_cast<T>(0), static_cast<T>(1)});
     }
 
     /**
@@ -2491,22 +2491,22 @@ class Matrix4 {
       return Matrix4<T>({ (centerPos - eyePos).normalize_copy().crossProduct(upDir).normalize_copy().x,
                           (centerPos - eyePos).normalize_copy().crossProduct(upDir).normalize_copy().crossProduct((centerPos - eyePos).normalize_copy()).x,
                          -(centerPos - eyePos).normalize_copy().x,
-                          T(0),
+                          static_cast<T>(0),
 
                           (centerPos - eyePos).normalize_copy().crossProduct(upDir).normalize_copy().y,
                           (centerPos - eyePos).normalize_copy().crossProduct(upDir).normalize_copy().crossProduct((centerPos - eyePos).normalize_copy()).y,
                          -(centerPos - eyePos).normalize_copy().y,
-                          T(0),
+                          static_cast<T>(0),
 
                           (centerPos - eyePos).normalize_copy().crossProduct(upDir).normalize_copy().z,
                           (centerPos - eyePos).normalize_copy().crossProduct(upDir).normalize_copy().crossProduct((centerPos - eyePos).normalize_copy()).z,
                          -(centerPos - eyePos).normalize_copy().z,
-                          T(0),
+                          static_cast<T>(0),
 
-                          T(0),
-                          T(0),
-                          T(0),
-                          T(1)}) * Matrix4<T>::createTranslation(-eyePos.x, -eyePos.y, -eyePos.z);
+                          static_cast<T>(0),
+                          static_cast<T>(0),
+                          static_cast<T>(0),
+                          static_cast<T>(1)}) * Matrix4<T>::createTranslation(-eyePos.x, -eyePos.y, -eyePos.z);
     }
 
     /**
@@ -2540,10 +2540,25 @@ class Matrix4 {
        *  C = - (zFar + zNear) / (zFar - zNear)
        *  D = - (2 zFar zNear) / (zFar - zNear)
        */
-      return Matrix4<T>({T(2) * zNear     / (right - left), T(0),                             T(0),                                  T(0),
-                         T(0),                              T(2) * zNear   / (top - bottom),  T(0),                                  T(0),
-                         (right + left) / (right - left),   (top + bottom) / (top - bottom), -(zFar + zNear)       / (zFar - zNear), T(-1),
-                         T(0),                              T(0),                             T(-2) * zNear * zFar / (zFar - zNear), T(1)});
+      return Matrix4<T>({static_cast<T>(2) * zNear / (right - left),
+                         static_cast<T>(0),
+                         static_cast<T>(0),
+                         static_cast<T>(0),
+
+                         static_cast<T>(0),
+                         static_cast<T>(2) * zNear / (top - bottom),
+                         static_cast<T>(0),
+                         static_cast<T>(0),
+
+                          (right + left) / (right - left),
+                          (top + bottom) / (top - bottom),
+                         -(zFar + zNear) / (zFar - zNear),
+                         static_cast<T>(-1),
+
+                         static_cast<T>(0),
+                         static_cast<T>(0),
+                         static_cast<T>(-2) * zNear * zFar / (zFar - zNear),
+                         static_cast<T>(1)});
     }
 
     /**
@@ -2575,10 +2590,10 @@ class Matrix4 {
        *    ty = - (top + bottom) / (top - bottom)
        *    tz = - (zFar + zNear) / (zFar - zNear)
        */
-      return Matrix4<T>({T(2)            / (right - left), T(0),                             T(0),                             T(0),
-                         T(0),                             T(2)            / (top - bottom), T(0),                             T(0),
-                         T(0),                             T(0),                             T(-2)           / (zFar - zNear), T(0),
-                         -(right + left) / (right - left), -(top + bottom) / (top - bottom), -(zFar + zNear) / (zFar - zNear), T(1)});
+      return Matrix4<T>({static_cast<T>(2) / (right - left), static_cast<T>(0),                  static_cast<T>(0),                   static_cast<T>(0),
+                         static_cast<T>(0),                  static_cast<T>(2) / (top - bottom), static_cast<T>(0),                   static_cast<T>(0),
+                         static_cast<T>(0),                  static_cast<T>(0),                  static_cast<T>(-2) / (zFar - zNear), static_cast<T>(0),
+                         -(right + left)   / (right - left), -(top + bottom)   / (top - bottom), -(zFar + zNear)    / (zFar - zNear), static_cast<T>(1)});
     }
 
     /**
@@ -3241,7 +3256,7 @@ class Quaternion {
      * @return Length of quaternion.
      */
     inline T constexpr length() const {
-      return (T) std::sqrt(w * w + v.lengthSq());
+      return static_cast<T>(std::sqrt(w * w + v.lengthSq()));
     }
 
     /**
@@ -3411,7 +3426,7 @@ class Quaternion {
       T s;
       T const tr = m(1, 1) + m(2, 2) + m(3, 3);
       if(tr >= epsilon) {
-        s = 0.5 / (T)sqrt(tr + 1.0);
+        s = 0.5 / static_cast<T>(std::sqrt(tr + 1.0));
         q.w = 0.25 / s;
         q.v.x = (m(3, 2) - m(2, 3)) * s;
         q.v.y = (m(1, 3) - m(3, 1)) * s;
@@ -3424,19 +3439,19 @@ class Quaternion {
         char bigIdx = (d0 > d1) ? ((d0 > d2) ? 0 : 2) : ((d1 > d2) ? 1 : 2);
 
         if(bigIdx == 0) {
-          s = 2.0 * (T) sqrt(1.0 + m(1, 1) - m(2, 2) - m(3, 3));
+          s = 2.0 * static_cast<T>(std::sqrt(1.0 + m(1, 1) - m(2, 2) - m(3, 3)));
           q.w = (m(3, 2) - m(2, 3)) / s;
           q.v.x = 0.25 * s;
           q.v.y = (m(1, 2) + m(2, 1)) / s;
           q.v.z = (m(1, 3) + m(3, 1)) / s;
         } else if(bigIdx == 1) {
-          s = 2.0 * (T) sqrt(1.0 + m(2, 2) - m(1, 1) - m(3, 3));
+          s = 2.0 * static_cast<T>(std::sqrt(1.0 + m(2, 2) - m(1, 1) - m(3, 3)));
           q.w = (m(1, 3) - m(3, 1)) / s;
           q.v.x = (m(1, 2) + m(2, 1)) / s;
           q.v.y = 0.25 * s;
           q.v.z = (m(2, 3) + m(3, 2)) / s;
         } else {
-          s = 2.0 * (T) sqrt(1.0 + m(3, 3) - m(1, 1) - m(2, 2));
+          s = 2.0 * static_cast<T>(std::sqrt(1.0 + m(3, 3) - m(1, 1) - m(2, 2)));
           q.w = (m(2, 1) - m(1, 2)) / s;
           q.v.x = (m(1, 3) + m(3, 1)) / s;
           q.v.y = (m(2, 3) + m(3, 2)) / s;
@@ -3461,7 +3476,7 @@ class Quaternion {
       T s;
       T const tr = m(1, 1) + m(2, 2) + m(3, 3);
       if(tr >= epsilon) {
-        s = 0.5 / (T)sqrt(tr + 1.0);
+        s = 0.5 / static_cast<T>(std::sqrt(tr + 1.0));
         q.w = 0.25 / s;
         q.v.x = (m(3, 2) - m(2, 3)) * s;
         q.v.y = (m(1, 3) - m(3, 1)) * s;
@@ -3474,19 +3489,19 @@ class Quaternion {
         char bigIdx = (d0 > d1) ? ((d0 > d2) ? 0 : 2) : ((d1 > d2) ? 1 : 2);
 
         if(bigIdx == 0) {
-          s = 2.0 * (T) sqrt(1.0 + m(1, 1) - m(2, 2) - m(3, 3));
+          s = 2.0 * static_cast<T>(std::sqrt(1.0 + m(1, 1) - m(2, 2) - m(3, 3)));
           q.w = (m(3, 2) - m(2, 3)) / s;
           q.v.x = 0.25 * s;
           q.v.y = (m(1, 2) + m(2, 1)) / s;
           q.v.z = (m(1, 3) + m(3, 1)) / s;
         } else if(bigIdx == 1) {
-          s = 2.0 * (T) sqrt(1.0 + m(2, 2) - m(1, 1) - m(3, 3));
+          s = 2.0 * static_cast<T>(std::sqrt(1.0 + m(2, 2) - m(1, 1) - m(3, 3)));
           q.w = (m(1, 3) - m(3, 1)) / s;
           q.v.x = (m(1, 2) + m(2, 1)) / s;
           q.v.y = 0.25 * s;
           q.v.z = (m(2, 3) + m(3, 2)) / s;
         } else {
-          s = 2.0 * (T) sqrt(1.0 + m(3, 3) - m(1, 1) - m(2, 2));
+          s = 2.0 * static_cast<T>(std::sqrt(1.0 + m(3, 3) - m(1, 1) - m(2, 2)));
           q.w = (m(2, 1) - m(1, 2)) / s;
           q.v.x = (m(1, 3) + m(3, 1)) / s;
           q.v.y = (m(2, 3) + m(3, 2)) / s;
@@ -3508,17 +3523,17 @@ class Quaternion {
     inline Quaternion<T> slerp(T r, Quaternion<T> const &q2) const {
       Quaternion<T> ret;
       T const cosTheta = w * q2.w + v.x * q2.v.x + v.y * q2.v.y + v.z * q2.v.z;
-      T const theta = (T)std::acos(cosTheta);
+      T const theta = static_cast<T>(std::acos(cosTheta));
       if(std::fabs(theta) < epsilon) {
         ret = *this;
       } else {
-        T sinTheta = (T)std::sqrt(1.0 - cosTheta * cosTheta);
+        T sinTheta = static_cast<T>(std::sqrt(1.0 - cosTheta * cosTheta));
         if(std::fabs(sinTheta) < epsilon) {
           ret.w = 0.5 * w + 0.5 * q2.w;
           ret.v = v.lerp(0.5, q2.v);
         } else {
-          T rA = (T)std::sin((1.0 - r) * theta) / sinTheta;
-          T rB = (T)std::sin(r * theta) / sinTheta;
+          T rA = static_cast<T>(std::sin((1.0 - r) * theta)) / sinTheta;
+          T rB = static_cast<T>(std::sin(r * theta)) / sinTheta;
 
           ret.w = w * rA + q2.w * rB;
           ret.v.x = v.x * rA + q2.v.x * rB;
