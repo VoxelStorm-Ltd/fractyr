@@ -116,30 +116,45 @@
 // Modified 2013-2014, Eugene Hopkinson for VoxelStorm Ltd
 //                     various expansions and conversions
 //                     Version 2.0: C++11 specific optimisations, including constexpr
+//                     Version 2.1: C++14 optimisations, intersection algorithms
 
 #ifndef __vmath_Header_File__
 #define __vmath_Header_File__
 
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include <cstring>
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <cassert>
+#include <array>
 
 #ifdef VMATH_NAMESPACE
 namespace VMATH_NAMESPACE {
 #endif
 
+#ifndef NO_BOOST
+#include <boost/math/constants/constants.hpp>
+// use boost's constants if available
+#else  // NO_BOOST
 #ifndef M_PI
 #define M_PI           3.14159265358979323846  /* pi */
-#endif
+#endif // M_PI
+#endif // NO_BOOST
 
-#define DEG2RAD(x) ((x * M_PI) / 180.0)
-//#define EPSILON (4.37114e-07)
-
-const double epsilon = 4.37114e-05;
+double constexpr epsilon = 4.37114e-05;
 #define EPSILON epsilon
+#define DEG2RAD deg2rad
+
+template<class T>
+inline static T constexpr const deg2rad(T angle_rad) {
+  #ifndef NO_BOOST
+    //return (angle_rad * boost::math::constants::pi<T>()) / 180.0;
+    return angle_rad * boost::math::constants::degree<T>();
+  #else  // NO_BOOST
+    return (angle_rad * M_PI) / 180.0;
+  #endif // NO_BOOST
+}
 
 template<class T> class Vector2;  // forward declarations
 template<class T> class Vector3;
@@ -147,6 +162,8 @@ template<class T> class Vector4;
 template<class T> class Matrix3;
 template<class T> class Matrix4;
 template<class T> class Quaternion;
+template<class T> class Aabb2;
+template<class T> class Aabb3;
 
 /**
  * Class for two dimensional vector.
@@ -266,11 +283,7 @@ class Vector2 {
      * y coordinate.
      */
     inline T &operator[](int n) {
-      assert(n >= 0 && n <= 1);
-      if(0 == n)
-        return x;
-      else
-        return y;
+      return n == 0 ? x : y;
     }
 
     /**
@@ -279,12 +292,8 @@ class Vector2 {
      * @return For n = 0, reference to x coordinate, else reference to y
      * y coordinate.
      */
-    inline const T &operator[](int n) const {
-      assert(n >= 0 && n <= 1);
-      if(0 == n)
-        return x;
-      else
-        return y;
+    inline T constexpr const &operator[](int n) const {
+      return n == 0 ? x : y;
     }
 
     //---------------[ vector aritmetic operator ]--------------
@@ -453,12 +462,12 @@ class Vector2 {
     /**
      * Equality test operator
      * @param rhs Right hand side argument of binary operator.
-     * @note Test of equality is based of threshold EPSILON value. To be two
-     * values equal, must satisfy this condition | lhs.x - rhs.y | < EPSILON,
+     * @note Test of equality is based of threshold epsilon value. To be two
+     * values equal, must satisfy this condition | lhs.x - rhs.y | < epsilon,
      * same for y-coordinate.
      */
-    inline constexpr bool operator==(Vector2<T> const &rhs) const {
-      return (std::abs(x - rhs.x) < EPSILON) && (std::abs(y - rhs.y) < EPSILON);
+    inline bool constexpr operator==(Vector2<T> const &rhs) const {
+      return (std::abs(x - rhs.x) < epsilon) && (std::abs(y - rhs.y) < epsilon);
     }
 
     /**
@@ -466,7 +475,7 @@ class Vector2 {
      * @param rhs Right hand side argument of binary operator.
      * @return not (lhs == rhs) :-P
      */
-    inline constexpr bool operator!=(Vector2<T> const &rhs) const {
+    inline bool constexpr operator!=(Vector2<T> const &rhs) const {
       return !(*this == rhs);
     }
 
@@ -523,16 +532,16 @@ class Vector2 {
      * @param aa Angle (in degrees) to be rotated.
      */
     inline void rotate(T aa) {
-      T a = cos(DEG2RAD(-aa));
-      T b = sin(DEG2RAD(-aa));
-      T nx = x * a - y * b;
-      T ny = x * b + y * a;
-      x = nx;
-      y = ny;
+      rotate_rad(deg2rad(-aa));
     }
+
+    /**
+     * Rotate 2D vector clockwise, radian version.
+     * @param aa Angle (in radians) to be rotated.
+     */
     inline void rotate_rad(T aa) {
-      T a = cos(-aa);
-      T b = sin(-aa);
+      T a = std::cos(-aa);
+      T b = std::sin(-aa);
       T nx = x * a - y * b;
       T ny = x * b + y * a;
       x = nx;
@@ -591,33 +600,56 @@ class Vector2 {
       return oss.str();
     }
 
-  /**
-   * Free function to check whether two lines intersect, and if so
-   * obtain the intersection point and store it in this vector.
-   * @param line1start The start coordinates of the first line
-   * @param line1end The end coordinates of the first line
-   * @param line2start The start coordinates of the first line
-   * @param line2end The end coordinates of the first line
-   */
-  inline bool get_line_intersection(Vector2<T> const &line1start,
-                                    Vector2<T> const &line1end,
-                                    Vector2<T> const &line2start,
-                                    Vector2<T> const &line2end) {
-    Vector2<T> s1(line1end.x - line1start.x,
-                  line1end.y - line1start.y);
-    Vector2<T> s2(line2end.x - line2start.x,
-                  line2end.y - line2start.y);
-    T s = (-s1.y * (line1start.x - line2start.x) + s1.x * (line1start.y - line2start.y)) / (-s2.x * s1.y + s1.x * s2.y);
-    T t = ( s2.x * (line1start.y - line2start.y) - s2.y * (line1start.x - line2start.x)) / (-s2.x * s1.y + s1.x * s2.y);
-
-    if(s >= 0 && s <= 1 && t >= 0 && t <= 1) {
-      // Collision detected
-      x = line1start.x + (t * s1.x);
-      y = line1start.y + (t * s1.y);
-      return true;
+    /**
+     * Check whether two lines intersect, and if so obtain the intersection point
+     * and store it in this vector.
+     * @param line1start The start coordinates of the first line
+     * @param line1end The end coordinates of the first line
+     * @param line2start The start coordinates of the first line
+     * @param line2end The end coordinates of the first line
+     */
+    template<class FromT>
+    inline bool get_line_intersection(Vector2<FromT> const &line1start,
+                                      Vector2<FromT> const &line1end,
+                                      Vector2<FromT> const &line2start,
+                                      Vector2<FromT> const &line2end) {
+      Vector2<T> const s1(line1end.x - line1start.x,
+                          line1end.y - line1start.y);
+      Vector2<T> const s2(line2end.x - line2start.x,
+                          line2end.y - line2start.y);
+      T const s = (-s1.y * (line1start.x - line2start.x) + s1.x * (line1start.y - line2start.y)) / (-s2.x * s1.y + s1.x * s2.y);
+      T const t = ( s2.x * (line1start.y - line2start.y) - s2.y * (line1start.x - line2start.x)) / (-s2.x * s1.y + s1.x * s2.y);
+      if(s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+        x = line1start.x + (t * s1.x);
+        y = line1start.y + (t * s1.y);
+        return true;
+      }
+      return false;
     }
-    return false;
-  }
+
+    /**
+     * Free function to check whether two lines intersect.
+     * @param line1start The start coordinates of the first line
+     * @param line1end The end coordinates of the first line
+     * @param line2start The start coordinates of the first line
+     * @param line2end The end coordinates of the first line
+     */
+    template<class FromT>
+    inline static bool constexpr do_lines_intersect(Vector2<FromT> const &line1start,
+                                                    Vector2<FromT> const &line1end,
+                                                    Vector2<FromT> const &line2start,
+                                                    Vector2<FromT> const &line2end) {
+      Vector2<T> constexpr s1(line1end.x - line1start.x,
+                              line1end.y - line1start.y);
+      Vector2<T> constexpr s2(line2end.x - line2start.x,
+                              line2end.y - line2start.y);
+      T constexpr s = (-s1.y * (line1start.x - line2start.x) + s1.x * (line1start.y - line2start.y)) / (-s2.x * s1.y + s1.x * s2.y);
+      T constexpr t = ( s2.x * (line1start.y - line2start.y) - s2.y * (line1start.x - line2start.x)) / (-s2.x * s1.y + s1.x * s2.y);
+      if(s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+        return true;
+      }
+      return false;
+    }
 };
 
 //--------------------------------------
@@ -736,6 +768,15 @@ class Vector3 {
       : x(static_cast<T>(src.x)), y(static_cast<T>(src.y)), z(static_cast<T>(src.z)) {
     }
 
+    inline constexpr Vector3(Vector2<T> const &src, T z)
+      : x(src.x), y(src.y), z(z) {
+    }
+
+    template<class FromT>
+    inline constexpr Vector3(Vector2<FromT> const &src, FromT z)
+      : x(static_cast<T>(src.x)), y(static_cast<T>(src.y)), z(static_cast<T>(z)) {
+    }
+
     //----------------[ assignment ]-------------------------
     /**
      * Sets to (x,y,z)
@@ -804,13 +845,7 @@ class Vector3 {
      * y coordinate.
      */
     inline T &operator[](int n) {
-      assert(n >= 0 && n <= 2);
-      if(0 == n)
-        return x;
-      else if(1 == n)
-        return y;
-      else
-        return z;
+      return n == 0 ? x : (n == 1 ? y : z);
     }
 
     /**
@@ -820,14 +855,8 @@ class Vector3 {
      * reference to y, else reference to z
      * y coordinate.
      */
-    inline const T &operator[](int n) const {
-      assert(n >= 0 && n <= 2);
-      if(0 == n)
-        return x;
-      else if(1 == n)
-        return y;
-      else
-        return z;
+    inline T constexpr const &operator[](int n) const {
+      return n == 0 ? x : (n == 1 ? y : z);
     }
 
     //---------------[ vector arithmetic operator ]--------------
@@ -1024,12 +1053,12 @@ class Vector3 {
     /**
      * Equality test operator
      * @param rhs Right hand side argument of binary operator.
-     * @note Test of equality is based of threshold EPSILON value. To be two
-     * values equal, must satisfy this condition | lhs.x - rhs.y | < EPSILON,
+     * @note Test of equality is based of threshold epsilon value. To be two
+     * values equal, must satisfy this condition | lhs.x - rhs.y | < epsilon,
      * same for y-coordinate, and z-coordinate.
      */
     inline bool constexpr operator==(Vector3<T> const &rhs) const {
-      return std::fabs(x - rhs.x) < EPSILON && std::fabs(y - rhs.y) < EPSILON && std::fabs(z - rhs.z) < EPSILON;
+      return std::fabs(x - rhs.x) < epsilon && std::fabs(y - rhs.y) < epsilon && std::fabs(z - rhs.z) < epsilon;
     }
 
     /**
@@ -1097,29 +1126,25 @@ class Vector3 {
      * @param az Angle (in degrees) to be rotated around Z-axis.
      */
     inline void rotate(T ax, T ay, T az) {
-      T a = cos(DEG2RAD(ax));
-      T b = sin(DEG2RAD(ax));
-      T c = cos(DEG2RAD(ay));
-      T d = sin(DEG2RAD(ay));
-      T e = cos(DEG2RAD(az));
-      T f = sin(DEG2RAD(az));
-      T nx = c * e * x - c * f * y + d * z;
-      T ny = (a * f + b * d * e) * x + (a * e - b * d * f) * y - b * c * z;
-      T nz = (b * f - a * d * e) * x + (a * d * f + b * e) * y + a * c * z;
-      x = nx;
-      y = ny;
-      z = nz;
+      rotate_rad(deg2rad(ax), deg2rad(ay), deg2rad(az));
     }
+
+    /**
+     * Rotate vector around three axis, radian version.
+     * @param ax Angle (in radians) to be rotated around X-axis.
+     * @param ay Angle (in radians) to be rotated around Y-axis.
+     * @param az Angle (in radians) to be rotated around Z-axis.
+     */
     inline void rotate_rad(T ax, T ay, T az) {
-      T a = cos(ax);
-      T b = sin(ax);
-      T c = cos(ay);
-      T d = sin(ay);
-      T e = cos(az);
-      T f = sin(az);
-      T nx = c * e * x - c * f * y + d * z;
-      T ny = (a * f + b * d * e) * x + (a * e - b * d * f) * y - b * c * z;
-      T nz = (b * f - a * d * e) * x + (a * d * f + b * e) * y + a * c * z;
+      T const a = std::cos(ax);
+      T const b = std::sin(ax);
+      T const c = std::cos(ay);
+      T const d = std::sin(ay);
+      T const e = std::cos(az);
+      T const f = std::sin(az);
+      T const nx = c * e * x - c * f * y + d * z;
+      T const ny = (a * f + b * d * e) * x + (a * e - b * d * f) * y - b * c * z;
+      T const nz = (b * f - a * d * e) * x + (a * d * f + b * e) * y + a * c * z;
       x = nx;
       y = ny;
       z = nz;
@@ -1311,6 +1336,15 @@ class Vector4 {
       : x(static_cast<T>(src.x)), y(static_cast<T>(src.y)), z(static_cast<T>(src.z)), w(static_cast<T>(src.w)) {
     }
 
+    inline constexpr Vector4(Vector3<T> const &src, T w)
+      : x(src.x), y(src.y), z(src.z), w(w) {
+    }
+
+    template<class FromT>
+    inline constexpr Vector4(Vector3<FromT> const &src, FromT w)
+      : x(static_cast<T>(src.x)), y(static_cast<T>(src.y)), z(static_cast<T>(src.z)), w(static_cast<T>(w)) {
+    }
+
     //----------------[ assignment ]-------------------------
     /**
      * Sets to (x,y,z)
@@ -1385,15 +1419,7 @@ class Vector4 {
      * else reference to w coordinate.
      */
     inline T &operator[](int n) {
-      assert(n >= 0 && n <= 3);
-      if(0 == n)
-        return x;
-      else if(1 == n)
-        return y;
-      else if(2 == n)
-        return z;
-      else
-        return w;
+      return n == 0 ? x : (n == 1 ? y : (n == 2 ? z : w));
     }
 
     /**
@@ -1403,16 +1429,8 @@ class Vector4 {
      * reference to y coordinate, n = 2 reference to z,
      * else reference to w coordinate.
      */
-    inline const T &operator[](int n) const {
-      assert(n >= 0 && n <= 3);
-      if(0 == n)
-        return x;
-      else if(1 == n)
-        return y;
-      else if(2 == n)
-        return z;
-      else
-        return w;
+    inline T constexpr const &operator[](int n) const {
+      return n == 0 ? x : (n == 1 ? y : (n == 2 ? z : w));
     }
 
     //---------------[ vector aritmetic operator ]--------------
@@ -1500,13 +1518,13 @@ class Vector4 {
     /**
      * Equality test operator
      * @param rhs Right hand side argument of binary operator.
-     * @note Test of equality is based of threshold EPSILON value. To be two
-     * values equal, must satisfy this condition | lhs.x - rhs.y | < EPSILON,
+     * @note Test of equality is based of threshold epsilon value. To be two
+     * values equal, must satisfy this condition | lhs.x - rhs.y | < epsilon,
      * same for y-coordinate, z-coordinate, and w-coordinate.
      */
     inline bool constexpr operator==(Vector4<T> const &rhs) const {
-      return std::fabs(x - rhs.x) < EPSILON && std::fabs(y - rhs.y) < EPSILON && std::fabs(z - rhs.z) < EPSILON
-             && std::fabs(w - rhs.w) < EPSILON;
+      return std::fabs(x - rhs.x) < epsilon && std::fabs(y - rhs.y) < epsilon && std::fabs(z - rhs.z) < epsilon
+             && std::fabs(w - rhs.w) < epsilon;
     }
 
     /**
@@ -1683,6 +1701,15 @@ class Vector4 {
       return reinterpret_cast<T const*>(this);
     }
 
+    /**
+     * Gets 3D vector. Note that the output is divided by w coordinate to apply projection
+     * transform. If the w coordinate is equal to zero, the result is not divided.
+     * @return (x/w, y/w, z/w) iff w != 0 otherwise (x,y,z)
+     */
+    inline constexpr Vector3<T> xyz() const {
+      return w == 0 ? Vector3<T>(x, y, z) : Vector3<T>(x / w, y / w, z / w);
+    }
+
     //-------------[ output operator ]------------------------
     /**
      * Output to stream operator
@@ -1725,32 +1752,41 @@ template<class T>
 class Matrix3 {
   public:
     /// Data stored in column major order
-    T data[9];
+    std::array<T, 9> data;
 
     //--------------------------[ constructors ]-------------------------------
     /**
      * Creates identity matrix
      */
-    inline Matrix3() {
-      for(int i = 0; i != 9; ++i) {
-        data[i] = (i % 4) ? 0 : 1;
-      }
+    inline constexpr Matrix3()
+      : data{1, 0, 0,
+             0, 1, 0,
+             0, 0, 1} {
     }
 
     /**
      * Copy matrix values from array (these data must be in column
      * major order!)
      */
-    inline Matrix3(T const *dt) {
-      std::memcpy(data, dt, sizeof(T) * 9);
+    inline constexpr Matrix3(T const *dt)
+      : data{dt[0], dt[1], dt[2],
+             dt[3], dt[4], dt[5],
+             dt[6], dt[7], dt[8]} {
+    }
+    inline constexpr Matrix3(T *dt)
+      : data{dt[0], dt[1], dt[2],
+             dt[3], dt[4], dt[5],
+             dt[6], dt[7], dt[8]} {
     }
 
     /**
      * Copy constructor.
      * @param src Data source for new created instance of Matrix3
      */
-    inline Matrix3(Matrix3<T> const &src) {
-      std::memcpy(data, src.data, sizeof(T) * 9);
+    inline constexpr Matrix3(Matrix3<T> const &src)
+      : data{src.data[0], src.data[1], src.data[2],
+             src.data[3], src.data[4], src.data[5],
+             src.data[6], src.data[7], src.data[8]} {
     }
 
     /**
@@ -1758,76 +1794,115 @@ class Matrix3 {
      * @param src Data source for new created instance of Matrix3
      */
     template<class FromT>
-    inline Matrix3(Matrix3<FromT> const &src) {
-      for(int i = 0; i != 9; ++i) {
-        data[i] = static_cast<T>(src.data[i]);
-      }
+    inline constexpr Matrix3(Matrix3<FromT> const &src)
+      : data{static_cast<T>(src.data[0]), static_cast<T>(src.data[1]), static_cast<T>(src.data[2]),
+             static_cast<T>(src.data[3]), static_cast<T>(src.data[4]), static_cast<T>(src.data[5]),
+             static_cast<T>(src.data[6]), static_cast<T>(src.data[7]), static_cast<T>(src.data[8])} {
+    }
+
+    /**
+     * Variadic initialisation constructor
+     * @param dt Initialiser list containing raw data for each element in order.
+     */
+    //inline constexpr Matrix3(std::initializer_list<T> dt)
+    //  : data(dt) {
+    //}
+    // see http://stackoverflow.com/a/5549918/1678468
+    template<class... FromT>
+    inline constexpr Matrix3(FromT... dt)
+      : data{dt...} {
     }
 
     /**
      * Resets matrix to be identity matrix
      */
     inline void identity() {
-      for(int i = 0; i != 9; ++i) {
-        data[i] = (i % 4) ? 0 : 1;
-      }
+      data = {1, 0, 0,
+              0, 1, 0,
+              0, 0, 1};
     }
 
     /**
-     * Creates rotation matrix by rotation around axis.
+     * Creates rotation matrix by rotation around three axes.
      * @param xDeg Angle (in degrees) of rotation around axis X.
      * @param yDeg Angle (in degrees) of rotation around axis Y.
      * @param zDeg Angle (in degrees) of rotation around axis Z.
      */
     inline static Matrix3<T> constexpr createRotationAroundAxis(T xDeg, T yDeg, T zDeg) {
-      T xRads(DEG2RAD(xDeg));
-      T yRads(DEG2RAD(yDeg));
-      T zRads(DEG2RAD(zDeg));
+      return createRotationAroundAxis_rad(deg2rad(xDeg), deg2rad(yDeg), deg2rad(zDeg));
+    }
 
-      Matrix3<T> ma, mb, mc;
-      T ac = cos(xRads);
-      T as = sin(xRads);
-      T bc = cos(yRads);
-      T bs = sin(yRads);
-      T cc = cos(zRads);
-      T cs = sin(zRads);
+    /**
+     * Creates rotation matrix by rotation around three axes, radian version.
+     * @param xRads Angle (in radians) of rotation around axis X.
+     * @param yRads Angle (in radians) of rotation around axis Y.
+     * @param zRads Angle (in radians) of rotation around axis Z.
+     */
+    inline static Matrix3<T> constexpr createRotationAroundAxis_rad(T xRads, T yRads, T zRads) {
+      // the static cast is to avoid narrowing conversion warnings when used with ints
+      return Matrix3<T>({static_cast<T>(std::cos(zRads) * std::cos(yRads)),
+                         static_cast<T>(std::cos(zRads) * std::sin(yRads) * std::sin(xRads) - std::sin(zRads) * std::cos(xRads)),
+                         static_cast<T>(std::cos(zRads) * std::sin(yRads) * std::cos(xRads) + std::sin(zRads) * std::sin(xRads)),
 
-      ma.at(1, 1) = ac;
-      ma.at(2, 1) = as;
-      ma.at(1, 2) = -as;
-      ma.at(2, 2) = ac;
+                         static_cast<T>(std::sin(zRads) * std::cos(yRads)),
+                         static_cast<T>(std::sin(zRads) * std::sin(yRads) * std::sin(xRads) + std::cos(zRads) * std::cos(xRads)),
+                         static_cast<T>(std::sin(zRads) * std::sin(yRads) * std::cos(xRads) - std::cos(zRads) * std::sin(xRads)),
 
-      mb.at(0, 0) = bc;
-      mb.at(2, 0) = -bs;
-      mb.at(0, 2) = bs;
-      mb.at(2, 2) = bc;
+                         static_cast<T>(std::sin(yRads)),
+                         static_cast<T>(std::cos(yRads) * std::sin(xRads)),
+                         static_cast<T>(std::cos(yRads) * std::cos(xRads))});
+    }
 
-      mc.at(0, 0) = cc;
-      mc.at(1, 0) = cs;
-      mc.at(0, 1) = -cs;
-      mc.at(1, 1) = cc;
+    /**
+     * Creates rotation matrix by rotation around an axis.
+     * @param axis Axis to rotate around.
+     * @param angle Angle (in degrees) of rotation around axis.
+     */
+    inline static Matrix3<T> constexpr createRotationAroundAxis(Vector3<T> const &axis, T angle) {
+      return createRotationAroundAxis_rad(axis, angle);
+    }
 
-      Matrix3<T> ret = ma * mb * mc;
-      return ret;
+    /**
+     * Creates rotation matrix by rotation around an axis, radian version.
+     * @param axis Axis to rotate around.
+     * @param angle Angle (in radians) of rotation around axis.
+     */
+    inline static Matrix3<T> constexpr createRotationAroundAxis_rad(Vector3<T> const &axis, T angle) {
+      // adapted from Inigo Quilez: http://www.iquilezles.org/www/articles/noacos/noacos.htm
+      // the static cast is to avoid narrowing conversion warnings when used with ints
+      return Matrix3<T>({static_cast<T>(axis.x * axis.x - std::cos(angle) + std::cos(angle)),
+                         static_cast<T>(axis.y * axis.x - std::cos(angle) - std::sin(angle) * axis.z),
+                         static_cast<T>(axis.z * axis.x - std::cos(angle) + std::sin(angle) * axis.y),
+
+                         static_cast<T>(axis.x * axis.y - std::cos(angle) + std::sin(angle) * axis.z),
+                         static_cast<T>(axis.y * axis.y - std::cos(angle) + std::cos(angle)),
+                         static_cast<T>(axis.z * axis.y - std::cos(angle) - std::sin(angle) * axis.x),
+
+                         static_cast<T>(axis.x * axis.z - std::cos(angle) - std::sin(angle) * axis.y),
+                         static_cast<T>(axis.y * axis.z - std::cos(angle) + std::sin(angle) * axis.x),
+                         static_cast<T>(axis.z * axis.z - std::cos(angle) + std::cos(angle))});
     }
 
     /**
      * Creates rotation matrix by aligning one vector to another.
-     * Taken from http://www.iquilezles.org/www/articles/noacos/noacos.htm
+     * Adapted from http://www.iquilezles.org/www/articles/noacos/noacos.htm
      * @param from Vector to rotate from.
      * @param to Vector to rotate to.
      * @return An instance of Matrix3<T> representing rotation between the two vectors.
      */
     inline static Matrix3<T> constexpr createRotationBetweenVectors(Vector3<T> from, Vector3<T> to) {
-      Vector3<T> const v = to.crossProduct(from);
-      T const c = to.dotProduct(from);
-      T const k = 1.0f / (1.0f + c);
-      T const retData[] = {
-        v.x * v.x * k + c,   v.y * v.x * k - v.z, v.z * v.x * k + v.y,
-        v.x * v.y * k + v.z, v.y * v.y * k + c,   v.z * v.y * k - v.x,
-        v.x * v.z * k - v.y, v.y * v.z * k + v.x, v.z * v.z * k + c
-      };
-      return retData;
+      // the static cast is to avoid narrowing conversion warnings when used with ints
+      return Matrix3<T>({static_cast<T>(to.crossProduct(from).x * to.crossProduct(from).x * (1.0f / (1.0f + to.dotProduct(from))) + to.dotProduct(from)),
+                         static_cast<T>(to.crossProduct(from).y * to.crossProduct(from).x * (1.0f / (1.0f + to.dotProduct(from))) - to.crossProduct(from).z),
+                         static_cast<T>(to.crossProduct(from).z * to.crossProduct(from).x * (1.0f / (1.0f + to.dotProduct(from))) + to.crossProduct(from).y),
+
+                         static_cast<T>(to.crossProduct(from).x * to.crossProduct(from).y * (1.0f / (1.0f + to.dotProduct(from))) + to.crossProduct(from).z),
+                         static_cast<T>(to.crossProduct(from).y * to.crossProduct(from).y * (1.0f / (1.0f + to.dotProduct(from))) + to.dotProduct(from)),
+                         static_cast<T>(to.crossProduct(from).z * to.crossProduct(from).y * (1.0f / (1.0f + to.dotProduct(from))) - to.crossProduct(from).x),
+
+                         static_cast<T>(to.crossProduct(from).x * to.crossProduct(from).z * (1.0f / (1.0f + to.dotProduct(from))) - to.crossProduct(from).y),
+                         static_cast<T>(to.crossProduct(from).y * to.crossProduct(from).z * (1.0f / (1.0f + to.dotProduct(from))) + to.crossProduct(from).x),
+                         static_cast<T>(to.crossProduct(from).z * to.crossProduct(from).z * (1.0f / (1.0f + to.dotProduct(from))) + to.dotProduct(from))});
     }
 
     /**
@@ -1835,13 +1910,9 @@ class Matrix3 {
      */
     template<class It>
     inline static Matrix3<T> constexpr fromOde(const It *mat) {
-      Matrix3<T> ret;
-      for(int i = 0; i != 3; ++i) {
-        for(int j = 0; j != 3; ++j) {
-          ret.at(i, j) = static_cast<T>(mat[j * 4 + i]);
-        }
-      }
-      return ret;
+      return Matrix3<T>({static_cast<T>(mat[0]), static_cast<T>(mat[4]), static_cast<T>(mat[8]),
+                         static_cast<T>(mat[1]), static_cast<T>(mat[5]), static_cast<T>(mat[9]),
+                         static_cast<T>(mat[2]), static_cast<T>(mat[6]), static_cast<T>(mat[10])});
     }
 
     /**
@@ -1852,13 +1923,9 @@ class Matrix3 {
      */
     template<class FromT>
     inline static Matrix3<T> constexpr fromRowMajorArray(const FromT *arr) {
-      T const retData[] = {
-        static_cast<T>(arr[0]), static_cast<T>(arr[3]), static_cast<T>(arr[6]),
-        static_cast<T>(arr[1]), static_cast<T>(arr[4]), static_cast<T>(arr[7]),
-        static_cast<T>(arr[2]), static_cast<T>(arr[5]), static_cast<T>(arr[8])
-      };
-
-      return retData;
+      return Matrix3<T>({static_cast<T>(arr[0]), static_cast<T>(arr[3]), static_cast<T>(arr[6]),
+                         static_cast<T>(arr[1]), static_cast<T>(arr[4]), static_cast<T>(arr[7]),
+                         static_cast<T>(arr[2]), static_cast<T>(arr[5]), static_cast<T>(arr[8])});
     }
 
     /**
@@ -1869,30 +1936,30 @@ class Matrix3 {
      */
     template<class FromT>
     inline static Matrix3<T> constexpr fromColumnMajorArray(const FromT *arr) {
-      T const retData[] = {
-        static_cast<T>(arr[0]), static_cast<T>(arr[1]), static_cast<T>(arr[2]),
-        static_cast<T>(arr[3]), static_cast<T>(arr[4]), static_cast<T>(arr[5]),
-        static_cast<T>(arr[6]), static_cast<T>(arr[7]), static_cast<T>(arr[8])
-      };
-
-      return retData;
+      return Matrix3<T>({static_cast<T>(arr[0]), static_cast<T>(arr[1]), static_cast<T>(arr[2]),
+                         static_cast<T>(arr[3]), static_cast<T>(arr[4]), static_cast<T>(arr[5]),
+                         static_cast<T>(arr[6]), static_cast<T>(arr[7]), static_cast<T>(arr[8])});
     }
 
     //---------------------[ equiality operators ]------------------------------
     /**
      * Equality test operator
      * @param rhs Right hand side argument of binary operator.
-     * @note Test of equality is based of threshold EPSILON value. To be two
+     * @note Test of equality is based of threshold epsilon value. To be two
      * values equal, must satisfy this condition all elements of matrix
-     * | lhs[i] - rhs[i] | < EPSILON,
+     * | lhs[i] - rhs[i] | < epsilon,
      * same for y-coordinate, z-coordinate, and w-coordinate.
      */
     inline bool constexpr operator==(Matrix3<T> const &rhs) const {
-      for(int i = 0; i != 9; ++i) {
-        if(std::fabs(data[i] - rhs.data[i]) >= EPSILON)
-          return false;
-      }
-      return true;
+      return std::fabs(data[0] - rhs.data[0]) < epsilon &&
+             std::fabs(data[1] - rhs.data[1]) < epsilon &&
+             std::fabs(data[2] - rhs.data[2]) < epsilon &&
+             std::fabs(data[3] - rhs.data[3]) < epsilon &&
+             std::fabs(data[4] - rhs.data[4]) < epsilon &&
+             std::fabs(data[5] - rhs.data[5]) < epsilon &&
+             std::fabs(data[6] - rhs.data[6]) < epsilon &&
+             std::fabs(data[7] - rhs.data[7]) < epsilon &&
+             std::fabs(data[8] - rhs.data[8]) < epsilon;
     }
 
     /**
@@ -1911,8 +1978,6 @@ class Matrix3 {
      * @param y Number of row (0..2)
      */
     inline T &at(int x, int y) {
-      assert(x >= 0 && x < 3);
-      assert(y >= 0 && y < 3);
       return data[x * 3 + y];
     }
 
@@ -1921,9 +1986,7 @@ class Matrix3 {
      * @param x Number of column (0..2)
      * @param y Number of row (0..2)
      */
-    inline const T &at(int x, int y) const {
-      assert(x >= 0 && x < 3);
-      assert(y >= 0 && y < 3);
+    inline T constexpr const &at(int x, int y) const {
       return data[x * 3 + y];
     }
 
@@ -1933,8 +1996,6 @@ class Matrix3 {
      * @param j Number of column (1..3)
      */
     inline T &operator()(int i, int j) {
-      assert(i >= 1 && i <= 3);
-      assert(j >= 1 && j <= 3);
       return data[(j - 1) * 3 + i - 1];
     }
 
@@ -1943,9 +2004,7 @@ class Matrix3 {
      * @param i Number of row (1..3)
      * @param j Number of column (1..3)
      */
-    inline const T &operator()(int i, int j) const {
-      assert(i >= 1 && i <= 3);
-      assert(j >= 1 && j <= 3);
+    inline T constexpr const &operator()(int i, int j) const {
       return data[(j - 1) * 3 + i - 1];
     }
 
@@ -1954,7 +2013,7 @@ class Matrix3 {
      * @param rhs Right hand side argument of binary operator.
      */
     inline Matrix3<T> &operator=(Matrix3<T> const &rhs) {
-      std::memcpy(data, rhs.data, sizeof(T) * 9);
+      std::memcpy(data.data(), rhs.data.data(), sizeof(T) * 9);
       return *this;
     }
 
@@ -1975,7 +2034,7 @@ class Matrix3 {
      * @param rhs Right hand side argument of binary operator.
      */
     inline Matrix3<T> &operator=(T const *rhs) {
-      std::memcpy(data, rhs, sizeof(T) * 9);
+      std::memcpy(data.data(), rhs, sizeof(T) * 9);
       return *this;
     }
 
@@ -1993,11 +2052,9 @@ class Matrix3 {
      * @param rhs Right hand side argument of binary operator.
      */
     inline Matrix3<T> constexpr operator+(Matrix3<T> const &rhs) const {
-      Matrix3<T> ret;
-      for(int i = 0; i != 9; ++i) {
-        ret.data[i] = data[i] + rhs.data[i];
-      }
-      return ret;
+      return Matrix3<T>({data[0] + rhs.data[0], data[1] + rhs.data[1], data[2] + rhs.data[2],
+                         data[3] + rhs.data[3], data[4] + rhs.data[4], data[5] + rhs.data[5],
+                         data[6] + rhs.data[6], data[7] + rhs.data[7], data[8] + rhs.data[8]});
     }
 
     /**
@@ -2005,11 +2062,9 @@ class Matrix3 {
      * @param rhs Right hand side argument of binary operator.
      */
     inline Matrix3<T> constexpr operator-(Matrix3<T> const &rhs) const {
-      Matrix3<T> ret;
-      for(int i = 0; i != 9; ++i) {
-        ret.data[i] = data[i] - rhs.data[i];
-      }
-      return ret;
+      return Matrix3<T>({data[0] - rhs.data[0], data[1] - rhs.data[1], data[2] - rhs.data[2],
+                         data[3] - rhs.data[3], data[4] - rhs.data[4], data[5] - rhs.data[5],
+                         data[6] - rhs.data[6], data[7] - rhs.data[7], data[8] - rhs.data[8]});
     }
 
     //--------------------[ matrix with scalar operations ]---------------------
@@ -2018,11 +2073,9 @@ class Matrix3 {
      * @param rhs Right hand side argument of binary operator.
      */
     inline Matrix3<T> constexpr operator+(T rhs) const {
-      Matrix3<T> ret;
-      for(int i = 0; i != 9; ++i) {
-        ret.data[i] = data[i] + rhs;
-      }
-      return ret;
+      return Matrix3<T>({data[0] + rhs, data[1] + rhs, data[2] + rhs,
+                         data[3] + rhs, data[4] + rhs, data[5] + rhs,
+                         data[6] + rhs, data[7] + rhs, data[8] + rhs});
     }
 
     /**
@@ -2030,11 +2083,10 @@ class Matrix3 {
      * @param rhs Right hand side argument of binary operator.
      */
     inline Matrix3<T> constexpr operator-(T rhs) const {
-      Matrix3<T> ret;
-      for(int i = 0; i != 9; ++i) {
-        ret.data[i] = data[i] - rhs;
-      }
-      return ret;
+      return Matrix3<T>({data[0] - rhs, data[1] - rhs, data[2] - rhs,
+                         data[3] - rhs, data[4] - rhs, data[5] - rhs,
+                         data[6] - rhs, data[7] - rhs, data[8] - rhs});
+
     }
 
     /**
@@ -2042,11 +2094,9 @@ class Matrix3 {
      * @param rhs Right hand side argument of binary operator.
      */
     inline Matrix3<T> constexpr operator*(T rhs) const {
-      Matrix3<T> ret;
-      for(int i = 0; i != 9; ++i) {
-        ret.data[i] = data[i] * rhs;
-      }
-      return ret;
+      return Matrix3<T>({data[0] * rhs, data[1] * rhs, data[2] * rhs,
+                         data[3] * rhs, data[4] * rhs, data[5] * rhs,
+                         data[6] * rhs, data[7] * rhs, data[8] * rhs});
     }
 
     /**
@@ -2054,11 +2104,9 @@ class Matrix3 {
      * @param rhs Right hand side argument of binary operator.
      */
     inline Matrix3<T> constexpr operator/(T rhs) const {
-      Matrix3<T> ret;
-      for(int i = 0; i != 9; ++i) {
-        ret.data[i] = data[i] / rhs;
-      }
-      return ret;
+      return Matrix3<T>({data[0] / rhs, data[1] / rhs, data[2] / rhs,
+                         data[3] / rhs, data[4] / rhs, data[5] / rhs,
+                         data[6] / rhs, data[7] / rhs, data[8] / rhs});
     }
 
     //--------------------[ multiply operators ]--------------------------------
@@ -2089,32 +2137,27 @@ class Matrix3 {
      * @param rhs Right hand side argument of binary operator.
      */
     inline Matrix3<T> constexpr operator*(Matrix3<T> rhs) const {
-      static Matrix3<T> w;
-      for(int i = 0; i != 3; ++i) {
-        for(int j = 0; j != 3; ++j) {
-          T n = 0;
-          for(int k = 0; k != 3; ++k) {
-            n += rhs.at(i, k) * at(k, j);
-          }
-          w.at(i, j) = n;
-        }
-      }
-      return w;
+      return Matrix3<T>({rhs.data[0] * data[0] + rhs.data[1] * data[3] + rhs.data[2] * data[6],
+                         rhs.data[0] * data[1] + rhs.data[1] * data[4] + rhs.data[2] * data[7],
+                         rhs.data[0] * data[2] + rhs.data[1] * data[5] + rhs.data[2] * data[8],
 
+                         rhs.data[3] * data[0] + rhs.data[4] * data[3] + rhs.data[5] * data[6],
+                         rhs.data[3] * data[1] + rhs.data[4] * data[4] + rhs.data[5] * data[7],
+                         rhs.data[3] * data[2] + rhs.data[4] * data[5] + rhs.data[5] * data[8],
+
+                         rhs.data[6] * data[0] + rhs.data[7] * data[3] + rhs.data[8] * data[6],
+                         rhs.data[6] * data[1] + rhs.data[7] * data[4] + rhs.data[8] * data[7],
+                         rhs.data[6] * data[2] + rhs.data[7] * data[5] + rhs.data[8] * data[8]});
     }
 
     //---------------------------[ misc operations ]----------------------------
     /**
      * Transpose matrix.
      */
-    inline Matrix3<T> constexpr transpose() {
-      Matrix3<T> ret;
-      for(int i = 0; i != 3; ++i) {
-        for(int j = 0; j != 3; ++j) {
-          ret.at(i, j) = at(j, i);
-        }
-      }
-      return ret;
+    inline Matrix3<T> constexpr transpose() const {
+      return Matrix3<T>({data[0], data[3], data[6],
+                         data[1], data[4], data[7],
+                         data[2], data[5], data[8]});
     }
 
     /**
@@ -2127,31 +2170,28 @@ class Matrix3 {
      * can get result (extrapolation?)
      */
     inline Matrix3<T> constexpr lerp(T fact, Matrix3<T> const &rhs) const {
-      Matrix3<T> ret = (*this) + (rhs - (*this)) * fact;
-      return ret;
+      return (*this) + (rhs - (*this)) * fact;
     }
 
-    inline T constexpr det() {
-      return + at(0, 0) * at(1, 1) * at(2, 2) + at(0, 1) * at(1, 2) * at(2, 0) + at(0, 2) * at(1, 0) * at(2, 1)
-             - at(0, 0) * at(1, 2) * at(2, 1) - at(0, 1) * at(1, 0) * at(2, 2) - at(0, 2) * at(1, 1) * at(2, 0);
+    inline T constexpr det() const {
+      return   data[0] * data[4] * data[8] + data[1] * data[5] * data[6] + data[2] * data[3] * data[7]
+             - data[0] * data[5] * data[7] - data[1] * data[3] * data[8] - data[2] * data[4] * data[6];
     }
 
     /**
      * Computes inverse matrix
      * @return Inverse matrix of this matrix.
      */
-    inline Matrix3<T> constexpr inverse() {
-      Matrix3<T> ret;
-      ret.at(0, 0) = at(1, 1) * at(2, 2) - at(2, 1) * at(1, 2);
-      ret.at(0, 1) = at(2, 1) * at(0, 2) - at(0, 1) * at(2, 2);
-      ret.at(0, 2) = at(0, 1) * at(1, 2) - at(1, 1) * at(0, 2);
-      ret.at(1, 0) = at(2, 0) * at(1, 2) - at(1, 0) * at(2, 2);
-      ret.at(1, 1) = at(0, 0) * at(2, 2) - at(2, 0) * at(0, 2);
-      ret.at(1, 2) = at(1, 0) * at(0, 2) - at(0, 0) * at(1, 2);
-      ret.at(2, 0) = at(1, 0) * at(2, 1) - at(2, 0) * at(1, 1);
-      ret.at(2, 1) = at(2, 0) * at(0, 1) - at(0, 0) * at(2, 1);
-      ret.at(2, 2) = at(0, 0) * at(1, 1) - at(1, 0) * at(0, 1);
-      return ret * (1.0f / det());
+    inline Matrix3<T> constexpr inverse() const {
+      return Matrix3<T>({data[4] * data[8] - data[7] * data[5],
+                         data[7] * data[2] - data[1] * data[8],
+                         data[1] * data[5] - data[4] * data[2],
+                         data[6] * data[5] - data[3] * data[8],
+                         data[0] * data[8] - data[6] * data[2],
+                         data[3] * data[2] - data[0] * data[5],
+                         data[3] * data[7] - data[6] * data[4],
+                         data[6] * data[1] - data[0] * data[7],
+                         data[0] * data[4] - data[3] * data[1]}) / det();
     }
 
     //-------------[ conversion ]-----------------------------
@@ -2162,7 +2202,7 @@ class Matrix3 {
      * used for passing Matrix3<T> values to gl*[fd]v functions.
      */
     inline operator T*() {
-      return reinterpret_cast<T*>(data);
+      return reinterpret_cast<T*>(data.data());
     }
 
     /**
@@ -2171,7 +2211,7 @@ class Matrix3 {
      * used for passing Matrix3<T> values to gl*[fd]v functions.
      */
     inline constexpr operator const T*() const {
-      return reinterpret_cast<T const*>(data);
+      return reinterpret_cast<T const*>(data.data());
     }
 
     //----------[ output operator ]----------------------------
@@ -2221,32 +2261,45 @@ template<class T>
 class Matrix4 {
   public:
     /// Data stored in column major order
-    T data[16];
+    std::array<T, 16> data;
 
     //--------------------------[ constructors ]-------------------------------
     /**
      *Creates identity matrix
      */
-    inline Matrix4() {
-      for(int i = 0; i != 16; ++i) {
-        data[i] = (i % 5) ? 0 : 1;
-      }
+    inline constexpr Matrix4()
+      : data{1, 0, 0, 0,
+             0, 1, 0, 0,
+             0, 0, 1, 0,
+             0, 0, 0, 1} {
     }
 
     /**
      * Copy matrix values from array (these data must be in column
      * major order!)
      */
-    inline Matrix4(T const *dt) {
-      std::memcpy(data, dt, sizeof(T) * 16);
+    inline constexpr Matrix4(T const *dt)
+      : data{dt[ 0], dt[ 1], dt[ 2], dt[ 3],
+             dt[ 4], dt[ 5], dt[ 6], dt[ 7],
+             dt[ 8], dt[ 9], dt[10], dt[11],
+             dt[12], dt[13], dt[14], dt[15]} {
+    }
+    inline constexpr Matrix4(T *dt)
+      : data{dt[ 0], dt[ 1], dt[ 2], dt[ 3],
+             dt[ 4], dt[ 5], dt[ 6], dt[ 7],
+             dt[ 8], dt[ 9], dt[10], dt[11],
+             dt[12], dt[13], dt[14], dt[15]} {
     }
 
     /**
      * Copy constructor.
      * @param src Data source for new created instance of Matrix4.
      */
-    inline Matrix4(Matrix4<T> const &src) {
-      std::memcpy(data, src.data, sizeof(T) * 16);
+    inline constexpr Matrix4(Matrix4<T> const &src)
+      : data{src.data[ 0], src.data[ 1], src.data[ 2], src.data[ 3],
+             src.data[ 4], src.data[ 5], src.data[ 6], src.data[ 7],
+             src.data[ 8], src.data[ 9], src.data[10], src.data[11],
+             src.data[12], src.data[13], src.data[14], src.data[15]} {
     }
 
     /**
@@ -2254,64 +2307,115 @@ class Matrix4 {
      * @param src Data source for new created instance of Matrix4.
      */
     template<class FromT>
-    inline Matrix4(Matrix4<FromT> const &src) {
-      for(int i = 0; i != 16; ++i) {
-        data[i] = static_cast<T>(src.data[i]);
-      }
+    inline constexpr Matrix4(Matrix4<FromT> const &src)
+      : data{static_cast<T>(src.data[ 0]), static_cast<T>(src.data[ 1]), static_cast<T>(src.data[ 2]), static_cast<T>(src.data[ 3]),
+             static_cast<T>(src.data[ 4]), static_cast<T>(src.data[ 5]), static_cast<T>(src.data[ 6]), static_cast<T>(src.data[ 7]),
+             static_cast<T>(src.data[ 8]), static_cast<T>(src.data[ 9]), static_cast<T>(src.data[10]), static_cast<T>(src.data[11]),
+             static_cast<T>(src.data[12]), static_cast<T>(src.data[13]), static_cast<T>(src.data[14]), static_cast<T>(src.data[15])} {
     }
+
+    /**
+     * Variadic initialisation constructor
+     * @param dt Initialiser list containing raw data for each element in order.
+     */
+    //inline constexpr Matrix4(std::initializer_list<T> dt)
+    //  : data(dt) {
+    //}
+    // see http://stackoverflow.com/a/5549918/1678468
+    template<class... FromT>
+    inline constexpr Matrix4(FromT... dt)
+      : data{dt...} {
+    }
+    //template<class... FromT>
+    //inline constexpr Matrix4(FromT&&... dt)
+    //  : data{std::forward<FromT>(dt)...} {
+    //}
 
     /**
      * Resets matrix to be identity matrix
      */
     inline void identity() {
-      for(int i = 0; i != 16; ++i) {
-        data[i] = (i % 5) ? 0 : 1;
-      }
+      data = {1, 0, 0, 0,
+              0, 1, 0, 0,
+              0, 0, 1, 0,
+              0, 0, 0, 1};
     }
 
     /**
-     * Creates rotation matrix by rotation around axis.
+     * Creates rotation matrix by rotation around three axes.
      * @param xDeg Angle (in degrees) of rotation around axis X.
      * @param yDeg Angle (in degrees) of rotation around axis Y.
      * @param zDeg Angle (in degrees) of rotation around axis Z.
      */
     inline static Matrix4<T> constexpr createRotationAroundAxis(T xDeg, T yDeg, T zDeg) {
-      T xRads(DEG2RAD(xDeg));
-      T yRads(DEG2RAD(yDeg));
-      T zRads(DEG2RAD(zDeg));
+      return createRotationAroundAxis_rad(deg2rad(xDeg), deg2rad(yDeg), deg2rad(zDeg));
+    }
 
-      Matrix4<T> ma, mb, mc;
-      T ac = cos(xRads);
-      T as = sin(xRads);
-      T bc = cos(yRads);
-      T bs = sin(yRads);
-      T cc = cos(zRads);
-      T cs = sin(zRads);
+    /**
+     * Creates rotation matrix by rotation around three axes, radian version.
+     * @param xRads Angle (in radians) of rotation around axis X.
+     * @param yRads Angle (in radians) of rotation around axis Y.
+     * @param zRads Angle (in radians) of rotation around axis Z.
+     */
+    inline static Matrix4<T> constexpr createRotationAroundAxis_rad(T xRads, T yRads, T zRads) {
+      // static_casts are used to avoid narrowing conversion warnings when called with ints
+      return Matrix4<T>({static_cast<T>( std::cos(zRads) * std::cos(yRads)),
+                         static_cast<T>(-std::sin(zRads) * std::cos(xRads) + std::cos(zRads) * std::sin(yRads) * std::sin(xRads)),
+                         static_cast<T>( std::sin(zRads) * std::sin(xRads) + std::cos(zRads) * std::sin(yRads) * std::cos(xRads)),
+                         T(0),
 
-      ma.at(1, 1) = ac;
-      ma.at(2, 1) = as;
-      ma.at(1, 2) = -as;
-      ma.at(2, 2) = ac;
+                         static_cast<T>( std::sin(zRads) * std::cos(yRads)),
+                         static_cast<T>( std::cos(zRads) * std::cos(xRads) + std::sin(zRads) * std::sin(yRads) * std::sin(xRads)),
+                         static_cast<T>(-std::cos(zRads) * std::sin(xRads) + std::sin(zRads) * std::sin(yRads) * std::cos(xRads)),
+                         T(0),
 
-      mb.at(0, 0) = bc;
-      mb.at(2, 0) = -bs;
-      mb.at(0, 2) = bs;
-      mb.at(2, 2) = bc;
+                         static_cast<T>(-std::sin(yRads)),
+                         static_cast<T>( std::cos(yRads) * std::sin(xRads)),
+                         static_cast<T>( std::cos(yRads) * std::cos(xRads)),
+                         T(0),
 
-      mc.at(0, 0) = cc;
-      mc.at(1, 0) = cs;
-      mc.at(0, 1) = -cs;
-      mc.at(1, 1) = cc;
+                         T(0),
+                         T(0),
+                         T(0),
+                         T(1)});
+    }
 
-      /*std::cout << "RotVec = " << a << "," << b << "," << c << std::endl;
-       std::cout << "Rx = " << std::endl << ma;
-       std::cout << "Ry = " << std::endl << mb;
-       std::cout << "Rz = " << std::endl << mc;*/
+    /**
+     * Creates rotation matrix by rotation around an axis.
+     * @param axis Axis to rotate around.
+     * @param angle Angle (in degrees) of rotation around axis.
+     */
+    inline static Matrix4<T> constexpr createRotationAroundAxis(Vector3<T> const &axis, T angle) {
+      return createRotationAroundAxis_rad(axis, angle);
+    }
 
-      Matrix4<T> ret = ma * mb * mc;
-      //std::cout << "Result = " << std::endl << ma * (mb * mc);
+    /**
+     * Creates rotation matrix by rotation around an axis, radian version.
+     * @param axis Axis to rotate around.
+     * @param angle Angle (in radians) of rotation around axis.
+     */
+    inline static Matrix4<T> constexpr createRotationAroundAxis_rad(Vector3<T> const &axis, T angle) {
+      // adapted from Inigo Quilez: http://www.iquilezles.org/www/articles/noacos/noacos.htm
+      // static_casts are used to avoid narrowing conversion warnings when called with ints
+      return Matrix4<T>({static_cast<T>(axis.x * axis.x - std::cos(angle) + std::cos(angle)),
+                         static_cast<T>(axis.y * axis.x - std::cos(angle) - std::sin(angle) * axis.z),
+                         static_cast<T>(axis.z * axis.x - std::cos(angle) + std::sin(angle) * axis.y),
+                         T(0),
 
-      return ret;
+                         static_cast<T>(axis.x * axis.y - std::cos(angle) + std::sin(angle) * axis.z),
+                         static_cast<T>(axis.y * axis.y - std::cos(angle) + std::cos(angle)),
+                         static_cast<T>(axis.z * axis.y - std::cos(angle) - std::sin(angle) * axis.x),
+                         T(0),
+
+                         static_cast<T>(axis.x * axis.z - std::cos(angle) - std::sin(angle) * axis.y),
+                         static_cast<T>(axis.y * axis.z - std::cos(angle) + std::sin(angle) * axis.x),
+                         static_cast<T>(axis.z * axis.z - std::cos(angle) + std::cos(angle)),
+                         T(0),
+
+                         T(0),
+                         T(0),
+                         T(0),
+                         T(1)});
     }
 
     /// Creates translation matrix
@@ -2323,13 +2427,25 @@ class Matrix4 {
      * @param w for W-coordinate translation (implicitly set to 1)
      */
     inline static Matrix4<T> constexpr createTranslation(T x, T y, T z, T w = 1) {
-      Matrix4 ret;
-      ret.at(3, 0) = x;
-      ret.at(3, 1) = y;
-      ret.at(3, 2) = z;
-      ret.at(3, 3) = w;
+      return Matrix4<T>({T(1), T(0), T(0), T(0),
+                         T(0), T(1), T(0), T(0),
+                         T(0), T(0), T(1), T(0),
+                         x,    y,    z,    w});
+    }
 
-      return ret;
+    /**
+     * Create scale matrix with @a sx, @a sy, and @a sz
+     * being values of matrix main diagonal.
+     * @param sx Scale in X-axis
+     * @param sy Scale in Y-axis
+     * @param sz Scale in Z-axis
+     * @return Transform matrix 4x4 with scale transformation.
+     */
+    inline static Matrix4<T> constexpr createScale(T sx, T sy, T sz) {
+      return Matrix4<T>({sx,   T(0), T(0), T(0),
+                         T(0), sy,   T(0), T(0),
+                         T(0), T(0), sz,   T(0),
+                         T(0), T(0), T(0), T(1)});
     }
 
     /**
@@ -2340,37 +2456,58 @@ class Matrix4 {
      * @return Resulting view matrix that looks from and at specific position.
      */
     inline static Matrix4<T> constexpr createLookAt(Vector3<T> const &eyePos, Vector3<T> const &centerPos, Vector3<T> const &upDir) {
-      Vector3<T> forward, side, up;
-      Matrix4<T> m;
-
-      forward = centerPos - eyePos;
-      up = upDir;
-
+      /*
+      Vector3<T> forward = centerPos - eyePos;
       forward.normalize();
 
       // Side = forward x up
-      side = forward.crossProduct(up);
+      Vector3<T> side = forward.crossProduct(upDir);
       side.normalize();
 
       // Recompute up as: up = side x forward
-      up = side.crossProduct(forward);
+      Vector3<T> const up = side.crossProduct(forward);
 
-      m.at(0, 0) = side.x;
-      m.at(1, 0) = side.y;
-      m.at(2, 0) = side.z;
+      return Matrix4<T>({side.x,
+                         up.x,
+                         -forward.x,
+                         0.0f,
 
-      m.at(0, 1) = up.x;
-      m.at(1, 1) = up.y;
-      m.at(2, 1) = up.z;
+                         side.y,
+                         up.y,
+                         -forward.y,
+                         0.0f,
 
-      m.at(0, 2) = -forward.x;
-      m.at(1, 2) = -forward.y;
-      m.at(2, 2) = -forward.z;
+                         side.z,
+                         up.z,
+                         -forward.z,
+                         0.0f,
 
-      m = m * Matrix4<T>::createTranslation(-eyePos.x, -eyePos.y, -eyePos.z);
-      return m;
+                         0.0f,
+                         0.0f,
+                         0.0f,
+                         1.0f}) * Matrix4<T>::createTranslation(-eyePos.x, -eyePos.y, -eyePos.z);
+      */
+      // constexpr-suitable return-only alternative, may turn out much slower when computed at runtime:
+      return Matrix4<T>({ (centerPos - eyePos).normalize_copy().crossProduct(upDir).normalize_copy().x,
+                          (centerPos - eyePos).normalize_copy().crossProduct(upDir).normalize_copy().crossProduct((centerPos - eyePos).normalize_copy()).x,
+                         -(centerPos - eyePos).normalize_copy().x,
+                          T(0),
+
+                          (centerPos - eyePos).normalize_copy().crossProduct(upDir).normalize_copy().y,
+                          (centerPos - eyePos).normalize_copy().crossProduct(upDir).normalize_copy().crossProduct((centerPos - eyePos).normalize_copy()).y,
+                         -(centerPos - eyePos).normalize_copy().y,
+                          T(0),
+
+                          (centerPos - eyePos).normalize_copy().crossProduct(upDir).normalize_copy().z,
+                          (centerPos - eyePos).normalize_copy().crossProduct(upDir).normalize_copy().crossProduct((centerPos - eyePos).normalize_copy()).z,
+                         -(centerPos - eyePos).normalize_copy().z,
+                          T(0),
+
+                          T(0),
+                          T(0),
+                          T(0),
+                          T(1)}) * Matrix4<T>::createTranslation(-eyePos.x, -eyePos.y, -eyePos.z);
     }
-
 
     /**
      * Creates OpenGL compatible perspective projection according to specified frustum parameters.
@@ -2403,25 +2540,10 @@ class Matrix4 {
        *  C = - (zFar + zNear) / (zFar - zNear)
        *  D = - (2 zFar zNear) / (zFar - zNear)
        */
-      Matrix4<T> ret;
-
-      T const invWidth = 1.0 / (right - left);
-      T const invHeight = 1.0 / (top - bottom);
-      T const invDepth = 1.0 / (zFar - zNear);
-
-      T const twoZNear = 2 * zNear;
-
-      ret.at(0, 0) = twoZNear * invWidth;
-      ret.at(1, 1) = twoZNear * invHeight;
-
-      ret.at(2, 0) = (right + left) * invWidth;
-      ret.at(2, 1) = (top + bottom) * invHeight;
-      ret.at(2, 2) = - (zFar + zNear) * invDepth;
-      ret.at(2, 3) = -1;
-
-      ret.at(3, 2) = - twoZNear * zFar * invDepth;
-
-      return ret;
+      return Matrix4<T>({T(2) * zNear     / (right - left), T(0),                             T(0),                                  T(0),
+                         T(0),                              T(2) * zNear   / (top - bottom),  T(0),                                  T(0),
+                         (right + left) / (right - left),   (top + bottom) / (top - bottom), -(zFar + zNear)       / (zFar - zNear), T(-1),
+                         T(0),                              T(0),                             T(-2) * zNear * zFar / (zFar - zNear), T(1)});
     }
 
     /**
@@ -2437,46 +2559,26 @@ class Matrix4 {
      * @return Othrographic projection matrix.
      */
     inline static Matrix4<T> constexpr createOrtho(T left, T right, T bottom, T top, T zNear, T zFar) {
-      /*
-             2
-          ------------       0              0              tx
-          right - left
-
-                             2
-              0         ------------        0              ty
-                        top - bottom
-
-                                            -2
-              0              0         ------------        tz
-                                        zFar-zNear
-
-              0              0              0              1
-
-         where
-
-                                                      tx = - (right + left) / (right - left)
-
-                                                      ty = - (top + bottom) / (top - bottom)
-
-                                                      tz = - (zFar + zNear) / (zFar - zNear)
-
+      /*      2
+       *  ------------       0              0              tx
+       *  right - left
+       *                     2
+       *      0         ------------        0              ty
+       *                top - bottom
+       *                                    -2
+       *      0              0         ------------        tz
+       *                                zFar-zNear
+       *
+       *      0              0              0              1
+       *
+       *    tx = - (right + left) / (right - left)
+       *    ty = - (top + bottom) / (top - bottom)
+       *    tz = - (zFar + zNear) / (zFar - zNear)
        */
-
-      T const invWidth  = 1.0 / (right - left);
-      T const invHeight = 1.0 / (top - bottom);
-      T const invDepth  = 1.0 / (zFar - zNear);
-
-      Matrix4<T> ret;
-
-      ret.at(0, 0) =  2 * invWidth;
-      ret.at(1, 1) =  2 * invHeight;
-      ret.at(2, 2) = -2 * invDepth;
-
-      ret.at(3, 0) = -(right + left) * invWidth;
-      ret.at(3, 1) = -(top + bottom) * invHeight;
-      ret.at(3, 2) = -(zFar + zNear) * invDepth;
-
-      return ret;
+      return Matrix4<T>({T(2)            / (right - left), T(0),                             T(0),                             T(0),
+                         T(0),                             T(2)            / (top - bottom), T(0),                             T(0),
+                         T(0),                             T(0),                             T(-2)           / (zFar - zNear), T(0),
+                         -(right + left) / (right - left), -(top + bottom) / (top - bottom), -(zFar + zNear) / (zFar - zNear), T(1)});
     }
 
     /**
@@ -2487,14 +2589,10 @@ class Matrix4 {
      */
     template<class FromT>
     inline static Matrix4<T> constexpr fromRowMajorArray(const FromT *arr) {
-      T const retData[] = {
-        static_cast<T>(arr[0]), static_cast<T>(arr[4]), static_cast<T>(arr[8]), static_cast<T>(arr[12]),
-        static_cast<T>(arr[1]), static_cast<T>(arr[5]), static_cast<T>(arr[9]), static_cast<T>(arr[13]),
-        static_cast<T>(arr[2]), static_cast<T>(arr[6]), static_cast<T>(arr[10]), static_cast<T>(arr[14]),
-        static_cast<T>(arr[3]), static_cast<T>(arr[7]), static_cast<T>(arr[11]), static_cast<T>(arr[15])
-      };
-
-      return retData;
+      return Matrix4<T>({static_cast<T>(arr[0]), static_cast<T>(arr[4]), static_cast<T>(arr[8]),  static_cast<T>(arr[12]),
+                         static_cast<T>(arr[1]), static_cast<T>(arr[5]), static_cast<T>(arr[9]),  static_cast<T>(arr[13]),
+                         static_cast<T>(arr[2]), static_cast<T>(arr[6]), static_cast<T>(arr[10]), static_cast<T>(arr[14]),
+                         static_cast<T>(arr[3]), static_cast<T>(arr[7]), static_cast<T>(arr[11]), static_cast<T>(arr[15])});
     }
 
     /**
@@ -2505,32 +2603,38 @@ class Matrix4 {
      */
     template<class FromT>
     inline static Matrix4<T> constexpr fromColumnMajorArray(const FromT *arr) {
-      T const retData[] = {
-        static_cast<T>(arr[0]), static_cast<T>(arr[1]), static_cast<T>(arr[2]), static_cast<T>(arr[3]),
-        static_cast<T>(arr[4]), static_cast<T>(arr[5]), static_cast<T>(arr[6]), static_cast<T>(arr[7]),
-        static_cast<T>(arr[8]), static_cast<T>(arr[9]), static_cast<T>(arr[10]), static_cast<T>(arr[11]),
-        static_cast<T>(arr[12]), static_cast<T>(arr[13]), static_cast<T>(arr[14]), static_cast<T>(arr[15])
-      };
-
-      return retData;
+      return Matrix4<T>({static_cast<T>(arr[0]),  static_cast<T>(arr[1]),  static_cast<T>(arr[2]),  static_cast<T>(arr[3]),
+                         static_cast<T>(arr[4]),  static_cast<T>(arr[5]),  static_cast<T>(arr[6]),  static_cast<T>(arr[7]),
+                         static_cast<T>(arr[8]),  static_cast<T>(arr[9]),  static_cast<T>(arr[10]), static_cast<T>(arr[11]),
+                         static_cast<T>(arr[12]), static_cast<T>(arr[13]), static_cast<T>(arr[14]), static_cast<T>(arr[15])});
     }
 
     //---------------------[ Equality operators ]------------------------------
     /**
      * Equality test operator
      * @param rhs Right hand side argument of binary operator.
-     * @note Test of equality is based of threshold EPSILON value. To be two
+     * @note Test of equality is based of threshold epsilon value. To be two
      * values equal, must satisfy this condition all elements of matrix
-     * | lhs[i] - rhs[i] | < EPSILON,
+     * | lhs[i] - rhs[i] | < epsilon,
      * same for y-coordinate, z-coordinate, and w-coordinate.
      */
     inline bool constexpr operator==(Matrix4<T> const &rhs) const {
-      for(int i = 0; i != 16; ++i) {
-        if(std::fabs(data[i] - rhs.data[i]) >= EPSILON
-          )
-          return false;
-      }
-      return true;
+      return std::fabs(data[ 0] - rhs.data[ 0]) < epsilon &&
+             std::fabs(data[ 1] - rhs.data[ 1]) < epsilon &&
+             std::fabs(data[ 2] - rhs.data[ 2]) < epsilon &&
+             std::fabs(data[ 3] - rhs.data[ 3]) < epsilon &&
+             std::fabs(data[ 4] - rhs.data[ 4]) < epsilon &&
+             std::fabs(data[ 5] - rhs.data[ 5]) < epsilon &&
+             std::fabs(data[ 6] - rhs.data[ 6]) < epsilon &&
+             std::fabs(data[ 7] - rhs.data[ 7]) < epsilon &&
+             std::fabs(data[ 8] - rhs.data[ 8]) < epsilon &&
+             std::fabs(data[ 9] - rhs.data[ 9]) < epsilon &&
+             std::fabs(data[10] - rhs.data[10]) < epsilon &&
+             std::fabs(data[11] - rhs.data[11]) < epsilon &&
+             std::fabs(data[12] - rhs.data[12]) < epsilon &&
+             std::fabs(data[13] - rhs.data[13]) < epsilon &&
+             std::fabs(data[14] - rhs.data[14]) < epsilon &&
+             std::fabs(data[15] - rhs.data[15]) < epsilon;
     }
 
     /**
@@ -2549,8 +2653,6 @@ class Matrix4 {
      * @param y Number of row (0..3)
      */
     inline T &at(int x, int y) {
-      assert(x >= 0 && x < 4);
-      assert(y >= 0 && y < 4);
       return data[x * 4 + y];
     }
 
@@ -2559,9 +2661,7 @@ class Matrix4 {
      * @param x Number of column (0..3)
      * @param y Number of row (0..3)
      */
-    inline const T &at(int x, int y) const {
-      assert(x >= 0 && x < 4);
-      assert(y >= 0 && y < 4);
+    inline T constexpr const &at(int x, int y) const {
       return data[x * 4 + y];
     }
 
@@ -2571,8 +2671,6 @@ class Matrix4 {
      * @param j Number of column (1..4)
      */
     inline T &operator()(int i, int j) {
-      assert(i >= 1 && i <= 4);
-      assert(j >= 1 && j <= 4);
       return data[(j - 1) * 4 + i - 1];
     }
 
@@ -2581,9 +2679,7 @@ class Matrix4 {
      * @param i Number of row (1..4)
      * @param j Number of column (1..4)
      */
-    inline const T &operator()(int i, int j) const {
-      assert(i >= 1 && i <= 4);
-      assert(j >= 1 && j <= 4);
+    inline T constexpr const &operator()(int i, int j) const {
       return data[(j - 1) * 4 + i - 1];
     }
 
@@ -2593,14 +2689,14 @@ class Matrix4 {
      * @param v Vector of translation to be set.
      */
     inline void setTranslation(Vector3<T> const &v) {
-      at(3, 0) = v.x;
-      at(3, 1) = v.y;
-      at(3, 2) = v.z;
-      at(3, 3) = 1;
+      data[12] = v.x;
+      data[13] = v.y;
+      data[14] = v.z;
+      data[15] = 1;
     }
 
     inline Vector3<T> constexpr getTranslation() {
-      return Vector3<T>(at(3, 0), at(3, 1), at(3, 2));
+      return Vector3<T>(data[12], data[13], data[14]);
     }
 
     /**
@@ -2621,7 +2717,7 @@ class Matrix4 {
      * @param rhs Right hand side argument of binary operator.
      */
     inline Matrix4<T> &operator=(Matrix4<T> const &rhs) {
-      std::memcpy(data, rhs.data, sizeof(T) * 16);
+      std::memcpy(data.data(), rhs.data.data(), sizeof(T) * 16);
       return *this;
     }
 
@@ -2642,7 +2738,7 @@ class Matrix4 {
      * @param rhs Right hand side argument of binary operator.
      */
     inline Matrix4<T> &operator=(T const *rhs) {
-      std::memcpy(data, rhs, sizeof(T) * 16);
+      std::memcpy(data.data(), rhs, sizeof(T) * 16);
       return *this;
     }
 
@@ -2660,11 +2756,10 @@ class Matrix4 {
      * @param rhs Right hand side argument of binary operator.
      */
     inline Matrix4<T> constexpr operator+(Matrix4<T> const &rhs) const {
-      Matrix4<T> ret;
-      for(int i = 0; i != 16; ++i) {
-        ret.data[i] = data[i] + rhs.data[i];
-      }
-      return ret;
+      return Matrix4<T>({data[ 0] + rhs.data[ 0], data[ 1] + rhs.data[ 1], data[ 2] + rhs.data[ 2], data[ 3] + rhs.data[ 3],
+                         data[ 4] + rhs.data[ 4], data[ 5] + rhs.data[ 5], data[ 6] + rhs.data[ 6], data[ 7] + rhs.data[ 7],
+                         data[ 8] + rhs.data[ 8], data[ 9] + rhs.data[ 9], data[10] + rhs.data[10], data[11] + rhs.data[11],
+                         data[12] + rhs.data[12], data[13] + rhs.data[13], data[14] + rhs.data[14], data[15] + rhs.data[15]});
     }
 
     /**
@@ -2672,11 +2767,10 @@ class Matrix4 {
      * @param rhs Right hand side argument of binary operator.
      */
     inline Matrix4<T> constexpr operator-(Matrix4<T> const &rhs) const {
-      Matrix4<T> ret;
-      for(int i = 0; i != 16; ++i) {
-        ret.data[i] = data[i] - rhs.data[i];
-      }
-      return ret;
+      return Matrix4<T>({data[ 0] - rhs.data[ 0], data[ 1] - rhs.data[ 1], data[ 2] - rhs.data[ 2], data[ 3] - rhs.data[ 3],
+                         data[ 4] - rhs.data[ 4], data[ 5] - rhs.data[ 5], data[ 6] - rhs.data[ 6], data[ 7] - rhs.data[ 7],
+                         data[ 8] - rhs.data[ 8], data[ 9] - rhs.data[ 9], data[10] - rhs.data[10], data[11] - rhs.data[11],
+                         data[12] - rhs.data[12], data[13] - rhs.data[13], data[14] - rhs.data[14], data[15] - rhs.data[15]});
     }
 
     //--------------------[ matrix with scalar operations ]---------------------
@@ -2685,11 +2779,10 @@ class Matrix4 {
      * @param rhs Right hand side argument of binary operator.
      */
     inline Matrix4<T> constexpr operator+(T rhs) const {
-      Matrix4<T> ret;
-      for(int i = 0; i != 16; ++i) {
-        ret.data[i] = data[i] + rhs;
-      }
-      return ret;
+      return Matrix4<T>({data[ 0] + rhs, data[ 1] + rhs, data[ 2] + rhs, data[ 3] + rhs,
+                         data[ 4] + rhs, data[ 5] + rhs, data[ 6] + rhs, data[ 7] + rhs,
+                         data[ 8] + rhs, data[ 9] + rhs, data[10] + rhs, data[11] + rhs,
+                         data[12] + rhs, data[13] + rhs, data[14] + rhs, data[15] + rhs});
     }
 
     /**
@@ -2697,11 +2790,10 @@ class Matrix4 {
      * @param rhs Right hand side argument of binary operator.
      */
     inline Matrix4<T> constexpr operator-(T rhs) const {
-      Matrix4<T> ret;
-      for(int i = 0; i != 16; ++i) {
-        ret.data[i] = data[i] - rhs;
-      }
-      return ret;
+      return Matrix4<T>({data[ 0] - rhs, data[ 1] - rhs, data[ 2] - rhs, data[ 3] - rhs,
+                         data[ 4] - rhs, data[ 5] - rhs, data[ 6] - rhs, data[ 7] - rhs,
+                         data[ 8] - rhs, data[ 9] - rhs, data[10] - rhs, data[11] - rhs,
+                         data[12] - rhs, data[13] - rhs, data[14] - rhs, data[15] - rhs});
     }
 
     /**
@@ -2709,11 +2801,10 @@ class Matrix4 {
      * @param rhs Right hand side argument of binary operator.
      */
     inline Matrix4<T> constexpr operator*(T rhs) const {
-      Matrix4<T> ret;
-      for(int i = 0; i != 16; ++i) {
-        ret.data[i] = data[i] * rhs;
-      }
-      return ret;
+      return Matrix4<T>({data[ 0] * rhs, data[ 1] * rhs, data[ 2] * rhs, data[ 3] * rhs,
+                         data[ 4] * rhs, data[ 5] * rhs, data[ 6] * rhs, data[ 7] * rhs,
+                         data[ 8] * rhs, data[ 9] * rhs, data[10] * rhs, data[11] * rhs,
+                         data[12] * rhs, data[13] * rhs, data[14] * rhs, data[15] * rhs});
     }
 
     /**
@@ -2721,11 +2812,10 @@ class Matrix4 {
      * @param rhs Right hand side argument of binary operator.
      */
     inline Matrix4<T> constexpr operator/(T rhs) const {
-      Matrix4<T> ret;
-      for(int i = 0; i != 16; ++i) {
-        ret.data[i] = data[i] / rhs;
-      }
-      return ret;
+      return Matrix4<T>({data[ 0] / rhs, data[ 1] / rhs, data[ 2] / rhs, data[ 3] / rhs,
+                         data[ 4] / rhs, data[ 5] / rhs, data[ 6] / rhs, data[ 7] / rhs,
+                         data[ 8] / rhs, data[ 9] / rhs, data[10] / rhs, data[11] / rhs,
+                         data[12] / rhs, data[13] / rhs, data[14] / rhs, data[15] / rhs});
     }
 
     //--------------------[ multiply operators ]--------------------------------
@@ -2734,11 +2824,10 @@ class Matrix4 {
      * @param rhs Right hand side argument of binary operator.
      */
     inline Vector4<T> constexpr operator*(Vector4<T> const &rhs) const {
-      return Vector4<T>(data[0] * rhs.x + data[4] * rhs.y + data[8] * rhs.z + data[12] * rhs.w,
-                        data[1] * rhs.x + data[5] * rhs.y + data[9] * rhs.z + data[13] * rhs.w,
+      return Vector4<T>(data[0] * rhs.x + data[4] * rhs.y + data[ 8] * rhs.z + data[12] * rhs.w,
+                        data[1] * rhs.x + data[5] * rhs.y + data[ 9] * rhs.z + data[13] * rhs.w,
                         data[2] * rhs.x + data[6] * rhs.y + data[10] * rhs.z + data[14] * rhs.w,
                         data[3] * rhs.x + data[7] * rhs.y + data[11] * rhs.z + data[15] * rhs.w);
-
     }
 
     /**
@@ -2746,8 +2835,8 @@ class Matrix4 {
      * @param rhs Right hand side argument of binary operator.
      */
     inline Vector3<T> constexpr operator*(Vector3<T> const &rhs) const {
-      return Vector3<T>(data[0] * rhs.x + data[4] * rhs.y + data[8] * rhs.z,
-                        data[1] * rhs.x + data[5] * rhs.y + data[9] * rhs.z,
+      return Vector3<T>(data[0] * rhs.x + data[4] * rhs.y + data[8]  * rhs.z,
+                        data[1] * rhs.x + data[5] * rhs.y + data[9]  * rhs.z,
                         data[2] * rhs.x + data[6] * rhs.y + data[10] * rhs.z);
     }
 
@@ -2756,17 +2845,25 @@ class Matrix4 {
      * @param rhs Right hand side argument of binary operator.
      */
     inline Matrix4<T> constexpr operator*(Matrix4<T> rhs) const {
-      static Matrix4<T> w;
-      for(int i = 0; i != 4; ++i) {
-        for(int j = 0; j != 4; ++j) {
-          T n = 0;
-          for(int k = 0; k != 4; ++k)
-            n += rhs.at(i, k) * at(k, j);
-          w.at(i, j) = n;
-        }
-      }
-      return w;
+      return Matrix4<T>({rhs.data[ 0] * data[ 0] + rhs.data[ 1] * data[ 4] + rhs.data[ 2] * data[ 8] + rhs.data[ 3] * data[12],
+                         rhs.data[ 0] * data[ 1] + rhs.data[ 1] * data[ 5] + rhs.data[ 2] * data[ 9] + rhs.data[ 3] * data[13],
+                         rhs.data[ 0] * data[ 2] + rhs.data[ 1] * data[ 6] + rhs.data[ 2] * data[10] + rhs.data[ 3] * data[14],
+                         rhs.data[ 0] * data[ 3] + rhs.data[ 1] * data[ 7] + rhs.data[ 2] * data[11] + rhs.data[ 3] * data[15],
 
+                         rhs.data[ 4] * data[ 0] + rhs.data[ 5] * data[ 4] + rhs.data[ 6] * data[ 8] + rhs.data[ 7] * data[12],
+                         rhs.data[ 4] * data[ 1] + rhs.data[ 5] * data[ 5] + rhs.data[ 6] * data[ 9] + rhs.data[ 7] * data[13],
+                         rhs.data[ 4] * data[ 2] + rhs.data[ 5] * data[ 6] + rhs.data[ 6] * data[10] + rhs.data[ 7] * data[14],
+                         rhs.data[ 4] * data[ 3] + rhs.data[ 5] * data[ 7] + rhs.data[ 6] * data[11] + rhs.data[ 7] * data[15],
+
+                         rhs.data[ 8] * data[ 0] + rhs.data[ 9] * data[ 4] + rhs.data[10] * data[ 8] + rhs.data[11] * data[12],
+                         rhs.data[ 8] * data[ 1] + rhs.data[ 9] * data[ 5] + rhs.data[10] * data[ 9] + rhs.data[11] * data[13],
+                         rhs.data[ 8] * data[ 2] + rhs.data[ 9] * data[ 6] + rhs.data[10] * data[10] + rhs.data[11] * data[14],
+                         rhs.data[ 8] * data[ 3] + rhs.data[ 9] * data[ 7] + rhs.data[10] * data[11] + rhs.data[11] * data[15],
+
+                         rhs.data[12] * data[ 0] + rhs.data[13] * data[ 4] + rhs.data[14] * data[ 8] + rhs.data[15] * data[12],
+                         rhs.data[12] * data[ 1] + rhs.data[13] * data[ 5] + rhs.data[14] * data[ 9] + rhs.data[15] * data[13],
+                         rhs.data[12] * data[ 2] + rhs.data[13] * data[ 6] + rhs.data[14] * data[10] + rhs.data[15] * data[14],
+                         rhs.data[12] * data[ 3] + rhs.data[13] * data[ 7] + rhs.data[14] * data[11] + rhs.data[15] * data[15]});
     }
 
     //---------------------------[ misc operations ]----------------------------
@@ -2776,26 +2873,24 @@ class Matrix4 {
      * @return Determinant of matrix
      * @note This function does 3 * 4 * 6 mul, 3 * 6 add.
      */
-    inline T constexpr det() {
+    inline T constexpr det() const {
+      return   data[12] * data[9] * data[6]  * data[3]  - data[8] * data[13] * data[6]  * data[3]
+             - data[12] * data[5] * data[10] * data[3]  + data[4] * data[13] * data[10] * data[3]
 
-      return +at(3, 0) * at(2, 1) * at(1, 2) * at(0, 3) - at(2, 0) * at(3, 1) * at(1, 2) * at(0, 3)
-             - at(3, 0) * at(1, 1) * at(2, 2) * at(0, 3) + at(1, 0) * at(3, 1) * at(2, 2) * at(0, 3)
+             + data[8]  * data[5] * data[14] * data[3]  - data[4] * data[9]  * data[14] * data[3]
+             - data[12] * data[9] * data[2]  * data[7]  + data[8] * data[13] * data[2]  * data[7]
 
-             + at(2, 0) * at(1, 1) * at(3, 2) * at(0, 3) - at(1, 0) * at(2, 1) * at(3, 2) * at(0, 3)
-             - at(3, 0) * at(2, 1) * at(0, 2) * at(1, 3) + at(2, 0) * at(3, 1) * at(0, 2) * at(1, 3)
+             + data[12] * data[1] * data[10] * data[7]  - data[0] * data[13] * data[10] * data[7]
+             - data[8]  * data[1] * data[14] * data[7]  + data[0] * data[9]  * data[14] * data[7]
 
-             + at(3, 0) * at(0, 1) * at(2, 2) * at(1, 3) - at(0, 0) * at(3, 1) * at(2, 2) * at(1, 3)
-             - at(2, 0) * at(0, 1) * at(3, 2) * at(1, 3) + at(0, 0) * at(2, 1) * at(3, 2) * at(1, 3)
+             + data[12] * data[5] * data[2]  * data[11] - data[4] * data[13] * data[2]  * data[11]
+             - data[12] * data[1] * data[6]  * data[11] + data[0] * data[13] * data[6]  * data[11]
 
-             + at(3, 0) * at(1, 1) * at(0, 2) * at(2, 3) - at(1, 0) * at(3, 1) * at(0, 2) * at(2, 3)
-             - at(3, 0) * at(0, 1) * at(1, 2) * at(2, 3) + at(0, 0) * at(3, 1) * at(1, 2) * at(2, 3)
+             + data[4]  * data[1] * data[14] * data[11] - data[0] * data[5]  * data[14] * data[11]
+             - data[8]  * data[5] * data[2]  * data[15] + data[4] * data[9]  * data[2]  * data[15]
 
-             + at(1, 0) * at(0, 1) * at(3, 2) * at(2, 3) - at(0, 0) * at(1, 1) * at(3, 2) * at(2, 3)
-             - at(2, 0) * at(1, 1) * at(0, 2) * at(3, 3) + at(1, 0) * at(2, 1) * at(0, 2) * at(3, 3)
-
-             + at(2, 0) * at(0, 1) * at(1, 2) * at(3, 3) - at(0, 0) * at(2, 1) * at(1, 2) * at(3, 3)
-             - at(1, 0) * at(0, 1) * at(2, 2) * at(3, 3) + at(0, 0) * at(1, 1) * at(2, 2) * at(3, 3);
-
+             + data[8]  * data[1] * data[6]  * data[15] - data[0] * data[9]  * data[6]  * data[15]
+             - data[4]  * data[1] * data[10] * data[15] + data[0] * data[5]  * data[10] * data[15];
     }
 
     /**
@@ -2804,71 +2899,49 @@ class Matrix4 {
      * @note This is a little bit time consuming operation
      * (16 * 6 * 3 mul, 16 * 5 add + det() + mul() functions)
      */
-    inline Matrix4<T> constexpr inverse() {
-      Matrix4<T> ret;
-
-      ret.at(0, 0) = +at(2, 1) * at(3, 2) * at(1, 3) - at(3, 1) * at(2, 2) * at(1, 3) + at(3, 1) * at(1, 2) * at(2, 3)
-                     - at(1, 1) * at(3, 2) * at(2, 3) - at(2, 1) * at(1, 2) * at(3, 3) + at(1, 1) * at(2, 2) * at(3, 3);
-
-      ret.at(1, 0) = +at(3, 0) * at(2, 2) * at(1, 3) - at(2, 0) * at(3, 2) * at(1, 3) - at(3, 0) * at(1, 2) * at(2, 3)
-                     + at(1, 0) * at(3, 2) * at(2, 3) + at(2, 0) * at(1, 2) * at(3, 3) - at(1, 0) * at(2, 2) * at(3, 3);
-
-      ret.at(2, 0) = +at(2, 0) * at(3, 1) * at(1, 3) - at(3, 0) * at(2, 1) * at(1, 3) + at(3, 0) * at(1, 1) * at(2, 3)
-                     - at(1, 0) * at(3, 1) * at(2, 3) - at(2, 0) * at(1, 1) * at(3, 3) + at(1, 0) * at(2, 1) * at(3, 3);
-
-      ret.at(3, 0) = +at(3, 0) * at(2, 1) * at(1, 2) - at(2, 0) * at(3, 1) * at(1, 2) - at(3, 0) * at(1, 1) * at(2, 2)
-                     + at(1, 0) * at(3, 1) * at(2, 2) + at(2, 0) * at(1, 1) * at(3, 2) - at(1, 0) * at(2, 1) * at(3, 2);
-
-      ret.at(0, 1) = +at(3, 1) * at(2, 2) * at(0, 3) - at(2, 1) * at(3, 2) * at(0, 3) - at(3, 1) * at(0, 2) * at(2, 3)
-                     + at(0, 1) * at(3, 2) * at(2, 3) + at(2, 1) * at(0, 2) * at(3, 3) - at(0, 1) * at(2, 2) * at(3, 3);
-
-      ret.at(1, 1) = +at(2, 0) * at(3, 2) * at(0, 3) - at(3, 0) * at(2, 2) * at(0, 3) + at(3, 0) * at(0, 2) * at(2, 3)
-                     - at(0, 0) * at(3, 2) * at(2, 3) - at(2, 0) * at(0, 2) * at(3, 3) + at(0, 0) * at(2, 2) * at(3, 3);
-
-      ret.at(2, 1) = +at(3, 0) * at(2, 1) * at(0, 3) - at(2, 0) * at(3, 1) * at(0, 3) - at(3, 0) * at(0, 1) * at(2, 3)
-                     + at(0, 0) * at(3, 1) * at(2, 3) + at(2, 0) * at(0, 1) * at(3, 3) - at(0, 0) * at(2, 1) * at(3, 3);
-
-      ret.at(3, 1) = +at(2, 0) * at(3, 1) * at(0, 2) - at(3, 0) * at(2, 1) * at(0, 2) + at(3, 0) * at(0, 1) * at(2, 2)
-                     - at(0, 0) * at(3, 1) * at(2, 2) - at(2, 0) * at(0, 1) * at(3, 2) + at(0, 0) * at(2, 1) * at(3, 2);
-
-      ret.at(0, 2) = +at(1, 1) * at(3, 2) * at(0, 3) - at(3, 1) * at(1, 2) * at(0, 3) + at(3, 1) * at(0, 2) * at(1, 3)
-                     - at(0, 1) * at(3, 2) * at(1, 3) - at(1, 1) * at(0, 2) * at(3, 3) + at(0, 1) * at(1, 2) * at(3, 3);
-
-      ret.at(1, 2) = +at(3, 0) * at(1, 2) * at(0, 3) - at(1, 0) * at(3, 2) * at(0, 3) - at(3, 0) * at(0, 2) * at(1, 3)
-                     + at(0, 0) * at(3, 2) * at(1, 3) + at(1, 0) * at(0, 2) * at(3, 3) - at(0, 0) * at(1, 2) * at(3, 3);
-
-      ret.at(2, 2) = +at(1, 0) * at(3, 1) * at(0, 3) - at(3, 0) * at(1, 1) * at(0, 3) + at(3, 0) * at(0, 1) * at(1, 3)
-                     - at(0, 0) * at(3, 1) * at(1, 3) - at(1, 0) * at(0, 1) * at(3, 3) + at(0, 0) * at(1, 1) * at(3, 3);
-
-      ret.at(3, 2) = +at(3, 0) * at(1, 1) * at(0, 2) - at(1, 0) * at(3, 1) * at(0, 2) - at(3, 0) * at(0, 1) * at(1, 2)
-                     + at(0, 0) * at(3, 1) * at(1, 2) + at(1, 0) * at(0, 1) * at(3, 2) - at(0, 0) * at(1, 1) * at(3, 2);
-
-      ret.at(0, 3) = +at(2, 1) * at(1, 2) * at(0, 3) - at(1, 1) * at(2, 2) * at(0, 3) - at(2, 1) * at(0, 2) * at(1, 3)
-                     + at(0, 1) * at(2, 2) * at(1, 3) + at(1, 1) * at(0, 2) * at(2, 3) - at(0, 1) * at(1, 2) * at(2, 3);
-
-      ret.at(1, 3) = +at(1, 0) * at(2, 2) * at(0, 3) - at(2, 0) * at(1, 2) * at(0, 3) + at(2, 0) * at(0, 2) * at(1, 3)
-                     - at(0, 0) * at(2, 2) * at(1, 3) - at(1, 0) * at(0, 2) * at(2, 3) + at(0, 0) * at(1, 2) * at(2, 3);
-
-      ret.at(2, 3) = +at(2, 0) * at(1, 1) * at(0, 3) - at(1, 0) * at(2, 1) * at(0, 3) - at(2, 0) * at(0, 1) * at(1, 3)
-                     + at(0, 0) * at(2, 1) * at(1, 3) + at(1, 0) * at(0, 1) * at(2, 3) - at(0, 0) * at(1, 1) * at(2, 3);
-
-      ret.at(3, 3) = +at(1, 0) * at(2, 1) * at(0, 2) - at(2, 0) * at(1, 1) * at(0, 2) + at(2, 0) * at(0, 1) * at(1, 2)
-                     - at(0, 0) * at(2, 1) * at(1, 2) - at(1, 0) * at(0, 1) * at(2, 2) + at(0, 0) * at(1, 1) * at(2, 2);
-
-      return ret / det();
+    inline Matrix4<T> constexpr inverse() const {
+      return Matrix4<T>({data[9]  * data[14] * data[7]  - data[13] * data[10] * data[7]  + data[13] * data[6]  * data[11] -
+                         data[5]  * data[14] * data[11] - data[9]  * data[6]  * data[15] + data[5]  * data[10] * data[15],
+                         data[13] * data[10] * data[3]  - data[9]  * data[14] * data[3]  - data[13] * data[2]  * data[11] +
+                         data[1]  * data[14] * data[11] + data[9]  * data[2]  * data[15] - data[1]  * data[10] * data[15],
+                         data[5]  * data[14] * data[3]  - data[13] * data[6]  * data[3]  + data[13] * data[2]  * data[7] -
+                         data[1]  * data[14] * data[7]  - data[5]  * data[2]  * data[15] + data[1]  * data[6]  * data[15],
+                         data[9]  * data[6]  * data[3]  - data[5]  * data[10] * data[3]  - data[9]  * data[2]  * data[7] +
+                         data[1]  * data[10] * data[7]  + data[5]  * data[2]  * data[11] - data[1]  * data[6]  * data[11],
+                         data[12] * data[10] * data[7]  - data[8]  * data[14] * data[7]  - data[12] * data[6]  * data[11] +
+                         data[4]  * data[14] * data[11] + data[8]  * data[6]  * data[15] - data[4]  * data[10] * data[15],
+                         data[8]  * data[14] * data[3]  - data[12] * data[10] * data[3]  + data[12] * data[2]  * data[11] -
+                         data[0]  * data[14] * data[11] - data[8]  * data[2]  * data[15] + data[0]  * data[10] * data[15],
+                         data[12] * data[6]  * data[3]  - data[4]  * data[14] * data[3]  - data[12] * data[2]  * data[7] +
+                         data[0]  * data[14] * data[7]  + data[4]  * data[2]  * data[15] - data[0]  * data[6]  * data[15],
+                         data[4]  * data[10] * data[3]  - data[8]  * data[6]  * data[3]  + data[8]  * data[2]  * data[7] -
+                         data[0]  * data[10] * data[7]  - data[4]  * data[2]  * data[11] + data[0]  * data[6]  * data[11],
+                         data[8]  * data[13] * data[7]  - data[12] * data[9]  * data[7]  + data[12] * data[5]  * data[11] -
+                         data[4]  * data[13] * data[11] - data[8]  * data[5]  * data[15] + data[4]  * data[9]  * data[15],
+                         data[12] * data[9]  * data[3]  - data[8]  * data[13] * data[3]  - data[12] * data[1]  * data[11] +
+                         data[0]  * data[13] * data[11] + data[8]  * data[1]  * data[15] - data[0]  * data[9]  * data[15],
+                         data[4]  * data[13] * data[3]  - data[12] * data[5]  * data[3]  + data[12] * data[1]  * data[7] -
+                         data[0]  * data[13] * data[7]  - data[4]  * data[1]  * data[15] + data[0]  * data[5]  * data[15],
+                         data[8]  * data[5]  * data[3]  - data[4]  * data[9]  * data[3]  - data[8]  * data[1]  * data[7] +
+                         data[0]  * data[9]  * data[7]  + data[4]  * data[1]  * data[11] - data[0]  * data[5]  * data[11],
+                         data[12] * data[9]  * data[6]  - data[8]  * data[13] * data[6]  - data[12] * data[5]  * data[10] +
+                         data[4]  * data[13] * data[10] + data[8]  * data[5]  * data[14] - data[4]  * data[9]  * data[14],
+                         data[8]  * data[13] * data[2]  - data[12] * data[9]  * data[2]  + data[12] * data[1]  * data[10] -
+                         data[0]  * data[13] * data[10] - data[8]  * data[1]  * data[14] + data[0]  * data[9]  * data[14],
+                         data[12] * data[5]  * data[2]  - data[4]  * data[13] * data[2]  - data[12] * data[1]  * data[6] +
+                         data[0]  * data[13] * data[6]  + data[4]  * data[1]  * data[14] - data[0]  * data[5]  * data[14],
+                         data[4]  * data[9]  * data[2]  - data[8]  * data[5]  * data[2]  + data[8]  * data[1]  * data[6] -
+                         data[0]  * data[9]  * data[6]  - data[4]  * data[1]  * data[10] + data[0]  * data[5]  * data[10]}) / det();
     }
 
     /**
      * Transpose matrix.
      */
-    inline Matrix4<T> constexpr transpose() {
-      Matrix4<T> ret;
-      for(int i = 0; i != 4; ++i) {
-        for(int j = 0; j != 4; ++j) {
-          ret.at(i, j) = at(j, i);
-        }
-      }
-      return ret;
+    inline Matrix4<T> constexpr transpose() const {
+      return Matrix4<T>({data[0], data[4], data[8],  data[12],
+                         data[1], data[5], data[9],  data[13],
+                         data[2], data[6], data[10], data[14],
+                         data[3], data[7], data[11], data[15]});
     }
 
     /**
@@ -2881,8 +2954,7 @@ class Matrix4 {
      * can get result (extrapolation?)
      */
     inline Matrix4<T> constexpr lerp(T fact, Matrix4<T> const &rhs) const {
-      Matrix4<T> ret = (*this) + (rhs - (*this)) * fact;
-      return ret;
+      return (*this) + (rhs - (*this)) * fact;
     }
 
     //-------------[ conversion ]-----------------------------
@@ -2892,7 +2964,7 @@ class Matrix4 {
      * used for passing Matrix4<T> values to gl*[fd]v functions.
      */
     inline operator T*() {
-      return reinterpret_cast<T*>(data);
+      return reinterpret_cast<T*>(data.data());
     }
 
     /**
@@ -2901,7 +2973,7 @@ class Matrix4 {
      * used for passing Matrix4<T> values to gl*[fd]v functions.
      */
     inline constexpr operator const T*() const {
-      return reinterpret_cast<T const*>(data);
+      return reinterpret_cast<T const*>(data.data());
     }
 
     //----------[ output operator ]----------------------------
@@ -2930,7 +3002,6 @@ class Matrix4 {
       oss << *this;
       return oss.str();
     }
-
 };
 
 /// Matrix 4x4 of floats
@@ -3131,12 +3202,12 @@ class Quaternion {
     /**
      * Equality test operator
      * @param rhs Right hand side argument of binary operator.
-     * @note Test of equality is based of threshold EPSILON value. To be two
-     * values equal, must satisfy this condition | lhs - rhs | < EPSILON,
+     * @note Test of equality is based of threshold epsilon value. To be two
+     * values equal, must satisfy this condition | lhs - rhs | < epsilon,
      * for all quaternion coordinates.
      */
     inline bool constexpr operator==(Quaternion<T> const &rhs) const {
-      return (std::fabs(w - rhs.w) < EPSILON) && v == rhs.v;
+      return (std::fabs(w - rhs.w) < epsilon) && v == rhs.v;
     }
 
     /**
@@ -3262,7 +3333,7 @@ class Quaternion {
      * @param angleDeg Angle of rotation around axis (in degrees).
      */
     inline static Quaternion<T> constexpr fromAxisRot(Vector3<T> axis, T angleDeg) {
-      return Quaternion<T>(std::cos(DEG2RAD(angleDeg) / 2.0), axis * std::sin(DEG2RAD(angleDeg) / 2.0));
+      return fromAxisRot_rad(axis, deg2rad(angleDeg));
     }
 
     /**
@@ -3279,45 +3350,9 @@ class Quaternion {
      * @return Rotation matrix expressing this quaternion.
      */
     inline Matrix3<T> constexpr rotMatrix() {
-      Matrix3<T> ret;
-
-      /*ret.at(0,0) = 1 - 2*v.y*v.y - 2*v.z*v.z;
-       ret.at(1,0) = 2*v.x*v.y - 2*w*v.z;
-       ret.at(2,0) = 2*v.x*v.z - 2*w*v.y;
-
-       ret.at(0,1) = 2*v.x*v.y + 2*w*v.z;
-       ret.at(1,1) = 1 - 2*v.x*v.x - 2*v.z*v.z;
-       ret.at(2,1) = 2*v.y*v.z - 2*w*v.x;
-
-       ret.at(0,2) = 2*v.x*v.z - 2*w*v.y;
-       ret.at(1,2) = 2*v.y*v.z + 2*w*v.x;
-       ret.at(2,2) = 1 - 2*v.x*v.x - 2*v.y*v.y;*/
-
-      T xx = v.x * v.x;
-      T xy = v.x * v.y;
-      T xz = v.x * v.z;
-      T xw = v.x * w;
-
-      T yy = v.y * v.y;
-      T yz = v.y * v.z;
-      T yw = v.y * w;
-
-      T zz = v.z * v.z;
-      T zw = v.z * w;
-
-      ret.at(0, 0) = 1 - 2 * (yy + zz);
-      ret.at(1, 0) = 2 * (xy - zw);
-      ret.at(2, 0) = 2 * (xz + yw);
-
-      ret.at(0, 1) = 2 * (xy + zw);
-      ret.at(1, 1) = 1 - 2 * (xx + zz);
-      ret.at(2, 1) = 2 * (yz - xw);
-
-      ret.at(0, 2) = 2 * (xz - yw);
-      ret.at(1, 2) = 2 * (yz + xw);
-      ret.at(2, 2) = 1 - 2 * (xx + yy);
-
-      return ret;
+      return Matrix3<T>({1 - 2 * (v.y * v.y + v.z * v.z),     2 * (v.x * v.y + v.z * w),       2 * (v.x * v.z - v.y * w),
+                             2 * (v.x * v.y - v.z * w),   1 - 2 * (v.x * v.x + v.z * v.z),     2 * (v.y * v.z + v.x * w),
+                             2 * (v.x * v.z + v.y * w),       2 * (v.y * v.z - v.x * w),   1 - 2 * (v.x * v.x + v.y * v.y)});
     }
 
     /**
@@ -3327,42 +3362,10 @@ class Quaternion {
      * @return Transformation matrix expressing this quaternion.
      */
     inline Matrix4<T> constexpr transform() const {
-      Matrix4<T> ret;
-
-      T xx = v.x * v.x;
-      T xy = v.x * v.y;
-      T xz = v.x * v.z;
-      T xw = v.x * w;
-
-      T yy = v.y * v.y;
-      T yz = v.y * v.z;
-      T yw = v.y * w;
-
-      T zz = v.z * v.z;
-      T zw = v.z * w;
-
-      ret.at(0, 0) = 1 - 2 * (yy + zz);
-      ret.at(1, 0) = 2 * (xy - zw);
-      ret.at(2, 0) = 2 * (xz + yw);
-      ret.at(3, 0) = 0;
-
-      ret.at(0, 1) = 2 * (xy + zw);
-      ret.at(1, 1) = 1 - 2 * (xx + zz);
-      ret.at(2, 1) = 2 * (yz - xw);
-      ret.at(3, 1) = 0;
-
-      ret.at(0, 2) = 2 * (xz - yw);
-      ret.at(1, 2) = 2 * (yz + xw);
-      ret.at(2, 2) = 1 - 2 * (xx + yy);
-      ret.at(3, 2) = 0;
-
-      ret.at(0, 3) = 0;
-      ret.at(1, 3) = 0;
-      ret.at(2, 3) = 0;
-      ret.at(3, 3) = 1;
-
-      return ret;
-
+      return Matrix4<T>({1 - 2 * (v.y * v.y + v.z * v.z),     2 * (v.x * v.y + v.z * w),       2 * (v.x * v.z - v.y * w),   0.0f,
+                             2 * (v.x * v.y - v.z * w),   1 - 2 * (v.x * v.x + v.z * v.z),     2 * (v.y * v.z + v.x * w),   0.0f,
+                             2 * (v.x * v.z + v.y * w),       2 * (v.y * v.z - v.x * w),   1 - 2 * (v.x * v.x + v.y * v.y), 0.0f,
+                         0.0f,                            0.0f,                            0.0f,                            1.0f});
     }
 
     /**
@@ -3505,17 +3508,17 @@ class Quaternion {
     inline Quaternion<T> slerp(T r, Quaternion<T> const &q2) const {
       Quaternion<T> ret;
       T const cosTheta = w * q2.w + v.x * q2.v.x + v.y * q2.v.y + v.z * q2.v.z;
-      T const theta = (T)acos(cosTheta);
-      if(fabs(theta) < epsilon) {
+      T const theta = (T)std::acos(cosTheta);
+      if(std::fabs(theta) < epsilon) {
         ret = *this;
       } else {
-        T sinTheta = (T)sqrt(1.0 - cosTheta * cosTheta);
-        if(fabs(sinTheta) < epsilon) {
+        T sinTheta = (T)std::sqrt(1.0 - cosTheta * cosTheta);
+        if(std::fabs(sinTheta) < epsilon) {
           ret.w = 0.5 * w + 0.5 * q2.w;
           ret.v = v.lerp(0.5, q2.v);
         } else {
-          T rA = (T) sin((1.0 - r) * theta) / sinTheta;
-          T rB = (T) sin(r * theta) / sinTheta;
+          T rA = (T)std::sin((1.0 - r) * theta) / sinTheta;
+          T rB = (T)std::sin(r * theta) / sinTheta;
 
           ret.w = w * rA + q2.w * rB;
           ret.v.x = v.x * rA + q2.v.x * rB;
@@ -3528,13 +3531,892 @@ class Quaternion {
 
 };
 
+/// Quaternion of floats
 typedef Quaternion<float> Quatf;
+/// Quaternion of doubles
 typedef Quaternion<double> Quatd;
+/// Quaternion of long doubles
 typedef Quaternion<long double> Quatld;
 
 #ifdef VMATH_NAMESPACE
 }
 #endif
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Standard C++ library extensions
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Shortcut defines
+#ifdef VMATH_NAMESPACE
+#define VEC2 VMATH_NAMESPACE::Vector2
+#define VEC3 VMATH_NAMESPACE::Vector3
+#define VEC4 VMATH_NAMESPACE::Vector4
+#else
+#define VEC2 Vector2
+#define VEC3 Vector3
+#define VEC4 Vector4
+#endif
+
+namespace std {
+
+/**
+ * Gets vector containing minimal values of @a a and @a b coordinates.
+ * @return Vector of minimal coordinates.
+ */
+template<class T>
+constexpr VEC2<T> min(const VEC2<T> &a, const VEC2<T> &b) {
+  return VEC2<T>(::std::min(a.x, b.x), ::std::min(a.y, b.y));
+}
+
+/**
+ * Gets vector containing minimal values of @a a and @a b coordinates.
+ * @return Vector of minimal coordinates.
+ */
+template<class T>
+constexpr VEC3<T> min(const VEC3<T> &a, const VEC3<T> &b) {
+  return VEC3<T>(::std::min(a.x, b.x), ::std::min(a.y, b.y), ::std::min(a.z, b.z));
+}
+
+/**
+ * Gets vector containing minimal values of @a a and @a b coordinates.
+ * @return Vector of minimal coordinates.
+ */
+template<class T>
+constexpr VEC4<T> min(const VEC4<T> &a, const VEC4<T> &b) {
+  return VEC4<T>(::std::min(a.x, b.x), ::std::min(a.y, b.y), ::std::min(a.z, b.z), ::std::min(a.w, b.w));
+}
+
+/**
+ * Gets vector containing maximal values of @a a and @a b coordinates.
+ * @return Vector of maximal coordinates.
+ */
+template<class T>
+constexpr VEC2<T> max(const VEC2<T> &a, const VEC2<T> &b) {
+  return VEC2<T>(::std::max(a.x, b.x), ::std::max(a.y, b.y));
+}
+
+/**
+ * Gets vector containing maximal values of @a a and @a b coordinates.
+ * @return Vector of maximal coordinates.
+ */
+template<class T>
+constexpr VEC3<T> max(const VEC3<T> &a, const VEC3<T> &b) {
+  return VEC3<T>(::std::max(a.x, b.x), ::std::max(a.y, b.y), ::std::max(a.z, b.z));
+}
+
+/**
+ * Gets vector containing maximal values of @a a and @a b coordinates.
+ * @return Vector of maximal coordinates.
+ */
+template<class T>
+constexpr VEC4<T> max(const VEC4<T> &a, const VEC4<T> &b) {
+  return VEC4<T>(::std::max(a.x, b.x), ::std::max(a.y, b.y), ::std::max(a.z, b.z), ::std::max(a.w, b.w));
+}
+}
+
+// cleanup shortcut defines
+#undef VEC2
+#undef VEC3
+#undef VEC4
+
+#ifdef VMATH_NAMESPACE
+namespace VMATH_NAMESPACE {
+#endif //VMATH_NAMESPACE
+
+/**
+ * Two-dimensional axis-aligned bounding-box (aka AABB) class.
+ *
+ * This class provides functionality for:
+ * - creating an AABB from a point, or another AABB,
+ * - testing if a point of other AABB intersects with it,
+ * - getting result of intersection with other AABB,
+ * - transforming AABB with 4x4 matrix.
+ *
+ * There are also overloaded couple of operators to shorten common operations.
+ * For instance you can use  @c operator<< on AABB to extend it with a passed point or other AABB.
+ * @code
+ * Aabb2f aabb;
+ * aabb << Vector2f(1, 2) << Aabb2f(-3,-3, 2, 2);
+ * @endcode
+ */
+template<class T>
+class Aabb2 {
+  public:
+    /**
+     * Position of Min corner of bounding box.
+     */
+    Vector2<T> min;
+
+    /**
+     * Position of Max corner of bounding box
+     */
+    Vector2<T> max;
+
+    /**
+     * Constructs invalid axes-aligned bounding-box.
+     * @see valid() for explanation of invalid bounding-box usage.
+     */
+    inline constexpr Aabb2()
+      : min(1, 1), max(-1, -1) {
+    }
+
+    /**
+     * Constructs axes-aligned bound-box containing one point @a point
+     * @param point
+     */
+    template<class SrcT>
+    inline constexpr Aabb2(const Vector2<SrcT> &point)
+      : min(point), max(point) {
+    }
+
+    /**
+     * Constructs axes-aligned bounding-box form two corner points (@a x0, @a y0)
+     * and (@a x1, @a y1)
+     * @param x0 X-coordinate of first point
+     * @param y0 Y-coordinate of first point
+     * @param x1 X-coordinate of second point
+     * @param y1 Y-coordinate of second point
+     */
+    template<class SrcT>
+    inline constexpr Aabb2(SrcT x0, SrcT y0, SrcT x1, SrcT y1)
+      : min(std::min(x0, x1), std::min(y0, y1)),
+        max(std::max(x0, x1), std::max(y0, y1)) {
+    }
+
+    /**
+     * Constructs axes-aligned bounding-box from @a min and @b max
+     * @param min X-coordinate of first point
+     * @param max X-coordinate of second point
+     */
+    template<class SrcT>
+    inline constexpr Aabb2(Vector2<SrcT> const &min, Vector2<SrcT> const &max)
+      : min(min),
+        max(max) {
+    }
+
+    /**
+     * Constructs axes-aligned bounding-box containing point (@a x, @a y)
+     * @param x X-coordinate of point
+     * @param y Y-coordinate of point
+     */
+    template<class SrcT>
+    inline constexpr Aabb2(SrcT x, SrcT y)
+      : min(x, y), max(x, y) {
+    }
+
+    /**
+     * Creates copy of axis-aligned bounding-box
+     * @param src Source bounding-box
+     */
+    template<class SrcT>
+    inline constexpr Aabb2(const Aabb2<SrcT> &src)
+      : min(src.min), max(src.max) {
+    }
+
+    /**
+     * Assign operator
+     * @param rhs source bounding-box
+     * @return refenrence to this
+     */
+    template<class SrcT>
+    inline Aabb2<T> &operator=(const Aabb2<SrcT> &rhs) {
+      min = rhs.min;
+      max = rhs.max;
+      return *this;
+    }
+
+    /**
+     * Checks if bounding-box is valid. Valid bounding-box has non-negative size.
+     * If an invalid bounding-box is extended by point or another bounding-box, the target
+     * bounding box becomes valid and contains solely the source point or bounding-box respectively.
+     * @return True if box is valid, otherwise false
+     */
+    inline bool constexpr valid() const {
+      return min.x <= max.x && min.y <= max.y;
+    }
+
+    /**
+     * Makes this bounding-box invalid. So calling valid() gets false.
+     * @see valid() method for more info on usage of invalid bounding-boxes.
+     */
+    inline void invalidate() {
+      min = Vector2<T>( 1,  1);
+      max = Vector2<T>(-1, -1);
+    }
+
+    /**
+     * Extends this bounding-box by a point @a point.
+     * @param point A point to extend bounding-box by.
+     */
+    template<class SrcT>
+    inline void extend(const Vector2<SrcT> &point) {
+      if(!valid()) {
+        min = max = point;
+      } else {
+        min = std::min(min, point);
+        max = std::max(max, point);
+      }
+    }
+
+    /**
+     * Extends this bounding-box by a box @a box.
+     * @param box A box to extend this bounding-box by.
+     */
+    template<class SrcT>
+    inline void extend(const Aabb2<SrcT> &box) {
+      if(!valid()) {
+        min = box.min;
+        max = box.max;
+      } else {
+        min = std::min(min, box.min);
+        max = std::max(max, box.max);
+      }
+    }
+
+    /**
+     * Gets a copy of this bounding-box extend by a point @a point.
+     * @param point A point to extend the box by
+     * @return Copy of extended bounding-box
+     */
+    template<class SrcT>
+    inline constexpr Aabb2<T> extended(const Vector2<SrcT> &point) const {
+      Aabb2<T> ret(*this);
+      ret.extend(point);
+      return ret;
+    }
+
+    /**
+     * Gets a copy of this bounding-box extnended by box @a box.
+     * @param box A box to extend the copy be.
+     * @return Copy of extended bounding-box
+     */
+    template<class SrcT>
+    inline constexpr Aabb2<T> extended(const Aabb2<SrcT> &box) const {
+      Aabb2<T> ret(*this);
+      ret.extend(box);
+      return *this;
+    }
+
+    /**
+     * Tests if the point @a point is within this bounding-box
+     * @param point A point to be tested
+     * @return True if point @a point lies within bounding-box, otherwise false.
+     */
+    template<class SrcT>
+    inline bool constexpr intersects(const Vector2<SrcT> &point) const {
+      return min.x <= point.x && point.x <= max.x &&
+             min.y <= point.y && point.y <= max.y;
+    }
+
+    /**
+     * Tests if other bounding-box @a box intersects (even partially) with this bounding-box.
+     * @param box A box to be tested for intersection.
+     * @return True if there's intersection between boxes, otherwise false.
+     */
+    template<class SrcT>
+    inline bool constexpr intersects(const Aabb2<SrcT> &box) const {
+      return max.x >= box.min.x && min.x <= box.max.x &&
+             max.y >= box.min.y && min.y <= box.max.y;
+    }
+
+    /**
+     * Gets result of intersection of this bounding-box with @a other bounding-box.
+     * In case the boxes don't intersect, the returned bounding-box is invalid.
+     * @param other Box to be tested
+     * @return Result of intersection.
+     * @see valid() method for more information on invalid bounding-boxes.
+     */
+    template<class SrcT>
+    inline constexpr Aabb2<T> intersection(const Aabb2<SrcT> &other) const {
+      return (max.x < other.min.x || min.x > other.max.x ||
+              max.y < other.min.y || min.y > other.max.y) ? Aabb2<T>() : Aabb2<T>(std::max(min, other.min), std::min(max, other.max));
+    }
+
+    /**
+     * Tests if a ray @b from origin @a intersects with this bounding-box.
+     * @param origin Origin of the intersecting ray
+     * @param ray The intersecting ray; does not need to be normalised
+     * @return True if the ray intersects the box, otherwise false.
+     */
+    template<class SrcT>
+    inline bool constexpr ray_intersects(Vector2<SrcT> const &ray, Vector2<SrcT> const &origin = Vector2<SrcT>()) const {
+      // adapted from http://tavianator.com/2011/05/fast-branchless-raybounding-box-intersections/
+      /*
+      SrcT const dist_min_x = (min.x - origin.x) / ray.x;
+      SrcT const dist_max_x = (max.x - origin.x) / ray.x;
+      SrcT dist_min = std::min(dist_min_x, dist_max_x);
+      SrcT dist_max = std::max(dist_min_x, dist_max_x);
+
+      SrcT const dist_min_y = (min.y - origin.y) / ray.y;
+      SrcT const dist_max_y = (max.y - origin.y) / ray.y;
+      dist_min = std::max(dist_min, std::min(dist_min_y, dist_max_y));
+      dist_max = std::min(dist_max, std::max(dist_min_y, dist_max_y));
+
+      return dist_max >= std::max(dist_min, 0.0f);
+      */
+      // constexpr-compatible reformulation:
+      return std::min(std::max((min.x - origin.x) / ray.x,
+                               (max.x - origin.x) / ray.x),
+                      std::max((min.y - origin.y) / ray.y,
+                               (max.y - origin.y) / ray.y)) >=
+             std::max(std::max(std::min((min.x - origin.x) / ray.x,
+                                        (max.x - origin.x) / ray.x),
+                               std::min((min.y - origin.y) / ray.y,
+                                        (max.y - origin.y) / ray.y)), 0.0f);
+    }
+
+    /**
+     * Gets center point of bounding-box.
+     * @return A center point of bounding-box.
+     */
+    inline constexpr Vector2<T> center() const {
+      return (min + max) * 0.5f;
+    }
+
+    /**
+     * Gets extent of bounding-box.
+     * @return Extent of bounding-box.
+     */
+    inline constexpr Vector2<T> extent() const {
+      return (max - min) * 0.5f;
+    }
+
+    /**
+     * Gets diagonal size of bounding-box
+     * @return Sizes for particular dimensions.
+     */
+    inline constexpr Vector2<T> size() const {
+      return max - min;
+    }
+
+    /**
+     * Gets all 4 corner-points of bounding box
+     * @param i An index of bounding-box corner point. Valid values are 0 .. 3.
+     * @return A position of @a i-th corner-point.
+     * @note The order of points is as follows (where @c + denotes max-point and @c - min-point):
+     * 1. (@c + @c + @c +)
+     * 2. (@c - @c + @c +)
+     * 3. (@c + @c - @c +)
+     * 4. (@c - @c - @c +)
+     *
+     */
+    inline constexpr Vector2<T> point(unsigned int i) const {
+      return Vector2<T>(i & 1 ? min.x : max.x,
+                        i & 2 ? min.y : max.y);
+    }
+
+    //-------------------------------------------------------------------------------------------------------------
+    // operators
+    //-------------------------------------------------------------------------------------------------------------
+    /**
+     * Tests if @a rhs is equal to this bounding-box
+     * @param rhs Right-hand side
+     * @return True if @a rhs and this bounding-boxes are equal, otherwise false
+     */
+    template<class RhsT>
+    inline bool constexpr operator==(const Aabb2<RhsT> &rhs) const {
+      return min == rhs.min && max == rhs.max;
+    }
+
+    /**
+     * Tests if @a rhs is not equal to this bounding-box
+     * @param rhs Right-hand side
+     * @return True if @a rhs and this bounding-boxes are not equal, otherwise false
+     */
+    template<class RhsT>
+    inline bool constexpr operator!=(const Aabb2<RhsT> &rhs) const {
+      return min != rhs.min || max != rhs.max;
+    }
+
+    /**
+     * Extends this bounding-box by point @a rhs.
+     * @param rhs A point to extend this bounding-box by
+     * @return Reference to this
+     */
+    template<class SrcT>
+    inline Aabb2<T> &operator<<(const Vector2<SrcT> &rhs) {
+      extend(rhs);
+      return *this;
+    }
+
+    /**
+     * Extends this bounding-box by box @a rhs.
+     * @param rhs A box to extend this bounding-box by
+     * @return Reference to this
+     */
+    template<class SrcT>
+    inline Aabb2<T> &operator<<(const Aabb2<SrcT> &rhs) {
+      extend(rhs);
+      return *this;
+    }
+
+    /**
+     * Union of this and @a rhs bounding-boxes
+     * @param rhs Right-hand side of union
+     * @return A resulting bounding-box representing union
+     */
+    template<class RhsT>
+    inline constexpr Aabb2<T> operator|(const Aabb2<RhsT> &rhs) const {
+      return extended(rhs);
+    }
+
+    /**
+     * Intersection of this and @a rhs bounding-boxed
+     * @param rhs Right-hand side
+     * @return Resulting bounding-box representing the intersection.
+     */
+    template<class RhsT>
+    inline constexpr Aabb2<T> operator&(const Aabb2<RhsT> &rhs) const {
+      return intersection(rhs);
+    }
+
+    /**
+     * Outputs string representation of bounding-box @a rhs to output stream @a lhs
+     * @param lhs Output stream to write to
+     * @param rhs Bounding-box to write to output stream.
+     * @return Reference to output stream @a lhs
+     */
+    inline friend std::ostream &operator<<(std::ostream &lhs, const Aabb2<T> &rhs) {
+      lhs << rhs.min << " x " << rhs.max;
+      return lhs;
+    }
+};
+
+/**
+ * Three-dimensional axis-aligned bounding-box (aka AABB) class.
+ *
+ * This class provides functionality for:
+ * - creating an AABB from a point, or another AABB,
+ * - testing if a point of other AABB intersects with it,
+ * - getting result of intersection with other AABB,
+ * - transforming AABB with 4x4 matrix.
+ *
+ * There are also overloaded couple of operators to shorten common operations.
+ * For instance you can use  @c operator<< on AABB to extend it with a passed point or other AABB.
+ * @code
+ * Aabb3f aabb;
+ * aabb << Vector3f(1, 1, 2) << Aabb3f(-3,-3,-3, 2, 2, 2);
+ * @endcode
+ */
+template<class T>
+class Aabb3 {
+  public:
+    /**
+     * Position of Min corner of bounding box.
+     */
+    Vector3<T> min;
+
+    /**
+     * Position of Max corner of bounding box
+     */
+    Vector3<T> max;
+
+    /**
+     * Constructs invalid axes-aligned bounding-box.
+     * @see valid() for explanation of invalid bounding-box usage.
+     */
+    inline constexpr Aabb3()
+      : min(1, 1, 1), max(-1, -1, -1) {
+    }
+
+    /**
+     * Constructs axes-aligned bound-box containing one point @a point
+     * @param point
+     */
+    template<class SrcT>
+    inline constexpr Aabb3(const Vector3<SrcT> &point)
+      : min(point), max(point) {
+    }
+
+    /**
+     * Constructs axes-aligned bounding-box from two corner points (@a x0, @a y0, @a z0)
+     * and (@a x1, @a y1, @a z1)
+     * @param x0 X-coordinate of first point
+     * @param y0 Y-coordinate of first point
+     * @param z0 Z-coordinate of first point
+     * @param x1 X-coordinate of second point
+     * @param y1 Y-coordinate of second point
+     * @param z1 Z-coordinate of second point
+     */
+    template<class SrcT>
+    inline constexpr Aabb3(SrcT x0, SrcT y0, SrcT z0, SrcT x1, SrcT y1, SrcT z1)
+      : min(std::min(x0, x1), std::min(y0, y1), std::min(z0, z1)),
+        max(std::max(x0, x1), std::max(y0, y1), std::max(z0, z1)) {
+    }
+
+    /**
+     * Constructs axes-aligned bounding-box from @a min and @b max
+     * @param min X-coordinate of first point
+     * @param max X-coordinate of second point
+     */
+    template<class SrcT>
+    inline constexpr Aabb3(Vector3<SrcT> const &min, Vector3<SrcT> const &max)
+      : min(min),
+        max(max) {
+    }
+
+    /**
+     * Constructs axes-aligned bounding-box containing point (@a x, @a y, @a z)
+     * @param x X-coordinate of point
+     * @param y Y-coordinate of point
+     * @param z Z-coordinate of point
+     */
+    template<class SrcT>
+    inline constexpr Aabb3(SrcT x, SrcT y, SrcT z)
+      : min(x, y, z), max(x, y, z) {
+    }
+
+    /**
+     * Creates copy of axis-aligned bounding-box
+     * @param src Source bounding-box
+     */
+    template<class SrcT>
+    inline constexpr Aabb3(const Aabb3<SrcT> &src)
+      : min(src.min), max(src.max) {
+    }
+
+    /**
+     * Assign operator
+     * @param rhs source bounding-box
+     * @return refenrence to this
+     */
+    template<class SrcT>
+    inline Aabb3<T> &operator=(const Aabb3<SrcT> &rhs) {
+      min = rhs.min;
+      max = rhs.max;
+      return *this;
+    }
+
+    /**
+     * Checks if bounding-box is valid. Valid bounding-box has non-negative size.
+     * If an invalid bounding-box is extended by point or another bounding-box, the target
+     * bounding box becomes valid and contains solely the source point or bounding-box respectively.
+     * @return True if box is valid, otherwise false
+     */
+    inline bool constexpr valid() const {
+      return min.x <= max.x && min.y <= max.y && min.z <= max.z;
+    }
+
+    /**
+     * Makes this bounding-box invalid. So calling valid() gets false.
+     * @see valid() method for more info on usage of invalid bounding-boxes.
+     */
+    inline void invalidate() {
+      min = Vector3<T>(1, 1, 1);
+      max = Vector3<T>(-1, -1, -1);
+    }
+
+    /**
+     * Extends this bounding-box by a point @a point.
+     * @param point A point to extend bounding-box by.
+     */
+    template<class SrcT>
+    inline void extend(const Vector3<SrcT> &point) {
+      if(!valid()) {
+        min = max = point;
+      } else {
+        min = std::min(min, point);
+        max = std::max(max, point);
+      }
+    }
+
+    /**
+     * Extends this bounding-box by a box @a box.
+     * @param box A box to extend this bounding-box by.
+     */
+    template<class SrcT>
+    inline void extend(const Aabb3<SrcT> &box) {
+      if(!valid()) {
+        min = box.min;
+        max = box.max;
+      } else {
+        min = std::min(min, box.min);
+        max = std::max(max, box.max);
+      }
+    }
+
+    /**
+     * Gets a copy of this bounding-box extend by a point @a point.
+     * @param point A point to extend the box by
+     * @return Copy of extended bounding-box
+     */
+    template<class SrcT>
+    inline constexpr Aabb3<T> extended(const Vector3<SrcT> &point) const {
+      Aabb3<T> ret(*this);
+      ret.extend(point);
+      return ret;
+    }
+
+    /**
+     * Gets a copy of this bounding-box extnended by box @a box.
+     * @param box A box to extend the copy be.
+     * @return Copy of extended bounding-box
+     */
+    template<class SrcT>
+    inline constexpr Aabb3<T> extended(const Aabb3<SrcT> &box) const {
+      Aabb3<T> ret(*this);
+      ret.extend(box);
+      return *this;
+    }
+
+    /**
+     * Tests if the point @a point is within this bounding-box
+     * @param point A point to be tested
+     * @return True if point @a point lies within bounding-box, otherwise false.
+     */
+    template<class SrcT>
+    inline bool constexpr intersects(const Vector3<SrcT> &point) const {
+      return min.x <= point.x && point.x <= max.x &&
+             min.y <= point.y && point.y <= max.y &&
+             min.z <= point.z && point.z <= max.z;
+    }
+
+    /**
+     * Tests if other bounding-box @a box intersects (even partially) with this bounding-box.
+     * @param box A box to be tested for intersection.
+     * @return True if there's intersection between boxes, otherwise false.
+     */
+    template<class SrcT>
+    inline bool constexpr intersects(const Aabb3<SrcT> &box) const {
+      return max.x >= box.min.x && min.x <= box.max.x &&
+             max.y >= box.min.y && min.y <= box.max.y &&
+             max.z >= box.min.z && min.z <= box.max.z;
+    }
+
+    /**
+     * Gets result of intersection of this bounding-box with @a other bounding-box.
+     * In case the boxes don't intersect, the returned bounding-box is invalid.
+     * @param other Box to be tested
+     * @return Result of intersection.
+     * @see valid() method for more information on invalid bounding-boxes.
+     */
+    template<class SrcT>
+    inline constexpr Aabb3<T> intersection(const Aabb3<SrcT> &other) const {
+      return (max.x < other.min.x || min.x > other.max.x ||
+              max.y < other.min.y || min.y > other.max.y ||
+              max.z < other.min.z || min.z > other.max.z) ? Aabb3<T>() : Aabb3<T>(std::max(min, other.min), std::min(max, other.max));
+    }
+
+    /**
+     * Tests if a ray @b from origin @a intersects with this bounding-box.
+     * @param ray The intersecting ray; does not need to be normalised
+     * @param origin Origin of the intersecting ray
+     * @return True if the ray intersects the box, otherwise false.
+     */
+    template<class SrcT>
+    inline bool constexpr ray_intersects(Vector3<SrcT> const &ray, Vector3<SrcT> const &origin = Vector3<SrcT>()) const {
+      // adapted from http://tavianator.com/2011/05/fast-branchless-raybounding-box-intersections/
+      /*
+      SrcT const dist_min_x = (min.x - origin.x) / ray.x;
+      SrcT const dist_max_x = (max.x - origin.x) / ray.x;
+      SrcT dist_min = std::min(dist_min_x, dist_max_x);
+      SrcT dist_max = std::max(dist_min_x, dist_max_x);
+
+      SrcT const dist_min_y = (min.y - origin.y) / ray.y;
+      SrcT const dist_max_y = (max.y - origin.y) / ray.y;
+      dist_min = std::max(dist_min, std::min(dist_min_y, dist_max_y));
+      dist_max = std::min(dist_max, std::max(dist_min_y, dist_max_y));
+
+      SrcT const dist_min_z = (min.z - origin.z) / ray.z;
+      SrcT const dist_max_z = (max.z - origin.z) / ray.z;
+      dist_min = std::max(dist_min, std::min(dist_min_z, dist_max_z));
+      dist_max = std::min(dist_max, std::max(dist_min_z, dist_max_z));
+
+      return dist_max >= std::max(dist_min, 0.0f);
+      */
+      // constexpr-compatible reformulation:
+      return std::min(std::min(std::max((min.x - origin.x) / ray.x,
+                                        (max.x - origin.x) / ray.x),
+                               std::max((min.y - origin.y) / ray.y,
+                                        (max.y - origin.y) / ray.y)),
+                      std::max((min.z - origin.z) / ray.z,
+                               (max.z - origin.z) / ray.z)) >=
+             std::max(std::max(std::max(std::min((min.x - origin.x) / ray.x,
+                                                 (max.x - origin.x) / ray.x),
+                                        std::min((min.y - origin.y) / ray.y,
+                                                 (max.y - origin.y) / ray.y)),
+                               std::min((min.z - origin.z) / ray.z,
+                                        (max.z - origin.z) / ray.z)), 0.0f);
+    }
+
+    /**
+     * Gets center point of bounding-box.
+     * @return A center point of bounding-box.
+     */
+    inline constexpr Vector3<T> center() const {
+      return (min + max) * 0.5f;
+    }
+
+    /**
+     * Gets extent of bounding-box.
+     * @return Extent of bounding-box.
+     */
+    inline constexpr Vector3<T> extent() const {
+      return (max - min) * 0.5f;
+    }
+
+    /**
+     * Gets diagonal size of bounding-box
+     * @return Sizes for particular dimensions.
+     */
+    inline constexpr Vector3<T> size() const {
+      return max - min;
+    }
+
+    /**
+     * Gets all 8 corner-points of bounding box
+     * @param i An index of bounding-box corner point. Valid values are 0 .. 7.
+     * @return A position of @a i-th corner-point.
+     * @note The order of points is as follows (where @c + denotes max-point and @c - min-point):
+     * 1. (@c + @c + @c +)
+     * 2. (@c - @c + @c +)
+     * 3. (@c + @c - @c +)
+     * 4. (@c - @c - @c +)
+     * 5. (@c + @c + @c -)
+     * 6. (@c - @c + @c -)
+     * 7. (@c + @c - @c -)
+     * 8. (@c - @c - @c -)
+     *
+     */
+    inline constexpr Vector3<T> point(unsigned int i) const {
+      return Vector3<T>(i & 1 ? min.x : max.x, i & 2 ? min.y : max.y, i & 4 ? min.z : max.z);
+    }
+
+    /**
+     * Gets transformed bounding-box by transform @a t
+     * @param t A transform matrix
+     * @return Transformed bounding-box
+     */
+    inline Aabb3<T> transformed(const Matrix4<T> &t) const {
+      Aabb3<T> ret;
+      for(unsigned int i = 0; i != 8; ++i) {
+        const Vector4<T> p(point(i), 1);
+        ret.extend((t * p).xyz());
+      }
+      return ret;
+    }
+
+    //-------------------------------------------------------------------------------------------------------------
+    // operators
+    //-------------------------------------------------------------------------------------------------------------
+    /**
+     * Tests if @a rhs is equal to this bounding-box
+     * @param rhs Right-hand side
+     * @return True if @a rhs and this bounding-boxes are equal, otherwise false
+     */
+    template<class RhsT>
+    inline bool constexpr operator==(const Aabb3<RhsT> &rhs) const {
+      return min == rhs.min && max == rhs.max;
+    }
+
+    /**
+     * Tests if @a rhs is not equal to this bounding-box
+     * @param rhs Right-hand side
+     * @return True if @a rhs and this bounding-boxes are not equal, otherwise false
+     */
+    template<class RhsT>
+    inline bool constexpr operator!=(const Aabb3<RhsT> &rhs) const {
+      return min != rhs.min || max != rhs.max;
+    }
+
+    /**
+     * Gets transformed bounding-box by transform @a rhs.
+     * @param rhs Matrix 4x4 representing the transform
+     * @return Transformed bounding-box
+     */
+    inline constexpr Aabb3<T> operator*(const Matrix4<T> &rhs) const {
+      return transformed(rhs);
+    }
+
+    /**
+     * Apply transform @a rhs to this bounding-box
+     * @param rhs A transform to be applied
+     * @return Reference to this
+     */
+    inline Aabb3<T> &operator*=(const Matrix4<T> &rhs) {
+      *this = transformed(rhs);
+      return *this;
+    }
+
+
+    /**
+     * Extends this bounding-box by point @a rhs.
+     * @param rhs A point to extend this bounding-box by
+     * @return Reference to this
+     */
+    template<class SrcT>
+    inline Aabb3<T> &operator<<(const Vector3<SrcT> &rhs) {
+      extend(rhs);
+      return *this;
+    }
+
+    /**
+     * Extends this bounding-box by box @a rhs.
+     * @param rhs A box to extend this bounding-box by
+     * @return Reference to this
+     */
+    template<class SrcT>
+    inline Aabb3<T> &operator<<(const Aabb3<SrcT> &rhs) {
+      extend(rhs);
+      return *this;
+    }
+
+    /**
+     * Union of this and @a rhs bounding-boxes
+     * @param rhs Right-hand side of union
+     * @return A resulting bounding-box representing union
+     */
+    template<class RhsT>
+    inline constexpr Aabb3<T> operator|(const Aabb3<RhsT> &rhs) const {
+      return extended(rhs);
+    }
+
+    /**
+     * Intersection of this and @a rhs bounding-boxed
+     * @param rhs Right-hand side
+     * @return Resulting bounding-box representing the intersection.
+     */
+    template<class RhsT>
+    inline constexpr Aabb3<T> operator&(const Aabb3<RhsT> &rhs) const {
+      return intersection(rhs);
+    }
+
+    /**
+     * Outputs string representation of bounding-box @a rhs to output stream @a lhs
+     * @param lhs Output stream to write to
+     * @param rhs Bounding-box to write to output stream.
+     * @return Reference to output stream @a lhs
+     */
+    inline friend std::ostream &operator<<(std::ostream &lhs, const Aabb3<T> &rhs) {
+      lhs << rhs.min << " x " << rhs.max;
+      return lhs;
+    }
+};
+
+/// 2D axis-aligned bounding box of floats
+typedef Aabb2<float> Aabb2f;
+/// 2D axis-aligned bounding box of doubles
+typedef Aabb2<double> Aabb2d;
+/// 2D axis-aligned bounding box of long doubles
+typedef Aabb2<long double> Aabb2ld;
+/// 2D axis-aligned bounding box of integers
+typedef Aabb2<int> Aabb2i;
+
+/// 3D axis-aligned bounding box of floats
+typedef Aabb3<float> Aabb3f;
+/// 3D axis-aligned bounding box of doubles
+typedef Aabb3<double> Aabb3d;
+/// 3D axis-aligned bounding box of long doubles
+typedef Aabb3<long double> Aabb3ld;
+/// 2D axis-aligned bounding box of integers
+typedef Aabb3<int> Aabb3i;
+
+#ifdef VMATH_NAMESPACE
+}
+#endif //VMATH_NAMESPACE
+
 
 #endif // __vmath_Header_File__
 
