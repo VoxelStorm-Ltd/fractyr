@@ -133,27 +133,30 @@
 namespace VMATH_NAMESPACE {
 #endif
 
-#ifndef NO_BOOST
+#ifndef VMATH_NO_BOOST
 #include <boost/math/constants/constants.hpp>
 // use boost's constants if available
-#else  // NO_BOOST
+#else  // VMATH_NO_BOOST
 #ifndef M_PI
 #define M_PI           3.14159265358979323846  /* pi */
 #endif // M_PI
-#endif // NO_BOOST
+#endif // VMATH_NO_BOOST
 
+// note: use VMATH_SOFT_COMPARE to enable fuzzy matching for different types,
+// with epsilon used to match within a range of rounding error - but doing this
+// can be very expensive in some cases.
 double constexpr epsilon = 4.37114e-05;
 #define EPSILON epsilon
 #define DEG2RAD deg2rad
 
 template<class T>
 inline static T constexpr const deg2rad(T angle_rad) {
-  #ifndef NO_BOOST
+  #ifndef VMATH_NO_BOOST
     //return (angle_rad * boost::math::constants::pi<T>()) / 180.0;
     return angle_rad * boost::math::constants::degree<T>();
-  #else  // NO_BOOST
+  #else  // VMATH_NO_BOOST
     return (angle_rad * M_PI) / 180.0;
-  #endif // NO_BOOST
+  #endif // VMATH_NO_BOOST
 }
 
 template<class T> class Vector2;  // forward declarations
@@ -467,7 +470,13 @@ class Vector2 {
      * same for y-coordinate.
      */
     inline bool constexpr operator==(Vector2<T> const &rhs) const {
-      return (std::abs(x - rhs.x) < epsilon) && (std::abs(y - rhs.y) < epsilon);
+      #ifdef VMATH_SOFT_COMPARE
+        return (std::abs(x - rhs.x) < static_cast<T>(epsilon)) &&
+               (std::abs(y - rhs.y) < static_cast<T>(epsilon));
+      #else
+        return x == rhs.x &&
+               y == rhs.y;
+      #endif
     }
 
     /**
@@ -1058,7 +1067,15 @@ class Vector3 {
      * same for y-coordinate, and z-coordinate.
      */
     inline bool constexpr operator==(Vector3<T> const &rhs) const {
-      return std::fabs(x - rhs.x) < epsilon && std::fabs(y - rhs.y) < epsilon && std::fabs(z - rhs.z) < epsilon;
+      #ifdef VMATH_SOFT_COMPARE
+        return std::fabs(x - rhs.x) < static_cast<T>(epsilon) &&
+               std::fabs(y - rhs.y) < static_cast<T>(epsilon) &&
+               std::fabs(z - rhs.z) < static_cast<T>(epsilon);
+      #else
+        return x == rhs.x &&
+               y == rhs.y &&
+               z == rhs.z;
+      #endif // VMATH_SOFT_COMPARE
     }
 
     /**
@@ -1523,8 +1540,17 @@ class Vector4 {
      * same for y-coordinate, z-coordinate, and w-coordinate.
      */
     inline bool constexpr operator==(Vector4<T> const &rhs) const {
-      return std::fabs(x - rhs.x) < epsilon && std::fabs(y - rhs.y) < epsilon && std::fabs(z - rhs.z) < epsilon
-             && std::fabs(w - rhs.w) < epsilon;
+      #ifdef VMATH_SOFT_COMPARE
+        return std::fabs(x - rhs.x) < static_cast<T>(epsilon) &&
+               std::fabs(y - rhs.y) < static_cast<T>(epsilon) &&
+               std::fabs(z - rhs.z) < static_cast<T>(epsilon) &&
+               std::fabs(w - rhs.w) < static_cast<T>(epsilon);
+      #else
+        return x == rhs.x &&
+               y == rhs.y &&
+               z == rhs.z &&
+               w == rhs.w;
+      #endif // VMATH_SOFT_COMPARE
     }
 
     /**
@@ -1892,17 +1918,17 @@ class Matrix3 {
      */
     inline static Matrix3<T> constexpr createRotationBetweenVectors(Vector3<T> from, Vector3<T> to) {
       // the static cast is to avoid narrowing conversion warnings when used with ints
-      return Matrix3<T>({static_cast<T>(to.crossProduct(from).x * to.crossProduct(from).x * (1.0f / (1.0f + to.dotProduct(from))) + to.dotProduct(from)),
-                         static_cast<T>(to.crossProduct(from).y * to.crossProduct(from).x * (1.0f / (1.0f + to.dotProduct(from))) - to.crossProduct(from).z),
-                         static_cast<T>(to.crossProduct(from).z * to.crossProduct(from).x * (1.0f / (1.0f + to.dotProduct(from))) + to.crossProduct(from).y),
+      return Matrix3<T>({static_cast<T>(to.crossProduct(from).x * to.crossProduct(from).x * (static_cast<T>(1.0) / (static_cast<T>(1.0) + to.dotProduct(from))) + to.dotProduct(from)),
+                         static_cast<T>(to.crossProduct(from).y * to.crossProduct(from).x * (static_cast<T>(1.0) / (static_cast<T>(1.0) + to.dotProduct(from))) - to.crossProduct(from).z),
+                         static_cast<T>(to.crossProduct(from).z * to.crossProduct(from).x * (static_cast<T>(1.0) / (static_cast<T>(1.0) + to.dotProduct(from))) + to.crossProduct(from).y),
 
-                         static_cast<T>(to.crossProduct(from).x * to.crossProduct(from).y * (1.0f / (1.0f + to.dotProduct(from))) + to.crossProduct(from).z),
-                         static_cast<T>(to.crossProduct(from).y * to.crossProduct(from).y * (1.0f / (1.0f + to.dotProduct(from))) + to.dotProduct(from)),
-                         static_cast<T>(to.crossProduct(from).z * to.crossProduct(from).y * (1.0f / (1.0f + to.dotProduct(from))) - to.crossProduct(from).x),
+                         static_cast<T>(to.crossProduct(from).x * to.crossProduct(from).y * (static_cast<T>(1.0) / (static_cast<T>(1.0) + to.dotProduct(from))) + to.crossProduct(from).z),
+                         static_cast<T>(to.crossProduct(from).y * to.crossProduct(from).y * (static_cast<T>(1.0) / (static_cast<T>(1.0) + to.dotProduct(from))) + to.dotProduct(from)),
+                         static_cast<T>(to.crossProduct(from).z * to.crossProduct(from).y * (static_cast<T>(1.0) / (static_cast<T>(1.0) + to.dotProduct(from))) - to.crossProduct(from).x),
 
-                         static_cast<T>(to.crossProduct(from).x * to.crossProduct(from).z * (1.0f / (1.0f + to.dotProduct(from))) - to.crossProduct(from).y),
-                         static_cast<T>(to.crossProduct(from).y * to.crossProduct(from).z * (1.0f / (1.0f + to.dotProduct(from))) + to.crossProduct(from).x),
-                         static_cast<T>(to.crossProduct(from).z * to.crossProduct(from).z * (1.0f / (1.0f + to.dotProduct(from))) + to.dotProduct(from))});
+                         static_cast<T>(to.crossProduct(from).x * to.crossProduct(from).z * (static_cast<T>(1.0) / (static_cast<T>(1.0) + to.dotProduct(from))) - to.crossProduct(from).y),
+                         static_cast<T>(to.crossProduct(from).y * to.crossProduct(from).z * (static_cast<T>(1.0) / (static_cast<T>(1.0) + to.dotProduct(from))) + to.crossProduct(from).x),
+                         static_cast<T>(to.crossProduct(from).z * to.crossProduct(from).z * (static_cast<T>(1.0) / (static_cast<T>(1.0) + to.dotProduct(from))) + to.dotProduct(from))});
     }
 
     /**
@@ -1951,15 +1977,27 @@ class Matrix3 {
      * same for y-coordinate, z-coordinate, and w-coordinate.
      */
     inline bool constexpr operator==(Matrix3<T> const &rhs) const {
-      return std::fabs(data[0] - rhs.data[0]) < epsilon &&
-             std::fabs(data[1] - rhs.data[1]) < epsilon &&
-             std::fabs(data[2] - rhs.data[2]) < epsilon &&
-             std::fabs(data[3] - rhs.data[3]) < epsilon &&
-             std::fabs(data[4] - rhs.data[4]) < epsilon &&
-             std::fabs(data[5] - rhs.data[5]) < epsilon &&
-             std::fabs(data[6] - rhs.data[6]) < epsilon &&
-             std::fabs(data[7] - rhs.data[7]) < epsilon &&
-             std::fabs(data[8] - rhs.data[8]) < epsilon;
+      #ifdef VMATH_SOFT_COMPARE
+        return std::fabs(data[0] - rhs.data[0]) < static_cast<T>(epsilon) &&
+               std::fabs(data[1] - rhs.data[1]) < static_cast<T>(epsilon) &&
+               std::fabs(data[2] - rhs.data[2]) < static_cast<T>(epsilon) &&
+               std::fabs(data[3] - rhs.data[3]) < static_cast<T>(epsilon) &&
+               std::fabs(data[4] - rhs.data[4]) < static_cast<T>(epsilon) &&
+               std::fabs(data[5] - rhs.data[5]) < static_cast<T>(epsilon) &&
+               std::fabs(data[6] - rhs.data[6]) < static_cast<T>(epsilon) &&
+               std::fabs(data[7] - rhs.data[7]) < static_cast<T>(epsilon) &&
+               std::fabs(data[8] - rhs.data[8]) < static_cast<T>(epsilon);
+      #else
+        return data[0] == rhs.data[0] &&
+               data[1] == rhs.data[1] &&
+               data[2] == rhs.data[2] &&
+               data[3] == rhs.data[3] &&
+               data[4] == rhs.data[4] &&
+               data[5] == rhs.data[5] &&
+               data[6] == rhs.data[6] &&
+               data[7] == rhs.data[7] &&
+               data[8] == rhs.data[8];
+      #endif // VMATH_SOFT_COMPARE
     }
 
     /**
@@ -2634,22 +2672,41 @@ class Matrix4 {
      * same for y-coordinate, z-coordinate, and w-coordinate.
      */
     inline bool constexpr operator==(Matrix4<T> const &rhs) const {
-      return std::fabs(data[ 0] - rhs.data[ 0]) < epsilon &&
-             std::fabs(data[ 1] - rhs.data[ 1]) < epsilon &&
-             std::fabs(data[ 2] - rhs.data[ 2]) < epsilon &&
-             std::fabs(data[ 3] - rhs.data[ 3]) < epsilon &&
-             std::fabs(data[ 4] - rhs.data[ 4]) < epsilon &&
-             std::fabs(data[ 5] - rhs.data[ 5]) < epsilon &&
-             std::fabs(data[ 6] - rhs.data[ 6]) < epsilon &&
-             std::fabs(data[ 7] - rhs.data[ 7]) < epsilon &&
-             std::fabs(data[ 8] - rhs.data[ 8]) < epsilon &&
-             std::fabs(data[ 9] - rhs.data[ 9]) < epsilon &&
-             std::fabs(data[10] - rhs.data[10]) < epsilon &&
-             std::fabs(data[11] - rhs.data[11]) < epsilon &&
-             std::fabs(data[12] - rhs.data[12]) < epsilon &&
-             std::fabs(data[13] - rhs.data[13]) < epsilon &&
-             std::fabs(data[14] - rhs.data[14]) < epsilon &&
-             std::fabs(data[15] - rhs.data[15]) < epsilon;
+      #ifdef VMATH_SOFT_COMPARE
+        return std::fabs(data[ 0] - rhs.data[ 0]) < static_cast<T>(epsilon) &&
+               std::fabs(data[ 1] - rhs.data[ 1]) < static_cast<T>(epsilon) &&
+               std::fabs(data[ 2] - rhs.data[ 2]) < static_cast<T>(epsilon) &&
+               std::fabs(data[ 3] - rhs.data[ 3]) < static_cast<T>(epsilon) &&
+               std::fabs(data[ 4] - rhs.data[ 4]) < static_cast<T>(epsilon) &&
+               std::fabs(data[ 5] - rhs.data[ 5]) < static_cast<T>(epsilon) &&
+               std::fabs(data[ 6] - rhs.data[ 6]) < static_cast<T>(epsilon) &&
+               std::fabs(data[ 7] - rhs.data[ 7]) < static_cast<T>(epsilon) &&
+               std::fabs(data[ 8] - rhs.data[ 8]) < static_cast<T>(epsilon) &&
+               std::fabs(data[ 9] - rhs.data[ 9]) < static_cast<T>(epsilon) &&
+               std::fabs(data[10] - rhs.data[10]) < static_cast<T>(epsilon) &&
+               std::fabs(data[11] - rhs.data[11]) < static_cast<T>(epsilon) &&
+               std::fabs(data[12] - rhs.data[12]) < static_cast<T>(epsilon) &&
+               std::fabs(data[13] - rhs.data[13]) < static_cast<T>(epsilon) &&
+               std::fabs(data[14] - rhs.data[14]) < static_cast<T>(epsilon) &&
+               std::fabs(data[15] - rhs.data[15]) < static_cast<T>(epsilon);
+      #else
+        return data[ 0] == rhs.data[ 0] &&
+               data[ 1] == rhs.data[ 1] &&
+               data[ 2] == rhs.data[ 2] &&
+               data[ 3] == rhs.data[ 3] &&
+               data[ 4] == rhs.data[ 4] &&
+               data[ 5] == rhs.data[ 5] &&
+               data[ 6] == rhs.data[ 6] &&
+               data[ 7] == rhs.data[ 7] &&
+               data[ 8] == rhs.data[ 8] &&
+               data[ 9] == rhs.data[ 9] &&
+               data[10] == rhs.data[10] &&
+               data[11] == rhs.data[11] &&
+               data[12] == rhs.data[12] &&
+               data[13] == rhs.data[13] &&
+               data[14] == rhs.data[14] &&
+               data[15] == rhs.data[15];
+      #endif // VMATH_SOFT_COMPARE
     }
 
     /**
@@ -3222,7 +3279,11 @@ class Quaternion {
      * for all quaternion coordinates.
      */
     inline bool constexpr operator==(Quaternion<T> const &rhs) const {
-      return (std::fabs(w - rhs.w) < epsilon) && v == rhs.v;
+      #ifdef VMATH_SOFT_COMPARE
+        return (std::fabs(w - rhs.w) < static_cast<T>(epsilon)) && v == rhs.v;
+      #else
+        return w == rhs.w && v == rhs.v;
+      #endif // VMATH_SOFT_COMPARE
     }
 
     /**
@@ -3357,7 +3418,7 @@ class Quaternion {
      * @param angleDeg Angle of rotation around axis (in radians).
      */
     inline static Quaternion<T> constexpr fromAxisRot_rad(Vector3<T> axis, T angleRad) {
-      return Quaternion<T>(std::cos(angleRad / 2.0), axis * std::sin(angleRad / 2.0));
+      return Quaternion<T>(std::cos(angleRad / static_cast<T>(2.0)), axis * std::sin(angleRad / static_cast<T>(2.0)));
     }
 
     /**
@@ -3425,9 +3486,9 @@ class Quaternion {
 
       T s;
       T const tr = m(1, 1) + m(2, 2) + m(3, 3);
-      if(tr >= epsilon) {
-        s = 0.5 / static_cast<T>(std::sqrt(tr + 1.0));
-        q.w = 0.25 / s;
+      if(tr >= static_cast<T>(epsilon)) {
+        s = static_cast<T>(0.5) / static_cast<T>(std::sqrt(tr + static_cast<T>(1.0)));
+        q.w = static_cast<T>(0.25) / s;
         q.v.x = (m(3, 2) - m(2, 3)) * s;
         q.v.y = (m(1, 3) - m(3, 1)) * s;
         q.v.z = (m(2, 1) - m(1, 2)) * s;
@@ -3439,23 +3500,23 @@ class Quaternion {
         char bigIdx = (d0 > d1) ? ((d0 > d2) ? 0 : 2) : ((d1 > d2) ? 1 : 2);
 
         if(bigIdx == 0) {
-          s = 2.0 * static_cast<T>(std::sqrt(1.0 + m(1, 1) - m(2, 2) - m(3, 3)));
+          s = static_cast<T>(2.0) * static_cast<T>(std::sqrt(static_cast<T>(1.0) + m(1, 1) - m(2, 2) - m(3, 3)));
           q.w = (m(3, 2) - m(2, 3)) / s;
-          q.v.x = 0.25 * s;
+          q.v.x = static_cast<T>(0.25) * s;
           q.v.y = (m(1, 2) + m(2, 1)) / s;
           q.v.z = (m(1, 3) + m(3, 1)) / s;
         } else if(bigIdx == 1) {
-          s = 2.0 * static_cast<T>(std::sqrt(1.0 + m(2, 2) - m(1, 1) - m(3, 3)));
+          s = static_cast<T>(2.0) * static_cast<T>(std::sqrt(static_cast<T>(1.0) + m(2, 2) - m(1, 1) - m(3, 3)));
           q.w = (m(1, 3) - m(3, 1)) / s;
           q.v.x = (m(1, 2) + m(2, 1)) / s;
-          q.v.y = 0.25 * s;
+          q.v.y = static_cast<T>(0.25) * s;
           q.v.z = (m(2, 3) + m(3, 2)) / s;
         } else {
-          s = 2.0 * static_cast<T>(std::sqrt(1.0 + m(3, 3) - m(1, 1) - m(2, 2)));
+          s = static_cast<T>(2.0) * static_cast<T>(std::sqrt(static_cast<T>(1.0) + m(3, 3) - m(1, 1) - m(2, 2)));
           q.w = (m(2, 1) - m(1, 2)) / s;
           q.v.x = (m(1, 3) + m(3, 1)) / s;
           q.v.y = (m(2, 3) + m(3, 2)) / s;
-          q.v.z = 0.25 * s;
+          q.v.z = static_cast<T>(0.25) * s;
         }
       }
 
@@ -3475,9 +3536,9 @@ class Quaternion {
 
       T s;
       T const tr = m(1, 1) + m(2, 2) + m(3, 3);
-      if(tr >= epsilon) {
-        s = 0.5 / static_cast<T>(std::sqrt(tr + 1.0));
-        q.w = 0.25 / s;
+      if(tr >= static_cast<T>(epsilon)) {
+        s = static_cast<T>(0.5) / static_cast<T>(std::sqrt(tr + static_cast<T>(1.0)));
+        q.w = static_cast<T>(0.25) / s;
         q.v.x = (m(3, 2) - m(2, 3)) * s;
         q.v.y = (m(1, 3) - m(3, 1)) * s;
         q.v.z = (m(2, 1) - m(1, 2)) * s;
@@ -3489,23 +3550,23 @@ class Quaternion {
         char bigIdx = (d0 > d1) ? ((d0 > d2) ? 0 : 2) : ((d1 > d2) ? 1 : 2);
 
         if(bigIdx == 0) {
-          s = 2.0 * static_cast<T>(std::sqrt(1.0 + m(1, 1) - m(2, 2) - m(3, 3)));
+          s = static_cast<T>(2.0) * static_cast<T>(std::sqrt(static_cast<T>(1.0) + m(1, 1) - m(2, 2) - m(3, 3)));
           q.w = (m(3, 2) - m(2, 3)) / s;
-          q.v.x = 0.25 * s;
+          q.v.x = static_cast<T>(0.25) * s;
           q.v.y = (m(1, 2) + m(2, 1)) / s;
           q.v.z = (m(1, 3) + m(3, 1)) / s;
         } else if(bigIdx == 1) {
-          s = 2.0 * static_cast<T>(std::sqrt(1.0 + m(2, 2) - m(1, 1) - m(3, 3)));
+          s = static_cast<T>(2.0) * static_cast<T>(std::sqrt(static_cast<T>(1.0) + m(2, 2) - m(1, 1) - m(3, 3)));
           q.w = (m(1, 3) - m(3, 1)) / s;
           q.v.x = (m(1, 2) + m(2, 1)) / s;
-          q.v.y = 0.25 * s;
+          q.v.y = static_cast<T>(0.25) * s;
           q.v.z = (m(2, 3) + m(3, 2)) / s;
         } else {
-          s = 2.0 * static_cast<T>(std::sqrt(1.0 + m(3, 3) - m(1, 1) - m(2, 2)));
+          s = static_cast<T>(2.0) * static_cast<T>(std::sqrt(static_cast<T>(1.0) + m(3, 3) - m(1, 1) - m(2, 2)));
           q.w = (m(2, 1) - m(1, 2)) / s;
           q.v.x = (m(1, 3) + m(3, 1)) / s;
           q.v.y = (m(2, 3) + m(3, 2)) / s;
-          q.v.z = 0.25 * s;
+          q.v.z = static_cast<T>(0.25) * s;
         }
       }
 
@@ -3524,15 +3585,15 @@ class Quaternion {
       Quaternion<T> ret;
       T const cosTheta = w * q2.w + v.x * q2.v.x + v.y * q2.v.y + v.z * q2.v.z;
       T const theta = static_cast<T>(std::acos(cosTheta));
-      if(std::fabs(theta) < epsilon) {
+      if(std::fabs(theta) < static_cast<T>(epsilon)) {
         ret = *this;
       } else {
-        T sinTheta = static_cast<T>(std::sqrt(1.0 - cosTheta * cosTheta));
-        if(std::fabs(sinTheta) < epsilon) {
-          ret.w = 0.5 * w + 0.5 * q2.w;
-          ret.v = v.lerp(0.5, q2.v);
+        T sinTheta = static_cast<T>(std::sqrt(static_cast<T>(1.0) - cosTheta * cosTheta));
+        if(std::fabs(sinTheta) < static_cast<T>(epsilon)) {
+          ret.w = static_cast<T>(0.5) * w + static_cast<T>(0.5) * q2.w;
+          ret.v = v.lerp(static_cast<T>(0.5), q2.v);
         } else {
-          T rA = static_cast<T>(std::sin((1.0 - r) * theta)) / sinTheta;
+          T rA = static_cast<T>(std::sin((static_cast<T>(1.0) - r) * theta)) / sinTheta;
           T rB = static_cast<T>(std::sin(r * theta)) / sinTheta;
 
           ret.w = w * rA + q2.w * rB;
