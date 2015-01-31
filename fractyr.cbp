@@ -1013,6 +1013,7 @@
 		</Unit>
 		<Unit filename="resources/voxelstorm.ico" />
 		<Unit filename="shader_load.cpp" />
+		<Unit filename="shader_load.h" />
 		<Unit filename="soundstorm.cpp" />
 		<Unit filename="soundstorm.h" />
 		<Unit filename="universe.cpp" />

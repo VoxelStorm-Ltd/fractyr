@@ -1,6 +1,4 @@
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <string>
+#include "shader_load.h"
 #include <vector>
 #include <iostream>
 

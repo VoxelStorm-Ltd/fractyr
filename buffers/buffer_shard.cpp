@@ -1,9 +1,7 @@
 #include "buffer_shard.h"
 #include "vmath.h"
 #include "blob_loader.h"
-
-// loader
-GLuint shader_load(std::string const &shader_vertex_source, std::string const &shader_fragment_source);
+#include "shader_load.h"
 
 // linked binary resource blob symbols using blob_loader.h
 BLOB_LOAD(shaders_enemy_grunt_vert_glsl);
