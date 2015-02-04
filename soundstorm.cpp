@@ -591,7 +591,7 @@ unsigned int soundstorm::get_device_current() {
 
 void soundstorm::set_device(unsigned int new_device_index) {
   /// Switch to a different output device
-    for(auto const &it : boost::make_iterator_range(audio_system->devicesBegin(), audio_system->devicesEnd())) {
+  for(auto const &it : boost::make_iterator_range(audio_system->devicesBegin(), audio_system->devicesEnd())) {
     if(it.index() == static_cast<int>(new_device_index)) {
       audio_device = &it;
       std::cout << "SoundStorm: switched to device " << it.name() << std::endl;
