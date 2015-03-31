@@ -4,7 +4,7 @@
 #include <vector>
 #include <list>
 #include <queue>
-#include <boost/thread.hpp>
+#include <thread>
 #include <portaudiocpp/PortAudioCpp.hxx>
 #include <ogg/os_types.h>
 #include <vorbis/vorbisfile.h>
@@ -14,6 +14,7 @@ class soundstorm {
   /// VoxelStorm Sound Manager
   ///
   /// define DEBUG_SOUNDSTORM for detailed debugging output
+  /// define SOUNDSTORM_NO_SSE to avoid using Intel SSE intrinsics
 public:
   enum channel_type : size_t {                        // output channels used as array indices
     /// see http://en.wikipedia.org/wiki/Surround_sound#Standard_speaker_channels
@@ -94,11 +95,11 @@ public:
     /// A music playback deck
     #ifdef DEBUG_SOUNDSTORM
       unsigned int checkvalue = 123456;               // debug check value, this is the nearest we get to runtime type safety
-    #endif
+    #endif // DEBUG_SOUNDSTORM
     std::queue<music*> playlist;                      // what's playing now (front) and what to play next
-    float volume = 1.0;                               // how loud to play this current deck, 0-1 (but may exceed 1 for special effects)
-    float volume_target = 1.0;                        // what to fade towards, if anything
-    float volume_fadespeed = 0.0;                     // how fast to fade
+    float volume           __attribute__((__aligned__(16))) = 1.0;    // how loud to play this current deck, 0-1 (but may exceed 1 for special effects)
+    float volume_target    __attribute__((__aligned__(16))) = 1.0;    // what to fade towards, if anything
+    float volume_fadespeed __attribute__((__aligned__(16))) = 0.0;    // how fast to fade
     bool repeat = true;                               // at the end of the playlist last entry repeats indefinitely - if not, deck outputs silence
     std::vector<float> buffer_l[2];                   // ping-pong buffer pair, left channel
     std::vector<float> buffer_r[2];                   // ping-pong buffer pair, right channel
@@ -111,6 +112,7 @@ public:
   bool enabled = false;                               // whether to use the sound system - if disabled, all play functions exit early
 
 private:
+  unsigned int num_devices = 0;                       // number of known devices
   unsigned int channels = 2;                          // output channels
   float samplerate = 44100.0;                         // output sample rate
   unsigned long frames_per_buffer = 64;               // frames per buffer
@@ -133,11 +135,11 @@ private:
   portaudio::StreamParameters                  *stream_params     = nullptr;
   portaudio::MemFunCallbackStream<soundstorm>  *stream            = nullptr;
 
-  float hdr_window_top_min = 1.0;                     // the high dynamic range window's upper limit can't fall below this
-  float hdr_window_top = hdr_window_top_min;          // the high dynamic range window's upper limit, may exceed 1
-  float hdr_window_bottom = 0.0;                      // minimum hdr_scale for sounds to get played
-  //float hdr_dropback_rate = 1.0 / samplerate * frames_per_buffer;       // amount subtracted per buffer fill
-  float hdr_dropback_rate = 0.995;                    // scaling multiplier per buffer fill
+  float hdr_window_top_min __attribute__((__aligned__(16))) = 1.0;                // the high dynamic range window's upper limit can't fall below this
+  float hdr_window_top     __attribute__((__aligned__(16))) = hdr_window_top_min; // the high dynamic range window's upper limit, may exceed 1
+  float hdr_window_bottom  __attribute__((__aligned__(16))) = 0.0;                // minimum hdr_scale for sounds to get played
+  //float hdr_dropback_rate  __attribute__((__aligned__(16))) = 1.0 / samplerate * frames_per_buffer;   // amount subtracted per buffer fill
+  float hdr_dropback_rate  __attribute__((__aligned__(16))) = 0.995;              // scaling multiplier per buffer fill
 
   float volume = 1.0;                                 // global output volume control, from 0 to 1 (although possible to go outside this)
 
@@ -151,7 +153,7 @@ private:
   std::vector<music_buffer*> music_library;           // the music buffers
   std::vector<deck> decks;                            // music decks control what music is currently playing
 
-  boost::thread *streamer_thread = nullptr;           // thread for the streaming decoder
+  std::thread *streamer_thread = nullptr;             // thread for the streaming decoder
   bool streamer_run = true;                           // whether to keep running the streamer
 
   #ifdef DEBUG_SOUNDSTORM
@@ -160,13 +162,17 @@ private:
     unsigned int session_max_simultaneous_sounds = 0;
     float session_min_distance = 10000.0;
     float session_max_distance = 0.0;
-  #endif
+  #endif // DEBUG_SOUNDSTORM
 
 public:
   soundstorm();
   ~soundstorm();
 
+  void init_device();
+  void shutdown_device();
+  void restart_device();
   void start_streamer();
+  void stop_streamer();
 
   int mixer(void const *buffer_in,
             void *buffer_out,
@@ -179,14 +185,19 @@ public:
   static int    ogg_callback_close(void *datasource);
   static long   ogg_callback_tell( void *datasource);
 
-  unsigned int get_device_default();
-  unsigned int get_device_current();
+  unsigned int get_device_default() const;
+  unsigned int get_device_current() const;
+  void get_device_list(         std::vector<std::pair<unsigned int, std::string>> &target_list) const;
+  void get_device_list_out_only(std::vector<std::pair<unsigned int, std::string>> &target_list) const;
+  void get_device_list_in_only( std::vector<std::pair<unsigned int, std::string>> &target_list) const;
   void set_device(unsigned int new_device_index);
   // statistics
-  double get_cpu_usage();
-  double get_sample_rate();
-  double get_time();
-  void dump_stats();
+  double get_cpu_usage() const;
+  double get_sample_rate() const;
+  double get_time() const;
+  void dump_stats() const;
+  void dump_session_report() const;
+  void dump_device_info();
 
   // state
   Vector3f const &get_listener_position() const;
@@ -199,8 +210,8 @@ public:
   void update_ears();
 
   // library
-  soundeffect *get_effect(unsigned int effect_id);
-  music_buffer *get_music(unsigned int music_id);
+  soundeffect *get_effect(unsigned int effect_id) const;
+  music_buffer *get_music(unsigned int music_id) const;
   unsigned int load(unsigned char const *buffer, size_t buffersize, float hdr_scale = 1.0);
   unsigned int music_load(unsigned char const *buffer, size_t buffersize);
 
