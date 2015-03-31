@@ -1029,7 +1029,7 @@ void soundstorm::fade_music_volume(unsigned int deck_id, float newvolume, float 
       return;
     }
   #endif // NDEBUG
-  decks[deck_id].volume_fadespeed = fabsf(newvolume - decks[deck_id].volume) / (seconds_to_take * samplerate);  // this comes first since we're threaded
+  decks[deck_id].volume_fadespeed = std::fabs(newvolume - decks[deck_id].volume) / (seconds_to_take * samplerate);  // this comes first since we're threaded
   decks[deck_id].volume_target = newvolume;
 }
 
