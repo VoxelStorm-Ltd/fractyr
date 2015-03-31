@@ -79,7 +79,7 @@ public:
       /// Specific constructor
     }
   };
-  typedef std::vector<sound*> soundgroup;             // all of the channel components that make up a sound
+  using soundgroup = std::vector<sound*>;             // all of the channel components that make up a sound
   struct music_buffer {
     unsigned char const *buffer = nullptr;            // the buffer containing encoded music, in ogg vorbis format
     ogg_int64_t buffersize = 0;                       // the size of the buffer
