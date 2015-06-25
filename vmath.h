@@ -3156,6 +3156,19 @@ class Quaternion {
       : w(w_), v(x, y, z) {
     }
 
+    //----------------[ assignment ]-------------------------
+    /**
+     * Sets to (w_ + xi + yj + zk).
+     * @param w_ Real part of quaternion.
+     * @param x Complex coefficient for i complex constant.
+     * @param y Complex coefficient for j complex constant.
+     * @param z Complex coefficient for k complex constant.
+     */
+    inline void assign(T w_ = 0, T x = 0, T y = 0, T z = 0) __attribute__((__always_inline__)) {
+      w = w_;
+      v.assign(x, y, z);
+    }
+
     /**
      * Copy operator
      * @param rhs Right hand side argument of binary operator.
