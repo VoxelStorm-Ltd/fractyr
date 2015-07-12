@@ -3,8 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <FTGL/ftgl.h>
 #include "vmath.h"
-#include "soundstorm.h"
-#include "oculusstorm.h"
+#include "soundstorm/soundstorm.h"
+#include "oculusstorm/oculusstorm.h"
 #include "universe.h"
 #include "ship.h"
 #include "playership.h"

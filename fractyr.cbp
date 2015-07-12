@@ -969,8 +969,8 @@
 		<Unit filename="input/callback_windowresize.cpp" />
 		<Unit filename="input/controls.cpp" />
 		<Unit filename="main.cpp" />
-		<Unit filename="oculusstorm.cpp" />
-		<Unit filename="oculusstorm.h" />
+		<Unit filename="oculusstorm/oculusstorm.cpp" />
+		<Unit filename="oculusstorm/oculusstorm.h" />
 		<Unit filename="platform_defines.h" />
 		<Unit filename="resources/compile_blob.sh" />
 		<Unit filename="resources/music_main_intro.ogg">
@@ -1014,8 +1014,8 @@
 		<Unit filename="resources/voxelstorm.ico" />
 		<Unit filename="shader_load.cpp" />
 		<Unit filename="shader_load.h" />
-		<Unit filename="soundstorm.cpp" />
-		<Unit filename="soundstorm.h" />
+		<Unit filename="soundstorm/soundstorm.cpp" />
+		<Unit filename="soundstorm/soundstorm.h" />
 		<Unit filename="universe.cpp" />
 		<Unit filename="universe.h" />
 		<Unit filename="version.h" />

@@ -3,7 +3,7 @@
 #include "vmath.h"
 #include "gameplayer.h"
 #include "universe.h"
-#include "oculusstorm.h"
+#include "oculusstorm/oculusstorm.h"
 
 extern gameplayer player;
 extern universe root;

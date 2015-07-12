@@ -5,7 +5,7 @@
 #include <GLFW/glfw3.h>
 #include "vmath.h"
 #include "platform_defines.h"
-#include "oculusstorm.h"
+#include "oculusstorm/oculusstorm.h"
 
 // callbacks
 void callback_error(int error, char const *description);
