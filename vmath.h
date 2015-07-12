@@ -148,14 +148,24 @@ namespace VMATH_NAMESPACE {
 double constexpr epsilon = 4.37114e-05;
 #define EPSILON epsilon
 #define DEG2RAD deg2rad
+#define RAD2DEG rad2deg
 
 template<class T>
-inline static T constexpr const deg2rad(T angle_rad) {
+inline static T constexpr const deg2rad(T const angle_deg) {
   #ifndef VMATH_NO_BOOST
-    //return (angle_rad * boost::math::constants::pi<T>()) / 180.0;
-    return angle_rad * boost::math::constants::degree<T>();
+    //return (angle_deg * boost::math::constants::pi<T>()) / 180.0;
+    return angle_deg * boost::math::constants::degree<T>();
   #else  // VMATH_NO_BOOST
-    return (angle_rad * M_PI) / 180.0;
+    return (angle_deg * M_PI) / 180.0;
+  #endif // VMATH_NO_BOOST
+}
+
+template<class T>
+inline static T constexpr const rad2deg(T const angle_rad) {
+  #ifndef VMATH_NO_BOOST
+    return angle_rad * boost::math::constants::radian<T>();
+  #else  // VMATH_NO_BOOST
+    return (angle_rad * 180.0) / M_PI;
   #endif // VMATH_NO_BOOST
 }
 
@@ -3154,6 +3164,19 @@ class Quaternion {
      */
     inline constexpr Quaternion(T w_, T x, T y, T z) __attribute__((__always_inline__))
       : w(w_), v(x, y, z) {
+    }
+
+    //----------------[ assignment ]-------------------------
+    /**
+     * Sets to (w_ + xi + yj + zk).
+     * @param w_ Real part of quaternion.
+     * @param x Complex coefficient for i complex constant.
+     * @param y Complex coefficient for j complex constant.
+     * @param z Complex coefficient for k complex constant.
+     */
+    inline void assign(T w_ = 0, T x = 0, T y = 0, T z = 0) __attribute__((__always_inline__)) {
+      w = w_;
+      v.assign(x, y, z);
     }
 
     /**

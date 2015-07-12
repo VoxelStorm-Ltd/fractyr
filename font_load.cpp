@@ -1,8 +1,8 @@
+#include "font_load.h"
 #include <iostream>
 #include <boost/filesystem.hpp>
-#include <FTGL/ftgl.h>
 
-FTFont *font_load(std::string const &filename, unsigned int size = 16) {
+FTFont *font_load(std::string const &filename, unsigned int size) {
   /// Try to load a font from the specified filename, running all checks first
   if(!(boost::filesystem::exists(filename) &&
        boost::filesystem::is_regular_file(filename))) {
@@ -23,7 +23,7 @@ FTFont *font_load(std::string const &filename, unsigned int size = 16) {
   return font;
 }
 
-FTFont *font_load(unsigned char const *buffer, size_t buffersize, unsigned int size = 16) {
+FTFont *font_load(unsigned char const *buffer, size_t buffersize, unsigned int size) {
   /// Try to load a font from the specified filename, running all checks first
   FTFont *font = new FTTextureFont(buffer, buffersize);
   //FTFont *font = new FTBufferFont(buffer, buffersize);
@@ -37,7 +37,7 @@ FTFont *font_load(unsigned char const *buffer, size_t buffersize, unsigned int s
   return font;
 }
 
-FTFont *font_load3d(std::string const &filename, unsigned int size = 16) {
+FTFont *font_load3d(std::string const &filename, unsigned int size) {
   /// Try to load a font from the specified filename as a font for 3D display, running all checks first
   if(!(boost::filesystem::exists(filename) &&
        boost::filesystem::is_regular_file(filename))) {
@@ -57,7 +57,7 @@ FTFont *font_load3d(std::string const &filename, unsigned int size = 16) {
   return font;
 }
 
-FTFont *font_load3d(unsigned char const *buffer, size_t buffersize, unsigned int size = 16) {
+FTFont *font_load3d(unsigned char const *buffer, size_t buffersize, unsigned int size) {
   /// Try to load a font from the specified filename as a font for 3D display, running all checks first
   FTFont *font = new FTExtrudeFont(buffer, buffersize);
   if(!font) {

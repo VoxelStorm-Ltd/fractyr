@@ -260,12 +260,12 @@ void gameplayer::setup_input() {
     // gamepad / joystick bindings only if we actually have one connected, so we don't need runtime checks
     bind(controlbinding::controltype::JOYSTICK_BUTTON,    0,  &gameplayer::input_fire1);
     //bind(controlbinding::controltype::JOYSTICK_BUTTON,    1,  &gameplayer::input_fire2);
-    bind(controlbinding::controltype::JOYSTICK_BUTTON,    2,  &gameplayer::input_move_forward);
-    bind(controlbinding::controltype::JOYSTICK_BUTTON,    3,  &gameplayer::input_move_back);
+    bind(controlbinding::controltype::JOYSTICK_AXIS_FULL, 3,  &gameplayer::input_move_forward, true, 0.0, -1.0);
+    //bind(controlbinding::controltype::JOYSTICK_AXIS_FULL, 3,  &gameplayer::input_move_back);
     bind(controlbinding::controltype::JOYSTICK_AXIS_FULL, 0,  &gameplayer::input_roll_right,   true, 0.0, 4.0);
-    bind(controlbinding::controltype::JOYSTICK_AXIS_FULL, 1,  &gameplayer::input_pitch_down,   true, 0.0, 4.0);
+    bind(controlbinding::controltype::JOYSTICK_AXIS_FULL, 1,  &gameplayer::input_pitch_down,   true, 0.0, -4.0);
     bind(controlbinding::controltype::JOYSTICK_AXIS_FULL, 2,  &gameplayer::input_move_forward, true, 0.0, -1.0);
-    bind(controlbinding::controltype::JOYSTICK_AXIS_FULL, 3,  &gameplayer::input_yaw_right,    true, 0.0, 4.0);
+    bind(controlbinding::controltype::JOYSTICK_AXIS_FULL, 2,  &gameplayer::input_yaw_right,    true, 0.0, 4.0);
     //bind(controlbinding::controltype::JOYSTICK_BUTTON,    4,  &gameplayer::input_select_weapon_next);
     //bind(controlbinding::controltype::JOYSTICK_BUTTON,    5,  &gameplayer::input_select_weapon_prev);
     //bind(controlbinding::controltype::JOYSTICK_BUTTON,    12, &gameplayer::input_select_weapon_0);
