@@ -34,15 +34,15 @@
 #ifdef PLATFORM_WINDOWS
   #define BLOB_LOAD(name) extern unsigned char const binary_resources_##name##_start[]; \
                           extern unsigned char const binary_resources_##name##_end[]; \
-                          extern unsigned char const binary_resources_##name##_size[];
+                          extern unsigned char const binary_resources_##name##_size[]
 #else // PLATFORM_WINDOWS
   #ifdef PLATFORM_MACOS
     #define BLOB_LOAD(name) extern unsigned char _binary_resources_##name##_x[]; \
-                            extern unsigned int  _binary_resources_##name##_len_x;
+                            extern unsigned int  _binary_resources_##name##_len_x
   #else // PLATFORM_MACOS
     #define BLOB_LOAD(name) extern unsigned char const _binary_resources_##name##_start[]; \
                             extern unsigned char const _binary_resources_##name##_end[]; \
-                            extern unsigned char const _binary_resources_##name##_size[];
+                            extern unsigned char const _binary_resources_##name##_size[]
   #endif // PLATFORM_MACOS
 #endif // PLATFORM_WINDOWS
 // size pointer int converter
