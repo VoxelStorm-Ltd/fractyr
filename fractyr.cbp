@@ -946,6 +946,7 @@
 		<Unit filename="entity/ship.cpp" />
 		<Unit filename="entity/ship.h" />
 		<Unit filename="font_load.cpp" />
+		<Unit filename="font_load.h" />
 		<Unit filename="fractyr.rc">
 			<Option compilerVar="WINDRES" />
 			<Option target="Win32_Debug" />
@@ -956,6 +957,7 @@
 		<Unit filename="gameplayer.cpp" />
 		<Unit filename="gameplayer.h" />
 		<Unit filename="get_version.cpp" />
+		<Unit filename="get_version.h" />
 		<Unit filename="init_graphics.cpp" />
 		<Unit filename="input/callback_key.cpp" />
 		<Unit filename="input/callback_mouse.cpp" />
