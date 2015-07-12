@@ -21,7 +21,7 @@ cp bin/Release/* "$binary_dir"/
 size_blocks=$(du -s "$app_skel_dir" | cut -f 1)
 size_kb=$(du -s -k "$app_skel_dir" | cut -f 1)
 # allocate an extra margin in the image
-size_alloc_kb=$((size_kb + 1024))
+size_alloc_kb=$((size_kb + 4096))
 echo "App name: $app_name, size: $size_kb""KB ($size_blocks blocks), allocating $size_alloc_kb""KB"
 
 # create a writeable disk image of the correct size
