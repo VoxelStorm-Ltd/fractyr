@@ -10,7 +10,6 @@
 #include <portaudiocpp/PortAudioCpp.hxx>
 #include <ogg/ogg.h>
 #include <vorbis/vorbisfile.h>
-#include "vmath.h"
 
 soundstorm::soundstorm() try
   : audio_system_auto(false),             // don't initialise portaudio automatically
@@ -133,7 +132,9 @@ void soundstorm::init_device() {
 void soundstorm::shutdown_device() {
   /// Shut down the current output device and free it, in preparation of exit or re-init
   if(stream) {
-    stream->stop();
+    if(!stream->isStopped()) {
+      stream->stop();
+    }
     stream->close();
     delete stream;
     stream = nullptr;
@@ -601,7 +602,7 @@ int soundstorm::ogg_callback_seek(void *datasource, ogg_int64_t offset, int orig
   return 0;
 }
 
-int soundstorm::ogg_callback_close(void *datasource __attribute__((unused))) {
+int soundstorm::ogg_callback_close(void *datasource __attribute__((__unused__))) {
   /// The interface is identical to that of fclose, and identical behaviour is expected
   // we do absolutely nothing
   return 0;
