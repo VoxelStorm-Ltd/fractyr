@@ -1,4 +1,4 @@
-#include <GL/glew.h>
+//#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 void callback_textinput(GLFWwindow *thiswindow __attribute__((unused)), unsigned int thischar __attribute__((__unused__))) {

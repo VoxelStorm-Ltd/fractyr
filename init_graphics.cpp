@@ -1,10 +1,10 @@
 #include "universe.h"
-#include <cstdlib>
-#include <iostream>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include "vmath.h"
-#include "platform_defines.h"
+//#include <cstdlib>
+//#include <iostream>
+//#include <GL/glew.h>
+//#include <GLFW/glfw3.h>
+//#include "vmath.h"
+//#include "platform_defines.h"
 #include "oculusstorm/oculusstorm.h"
 
 // callbacks

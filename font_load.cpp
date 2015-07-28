@@ -1,5 +1,5 @@
 #include "font_load.h"
-#include <iostream>
+//#include <iostream>
 #include <boost/filesystem.hpp>
 
 FTFont *font_load(std::string const &filename, unsigned int size) {

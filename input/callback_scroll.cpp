@@ -1,7 +1,7 @@
-#include <iostream>
-#include <cmath>
+//#include <iostream>
+//#include <cmath>
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
+//#include <GLFW/glfw3.h>
 #include "gameplayer.h"
 
 extern gameplayer player;

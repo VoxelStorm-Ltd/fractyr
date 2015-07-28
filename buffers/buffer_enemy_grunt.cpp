@@ -1,5 +1,5 @@
 #include "buffer_enemy_grunt.h"
-#include "blob_loader.h"
+//#include "blob_loader.h"
 #include "shader_load.h"
 
 // linked binary resource blob symbols using blob_loader.h

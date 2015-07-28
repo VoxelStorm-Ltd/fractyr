@@ -1,7 +1,7 @@
-#include <iostream>
-#include <sstream>
+//#include <iostream>
+//#include <sstream>
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
+//#include <GLFW/glfw3.h>
 //#include "screenshotstorm.h"
 #include "gameplayer.h"
 #include "universe.h"

@@ -1,6 +1,6 @@
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include "vmath.h"
+//#include <GLFW/glfw3.h>
+//#include "vmath.h"
 #include "gameplayer.h"
 #include "universe.h"
 #include "oculusstorm/oculusstorm.h"

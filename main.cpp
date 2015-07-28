@@ -1,7 +1,7 @@
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
+//#include <GLFW/glfw3.h>
 #include <FTGL/ftgl.h>
-#include "platform_defines.h"
+//#include "platform_defines.h"
 #include "soundstorm/soundstorm.h"
 #include "oculusstorm/oculusstorm.h"
 #include "universe.h"
