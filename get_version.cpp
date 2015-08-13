@@ -1,5 +1,6 @@
 #include "get_version.h"
 #include "version.h"
+#include "git_version.h"
 
 std::string const get_version() {
   /// Return a string describing the current version.
@@ -9,5 +10,13 @@ std::string const get_version() {
     version += " ";
   }
   version += AutoVersion::FULLVERSION_STRING;
+  return version;
+}
+
+std::string const get_git_version() {
+  /// Return a string describing the current git revision.
+  std::string version(AutoVersion::GIT_BRANCH);
+  version += ":";
+  version += AutoVersion::GIT_REVISION;
   return version;
 }
