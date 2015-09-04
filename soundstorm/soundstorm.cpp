@@ -1,4 +1,8 @@
 #include "soundstorm.h"
+#include "platform_defines.h"
+#ifdef PLATFORM_LINUX
+  #include "pa_linux_alsa.h"
+#endif // PLATFORM_LINUX
 #ifndef NDEBUG
   #include <cassert>
 #endif
@@ -63,9 +67,17 @@ soundstorm::~soundstorm() {
   /// Default destructor
   dump_session_report();
   stop_streamer();
+  auto playing_backup = playing;                // so we can delete these after
   playing.clear();
   decks.clear();
   stream->abort();                              // tell the stream to stop without waiting for the buffers to finish
+  for(auto &it : playing_backup) {
+    delete it;
+  }
+  for(auto &it : effect_library) {
+    delete it;
+  }
+  effect_library.clear();
   shutdown_device();
   audio_system->terminate();                    // release audio resources
 }
@@ -117,7 +129,19 @@ void soundstorm::init_device() {
     *this,                                                    // class instance
     &soundstorm::mixer);                                      // member function to call
 
-  stream->start();                                            // start the stream
+  #ifdef PLATFORM_LINUX
+    int alsacard;
+    int const error = PaAlsa_GetStreamOutputCard(stream->paStream(), &alsacard);
+    if(error != 0) {
+      std::cout << "SoundStorm: Error querying ALSA for stream output card: " << error << std::endl;
+    }
+    std::cout << "SoundStorm: Requesting realtime scheduling from ALSA on card " << alsacard << std::endl;
+    PaAlsa_EnableRealtimeScheduling(stream->paStream(), true);
+  #endif // PLATFORM_LINUX
+
+  #ifndef NSOUND
+    stream->start();                                          // start the stream
+  #endif // NSOUND
   enabled = true;
   std::cout << "SoundStorm: Initialised." << std::endl;
 }
@@ -131,6 +155,10 @@ void soundstorm::shutdown_device() {
     delete stream;
     stream = nullptr;
   }
+  delete stream_out_params;
+  stream_out_params = nullptr;
+  delete stream_params;
+  stream_params = nullptr;
   enabled = false;
   std::cout << "SoundStorm: Shutdown complete." << std::endl;
 }
@@ -164,7 +192,9 @@ void soundstorm::start_streamer() {
   streamer_run = true;
 
   // start the streaming decoder thread
-  streamer_thread = new std::thread(std::bind(&soundstorm::streamer, this));
+  #ifndef NSOUND
+    streamer_thread = new std::thread(std::bind(&soundstorm::streamer, this));
+  #endif // NSOUND
 }
 
 void soundstorm::stop_streamer() {
@@ -353,7 +383,7 @@ int soundstorm::mixer(void const *buffer_in __attribute__((__unused__)),
     #else
       _mm_store_ss(&hdr_window_top, _mm_max_ss(_mm_set_ss(hdr_window_top), _mm_set_ss(max_level)));  // SSE intrinsicts: branchless max
     #endif // SOUNDSTORM_NO_SSE || DEBUG_SOUNDSTORM
-    float const final_scale = volume / hdr_window_top;                // final global volume control and HDR window scaling
+    float const final_scale = volume_master / hdr_window_top;         // final global volume control and HDR window scaling
     for(unsigned int channel = 0; channel != channels; ++channel) {   // scale all channels
       out[channel][i] *= final_scale;
     }
@@ -469,7 +499,7 @@ void soundstorm::streamer() {
       }
     }
     // sleep for 1/4 of buffer fill time to avoid spin-waiting
-    std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<unsigned int>(1000.0f * deck_buffer_size / samplerate / 4)));
+    std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<unsigned int>(1000.0f * static_cast<float>(deck_buffer_size) / samplerate / 4.0f)));
   } while(streamer_run);
 
   for(auto &thisdeck : decks) {     // cleanup
@@ -517,7 +547,7 @@ size_t soundstorm::ogg_callback_read(void *ptr, size_t size, size_t count, void 
     }
   #endif // DEBUG_SOUNDSTORM
 
-  unsigned int const bytes = size * count;
+  unsigned int const bytes = static_cast<unsigned int>(size * count);
   unsigned int i = 0;
   for(; i != bytes; ++i) {
     target[i] = thismusic->buffer->buffer[thismusic->seek];
@@ -609,7 +639,7 @@ long soundstorm::ogg_callback_tell(void *datasource) {
     return 0;                         // nullptr means we've got nothing playing
   }
   deck *thisdeck = reinterpret_cast<deck*>(datasource);
-  return thisdeck->playlist.front()->seek;
+  return static_cast<long>(thisdeck->playlist.front()->seek);
 }
 
 unsigned int soundstorm::get_device_default() const {
@@ -826,8 +856,18 @@ void soundstorm::update_ears() {
   }
 }
 
+float soundstorm::get_master_volume() const {
+  return volume_master;
+}
+void soundstorm::set_master_volume(float newvolume) {
+  volume_master = newvolume;
+}
+
 soundstorm::soundeffect *soundstorm::get_effect(unsigned int effect_id) const {
   /// Look up an effect in the library
+  #ifdef NSOUND
+    return nullptr;
+  #endif // NSOUND
   #ifndef NDEBUG
     if(effect_id >= effect_library.size()) {
       std::cout << "SoundStorm: Error: Called " << __PRETTY_FUNCTION__ << " with id " << effect_id << " outside library size " << effect_library.size() << "!" << std::endl;
@@ -843,6 +883,9 @@ soundstorm::soundeffect *soundstorm::get_effect(unsigned int effect_id) const {
 
 soundstorm::music_buffer *soundstorm::get_music(unsigned int music_id) const {
   /// Look up a music track in the library
+  #ifdef NSOUND
+    return nullptr;
+  #endif // NSOUND
   #ifndef NDEBUG
     if(music_id >= music_library.size()) {
       std::cout << "SoundStorm: Error: Called " << __PRETTY_FUNCTION__ << " with music_id " << music_id << " exceeding library size!" << std::endl;
@@ -854,7 +897,10 @@ soundstorm::music_buffer *soundstorm::get_music(unsigned int music_id) const {
 
 unsigned int soundstorm::load(unsigned char const *buffer, size_t buffersize, float hdr_scale) {
   /// Load a sound from a buffer into the library, and return its new library id
-  unsigned int const effectnum = effect_library.size();
+  #ifdef NSOUND
+    return 0;
+  #endif // NSOUND
+  unsigned int const effectnum = static_cast<unsigned int>(effect_library.size());
   soundeffect *thiseffect = new soundeffect;
   thiseffect->buffer = reinterpret_cast<float const*>(buffer);    // treat the buffer as one of 32bit floats
   thiseffect->buffersize = buffersize / sizeof(float);            // convert to our size in samples
@@ -879,7 +925,10 @@ unsigned int soundstorm::load(unsigned char const *buffer, size_t buffersize, fl
 
 unsigned int soundstorm::music_load(unsigned char const *buffer, size_t buffersize) {
   /// Load a piece of music from a buffer into the librarym and return its new library id
-  unsigned int const tracknum = music_library.size();
+  #ifdef NSOUND
+    return 0;
+  #endif // NSOUND
+  unsigned int const tracknum = static_cast<unsigned int>(music_library.size());
   music_buffer *thismusic = new music_buffer;
   thismusic->buffer = buffer;
   thismusic->buffersize = buffersize;
@@ -911,6 +960,9 @@ void soundstorm::play(Vector3f const &position,
                       float seek_speed,
                       soundgroup *thissoundgroup) {
   /// Add a sound effect to the currently playing list with the specified parameters
+  #ifdef NSOUND
+    return;
+  #endif // NSOUND
   if(!enabled) {
     return;
   }
@@ -954,6 +1006,9 @@ void soundstorm::play_loop(Vector3f const &position,
                            float seek_speed,
                            soundgroup *thissoundgroup) {
   /// Add a sound effect set to repeat indefinitely to the currently playing list with the specified parameters
+  #ifdef NSOUND
+    return;
+  #endif // NSOUND
   // parameters reordered to avoid call ambiguity
   if(!enabled) {
     return;
@@ -984,6 +1039,9 @@ void soundstorm::play_loop(Vector3f const &position,
 
 soundstorm::music *soundstorm::music_queue(unsigned int deck_id, unsigned int music_id) {
   /// Queue an item from the music library to play next on the specified deck
+  #ifdef NSOUND
+    return nullptr;
+  #endif // NSOUND
   if(!enabled) {
     return nullptr;
   }
@@ -1022,7 +1080,7 @@ void soundstorm::fade_music_volume(unsigned int deck_id, float newvolume, float 
       return;
     }
   #endif // NDEBUG
-  decks[deck_id].volume_fadespeed = std::fabs(newvolume - decks[deck_id].volume) / (seconds_to_take * samplerate);  // this comes first since we're threaded
+  decks[deck_id].volume_fadespeed = std::abs(newvolume - decks[deck_id].volume) / (seconds_to_take * samplerate);  // this comes first since we're threaded
   decks[deck_id].volume_target = newvolume;
 }
 
@@ -1037,7 +1095,7 @@ void soundstorm::crossfade_music(float seconds_to_take, unsigned int deck_from, 
 void soundstorm::stop(soundgroup const &thissoundgroup) {
   /// Make this sound stop immediately
   for(auto const &thissound : thissoundgroup) {                                       // do this for each channel
-    thissound->seek = thissound->effect->buffersize;
+    thissound->seek = static_cast<float>(thissound->effect->buffersize);
   }
 }
 

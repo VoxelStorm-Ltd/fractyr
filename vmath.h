@@ -133,9 +133,14 @@
 namespace VMATH_NAMESPACE {
 #endif
 
-#ifndef VMATH_NO_BOOST
-#include <boost/math/constants/constants.hpp>
 // use boost's constants if available
+#ifndef VMATH_NO_BOOST
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#include <boost/math/constants/constants.hpp>
+#pragma GCC diagnostic pop
 #else  // VMATH_NO_BOOST
 #ifndef M_PI
 #define M_PI           3.14159265358979323846  /* pi */
@@ -559,10 +564,10 @@ class Vector2 {
      * @param aa Angle (in radians) to be rotated.
      */
     inline void rotate_rad(T aa) __attribute__((__always_inline__)) {
-      T const a = std::cos(-aa);
-      T const b = std::sin(-aa);
-      T const nx = x * a - y * b;
-      T const ny = x * b + y * a;
+      auto const a = std::cos(-aa);
+      auto const b = std::sin(-aa);
+      T const nx = static_cast<T>((x * a) - (y * b));
+      T const ny = static_cast<T>((x * b) + (y * a));
       x = nx;
       y = ny;
     }
@@ -668,6 +673,26 @@ class Vector2 {
         return true;
       }
       return false;
+    }
+
+    /**
+     * Gets a 3D vector equivalent populating the X and Y axes
+     */
+    inline Vector3<T> constexpr to_3D_XY() const __attribute__((__always_inline__)) {
+      return Vector3<T>(x, y, 0);
+    }
+    inline Vector3<T> constexpr to_3d_xy() const __attribute__((__always_inline__)) {
+      return Vector3<T>(x, y, 0);
+    }
+
+    /**
+     * Gets a 3D vector equivalent populating the X and Z axes
+     */
+    inline Vector3<T> constexpr to_3D_XZ() const __attribute__((__always_inline__)) {
+      return Vector3<T>(x, 0, z);
+    }
+    inline Vector3<T> constexpr to_3d_xz() const __attribute__((__always_inline__)) {
+      return Vector3<T>(x, 0, z);
     }
 };
 
@@ -1078,9 +1103,9 @@ class Vector3 {
      */
     inline bool constexpr operator==(Vector3<T> const &rhs) const __attribute__((__always_inline__)) {
       #ifdef VMATH_SOFT_COMPARE
-        return std::fabs(x - rhs.x) < static_cast<T>(epsilon) &&
-               std::fabs(y - rhs.y) < static_cast<T>(epsilon) &&
-               std::fabs(z - rhs.z) < static_cast<T>(epsilon);
+        return std::abs(x - rhs.x) < static_cast<T>(epsilon) &&
+               std::abs(y - rhs.y) < static_cast<T>(epsilon) &&
+               std::abs(z - rhs.z) < static_cast<T>(epsilon);
       #else
         return x == rhs.x &&
                y == rhs.y &&
@@ -1163,15 +1188,15 @@ class Vector3 {
      * @param az Angle (in radians) to be rotated around Z-axis.
      */
     inline void rotate_rad(T ax, T ay, T az) __attribute__((__always_inline__)) {
-      T const a = std::cos(ax);
-      T const b = std::sin(ax);
-      T const c = std::cos(ay);
-      T const d = std::sin(ay);
-      T const e = std::cos(az);
-      T const f = std::sin(az);
-      T const nx = c * e * x - c * f * y + d * z;
-      T const ny = (a * f + b * d * e) * x + (a * e - b * d * f) * y - b * c * z;
-      T const nz = (b * f - a * d * e) * x + (a * d * f + b * e) * y + a * c * z;
+      auto const a = std::cos(ax);
+      auto const b = std::sin(ax);
+      auto const c = std::cos(ay);
+      auto const d = std::sin(ay);
+      auto const e = std::cos(az);
+      auto const f = std::sin(az);
+      T const nx = static_cast<T>(((c *             e) * x) - ((c *             f) * y) + (d *     z));
+      T const ny = static_cast<T>(((a * f + b * d * e) * x) + ((a * e - b * d * f) * y) - (b * c * z));
+      T const nz = static_cast<T>(((b * f - a * d * e) * x) + ((a * d * f + b * e) * y) + (a * c * z));
       x = nx;
       y = ny;
       z = nz;
@@ -1244,11 +1269,17 @@ class Vector3 {
     inline Vector2<T> constexpr to_2D_XY() const __attribute__((__always_inline__)) {
       return Vector2<T>(x, y);
     }
+    inline Vector2<T> constexpr to_2d_xy() const __attribute__((__always_inline__)) {
+      return Vector2<T>(x, y);
+    }
 
     /**
      * Gets a 2D vector equivalent using the X and Z axes
      */
     inline Vector2<T> constexpr to_2D_XZ() const __attribute__((__always_inline__)) {
+      return Vector2<T>(x, z);
+    }
+    inline Vector2<T> constexpr to_2d_xz() const __attribute__((__always_inline__)) {
       return Vector2<T>(x, z);
     }
 };
@@ -1551,10 +1582,10 @@ class Vector4 {
      */
     inline bool constexpr operator==(Vector4<T> const &rhs) const __attribute__((__always_inline__)) {
       #ifdef VMATH_SOFT_COMPARE
-        return std::fabs(x - rhs.x) < static_cast<T>(epsilon) &&
-               std::fabs(y - rhs.y) < static_cast<T>(epsilon) &&
-               std::fabs(z - rhs.z) < static_cast<T>(epsilon) &&
-               std::fabs(w - rhs.w) < static_cast<T>(epsilon);
+        return std::abs(x - rhs.x) < static_cast<T>(epsilon) &&
+               std::abs(y - rhs.y) < static_cast<T>(epsilon) &&
+               std::abs(z - rhs.z) < static_cast<T>(epsilon) &&
+               std::abs(w - rhs.w) < static_cast<T>(epsilon);
       #else
         return x == rhs.x &&
                y == rhs.y &&
@@ -1988,15 +2019,15 @@ class Matrix3 {
      */
     inline bool constexpr operator==(Matrix3<T> const &rhs) const __attribute__((__always_inline__)) {
       #ifdef VMATH_SOFT_COMPARE
-        return std::fabs(data[0] - rhs.data[0]) < static_cast<T>(epsilon) &&
-               std::fabs(data[1] - rhs.data[1]) < static_cast<T>(epsilon) &&
-               std::fabs(data[2] - rhs.data[2]) < static_cast<T>(epsilon) &&
-               std::fabs(data[3] - rhs.data[3]) < static_cast<T>(epsilon) &&
-               std::fabs(data[4] - rhs.data[4]) < static_cast<T>(epsilon) &&
-               std::fabs(data[5] - rhs.data[5]) < static_cast<T>(epsilon) &&
-               std::fabs(data[6] - rhs.data[6]) < static_cast<T>(epsilon) &&
-               std::fabs(data[7] - rhs.data[7]) < static_cast<T>(epsilon) &&
-               std::fabs(data[8] - rhs.data[8]) < static_cast<T>(epsilon);
+        return std::abs(data[0] - rhs.data[0]) < static_cast<T>(epsilon) &&
+               std::abs(data[1] - rhs.data[1]) < static_cast<T>(epsilon) &&
+               std::abs(data[2] - rhs.data[2]) < static_cast<T>(epsilon) &&
+               std::abs(data[3] - rhs.data[3]) < static_cast<T>(epsilon) &&
+               std::abs(data[4] - rhs.data[4]) < static_cast<T>(epsilon) &&
+               std::abs(data[5] - rhs.data[5]) < static_cast<T>(epsilon) &&
+               std::abs(data[6] - rhs.data[6]) < static_cast<T>(epsilon) &&
+               std::abs(data[7] - rhs.data[7]) < static_cast<T>(epsilon) &&
+               std::abs(data[8] - rhs.data[8]) < static_cast<T>(epsilon);
       #else
         return data[0] == rhs.data[0] &&
                data[1] == rhs.data[1] &&
@@ -2683,22 +2714,22 @@ class Matrix4 {
      */
     inline bool constexpr operator==(Matrix4<T> const &rhs) const __attribute__((__always_inline__)) {
       #ifdef VMATH_SOFT_COMPARE
-        return std::fabs(data[ 0] - rhs.data[ 0]) < static_cast<T>(epsilon) &&
-               std::fabs(data[ 1] - rhs.data[ 1]) < static_cast<T>(epsilon) &&
-               std::fabs(data[ 2] - rhs.data[ 2]) < static_cast<T>(epsilon) &&
-               std::fabs(data[ 3] - rhs.data[ 3]) < static_cast<T>(epsilon) &&
-               std::fabs(data[ 4] - rhs.data[ 4]) < static_cast<T>(epsilon) &&
-               std::fabs(data[ 5] - rhs.data[ 5]) < static_cast<T>(epsilon) &&
-               std::fabs(data[ 6] - rhs.data[ 6]) < static_cast<T>(epsilon) &&
-               std::fabs(data[ 7] - rhs.data[ 7]) < static_cast<T>(epsilon) &&
-               std::fabs(data[ 8] - rhs.data[ 8]) < static_cast<T>(epsilon) &&
-               std::fabs(data[ 9] - rhs.data[ 9]) < static_cast<T>(epsilon) &&
-               std::fabs(data[10] - rhs.data[10]) < static_cast<T>(epsilon) &&
-               std::fabs(data[11] - rhs.data[11]) < static_cast<T>(epsilon) &&
-               std::fabs(data[12] - rhs.data[12]) < static_cast<T>(epsilon) &&
-               std::fabs(data[13] - rhs.data[13]) < static_cast<T>(epsilon) &&
-               std::fabs(data[14] - rhs.data[14]) < static_cast<T>(epsilon) &&
-               std::fabs(data[15] - rhs.data[15]) < static_cast<T>(epsilon);
+        return std::abs(data[ 0] - rhs.data[ 0]) < static_cast<T>(epsilon) &&
+               std::abs(data[ 1] - rhs.data[ 1]) < static_cast<T>(epsilon) &&
+               std::abs(data[ 2] - rhs.data[ 2]) < static_cast<T>(epsilon) &&
+               std::abs(data[ 3] - rhs.data[ 3]) < static_cast<T>(epsilon) &&
+               std::abs(data[ 4] - rhs.data[ 4]) < static_cast<T>(epsilon) &&
+               std::abs(data[ 5] - rhs.data[ 5]) < static_cast<T>(epsilon) &&
+               std::abs(data[ 6] - rhs.data[ 6]) < static_cast<T>(epsilon) &&
+               std::abs(data[ 7] - rhs.data[ 7]) < static_cast<T>(epsilon) &&
+               std::abs(data[ 8] - rhs.data[ 8]) < static_cast<T>(epsilon) &&
+               std::abs(data[ 9] - rhs.data[ 9]) < static_cast<T>(epsilon) &&
+               std::abs(data[10] - rhs.data[10]) < static_cast<T>(epsilon) &&
+               std::abs(data[11] - rhs.data[11]) < static_cast<T>(epsilon) &&
+               std::abs(data[12] - rhs.data[12]) < static_cast<T>(epsilon) &&
+               std::abs(data[13] - rhs.data[13]) < static_cast<T>(epsilon) &&
+               std::abs(data[14] - rhs.data[14]) < static_cast<T>(epsilon) &&
+               std::abs(data[15] - rhs.data[15]) < static_cast<T>(epsilon);
       #else
         return data[ 0] == rhs.data[ 0] &&
                data[ 1] == rhs.data[ 1] &&
@@ -3343,7 +3374,7 @@ class Quaternion {
      */
     inline bool constexpr operator==(Quaternion<T> const &rhs) const __attribute__((__always_inline__)) {
       #ifdef VMATH_SOFT_COMPARE
-        return (std::fabs(w - rhs.w) < static_cast<T>(epsilon)) && v == rhs.v;
+        return (std::abs(w - rhs.w) < static_cast<T>(epsilon)) && v == rhs.v;
       #else
         return w == rhs.w && v == rhs.v;
       #endif // VMATH_SOFT_COMPARE
@@ -3490,7 +3521,7 @@ class Quaternion {
      * @param axis The axis around which the rotation is
      */
     inline void constexpr toAngleAxis(T &angle, Vector3<T> &axis) __attribute__((__always_inline__)) {
-      float const squareLength = v.lengthSq();
+      T const squareLength = v.lengthSq();
       if(squareLength != 0) {
         angle = static_cast<T>(2.0) * std::acos(w);
         axis = v / std::pow(squareLength, static_cast<T>(0.5));
@@ -3664,11 +3695,11 @@ class Quaternion {
       Quaternion<T> ret;
       T const cosTheta = w * q2.w + v.x * q2.v.x + v.y * q2.v.y + v.z * q2.v.z;
       T const theta = static_cast<T>(std::acos(cosTheta));
-      if(std::fabs(theta) < static_cast<T>(epsilon)) {
+      if(std::abs(theta) < static_cast<T>(epsilon)) {
         ret = *this;
       } else {
         T sinTheta = static_cast<T>(std::sqrt(static_cast<T>(1.0) - cosTheta * cosTheta));
-        if(std::fabs(sinTheta) < static_cast<T>(epsilon)) {
+        if(std::abs(sinTheta) < static_cast<T>(epsilon)) {
           ret.w = static_cast<T>(0.5) * w + static_cast<T>(0.5) * q2.w;
           ret.v = v.lerp(static_cast<T>(0.5), q2.v);
         } else {
@@ -4027,7 +4058,7 @@ class Aabb2 {
      * @return A center point of bounding-box.
      */
     inline constexpr Vector2<T> center() const __attribute__((__always_inline__)) {
-      return (min + max) * 0.5f;
+      return (min + max) * static_cast<T>(0.5);
     }
 
     /**
@@ -4035,7 +4066,7 @@ class Aabb2 {
      * @return Extent of bounding-box.
      */
     inline constexpr Vector2<T> extent() const __attribute__((__always_inline__)) {
-      return (max - min) * 0.5f;
+      return (max - min) * static_cast<T>(0.5);
     }
 
     /**
@@ -4401,7 +4432,7 @@ class Aabb3 {
      * @return A center point of bounding-box.
      */
     inline constexpr Vector3<T> center() const __attribute__((__always_inline__)) {
-      return (min + max) * 0.5f;
+      return (min + max) * static_cast<T>(0.5);
     }
 
     /**
@@ -4409,7 +4440,7 @@ class Aabb3 {
      * @return Extent of bounding-box.
      */
     inline constexpr Vector3<T> extent() const __attribute__((__always_inline__)) {
-      return (max - min) * 0.5f;
+      return (max - min) * static_cast<T>(0.5);
     }
 
     /**
@@ -4495,7 +4526,6 @@ class Aabb3 {
       return *this;
     }
 
-
     /**
      * Extends this bounding-box by point @a rhs.
      * @param rhs A point to extend this bounding-box by
@@ -4571,7 +4601,6 @@ using Aabb3i = Aabb3<int>;
 #ifdef VMATH_NAMESPACE
 }
 #endif //VMATH_NAMESPACE
-
 
 #endif // __vmath_Header_File__
 

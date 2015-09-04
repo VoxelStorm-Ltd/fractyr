@@ -17,5 +17,4 @@
   #define PLATFORM_LITTLEENDIAN
 #endif
 
-
 #endif // PLATFORM_DEFINES_H_INCLUDED

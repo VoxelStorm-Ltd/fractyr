@@ -7,7 +7,16 @@ infile="$1"
 outfile="$2"
 compiler="$3"
 if [ "$compiler" = "" ]; then
-  compiler="g++"
+  compiler="g++5"
+  if [ -z "$(which "$compiler")" ]; then
+    compiler="g++"
+  fi
 fi
 
-xxd -i "$infile" | sed 's/\(resources[a-zA-Z0-9_]*\)/_binary_\1_x/' | "$compiler" -c -o "$outfile" -x c++ -
+if echo "$MACHTYPE" | grep -iq "apple"; then
+  # os x requires special treatment
+  xxd -i "$infile" | sed 's/\(resources[a-zA-Z0-9_]*\)/_binary_\1_x/' | "$compiler" -c -o "$outfile" -x c++ -
+else
+  # everything else works with gnu ld
+  ld -r -b binary -o "$outfile" "$infile"
+fi
