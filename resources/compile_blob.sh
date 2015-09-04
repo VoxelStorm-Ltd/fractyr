@@ -16,7 +16,11 @@ fi
 if echo "$MACHTYPE" | grep -iq "apple"; then
   # os x requires special treatment
   xxd -i "$infile" | sed 's/\(resources[a-zA-Z0-9_]*\)/_binary_\1_x/' | "$compiler" -c -o "$outfile" -x c++ -
+elif echo "$MACHTYPE" | grep -iq "linux"; then
+  # everything else just works with gnu ld
+  ld -r -b binary -o "$outfile" "$infile"
 else
-  # everything else works with gnu ld
+  # ...except if we're on windows, and then hoops need to be jumped through for backslashes
+  outfile="$(sed 's/\\/\//g' <<< "$outfile")"
   ld -r -b binary -o "$outfile" "$infile"
 fi
