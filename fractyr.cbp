@@ -490,7 +490,7 @@
 					<Add library="Xxf86vm" />
 					<Add library="pthread" />
 					<Add library="udev" />
-					<Add library="Xinerama" />
+					<Add library="lib/linux64/libXinerama.a" />
 					<Add library="lib/linux64/libz.a" />
 				</Linker>
 			</Target>
@@ -595,7 +595,7 @@
 					<Add library="Xxf86vm" />
 					<Add library="pthread" />
 					<Add library="udev" />
-					<Add library="Xinerama" />
+					<Add library="lib/linux64/libXinerama.a" />
 					<Add library="lib/linux64/libz.a" />
 				</Linker>
 				<ExtraCommands>
