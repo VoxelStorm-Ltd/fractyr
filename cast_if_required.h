@@ -6,6 +6,8 @@
 /// identical, to simultaneously avoid compiler warnings about both implicit
 /// casts and unnecessary casts
 
+#include <type_traits>
+
 template<typename Tdest, typename Tsrc>
 typename std::enable_if_t<sizeof(Tsrc) == sizeof(Tdest), Tdest> cast_if_required(Tsrc &&value) __attribute__((__const__));
 template<typename Tdest, typename Tsrc>
