@@ -23,10 +23,7 @@
 				<Compiler>
 					<Add option="-g" />
 					<Add option="-Og" />
-					<Add option="-ggdb" />
-					<Add option="-static" />
-					<Add option="-static-libgcc" />
-					<Add option="-static-libstdc++" />
+					<Add option="-ggdb3" />
 					<Add option="-mthreads" />
 					<Add option="-m32" />
 					<Add option="-mmmx" />
@@ -75,9 +72,6 @@
 					<Add option="-fomit-frame-pointer" />
 					<Add option="-fexpensive-optimizations" />
 					<Add option="-Ofast" />
-					<Add option="-static" />
-					<Add option="-static-libgcc" />
-					<Add option="-static-libstdc++" />
 					<Add option="-mthreads" />
 					<Add option="-m32" />
 					<Add option="-mmmx" />
@@ -114,6 +108,7 @@
 					<Add option="-fbranch-target-load-optimize" />
 					<Add option="-fuse-linker-plugin" />
 					<Add option="-flto" />
+					<Add option="-ffast-math" />
 					<Add option="-fno-math-errno" />
 					<Add option="-funsafe-math-optimizations" />
 					<Add option="-fassociative-math" />
@@ -136,11 +131,8 @@
 					<Add option="-static" />
 					<Add option="-static-libgcc" />
 					<Add option="-static-libstdc++" />
-					<Add option="-fprofile-arcs" />
-					<Add option="-lgcov" />
 					<Add option="-fuse-linker-plugin" />
 					<Add option="-flto" />
-					<Add option="-funsafe-math-optimizations" />
 					<Add library="lib/win32/libboost_system-mgw49-mt-s-1_55.a" />
 					<Add library="lib/win32/libboost_filesystem-mgw49-mt-s-1_55.a" />
 					<Add library="lib/win32/libboost_thread-mgw49-mt-s-1_55.a" />
@@ -176,10 +168,7 @@
 				<Compiler>
 					<Add option="-g" />
 					<Add option="-Og" />
-					<Add option="-ggdb" />
-					<Add option="-static" />
-					<Add option="-static-libgcc" />
-					<Add option="-static-libstdc++" />
+					<Add option="-ggdb3" />
 					<Add option="-mthreads" />
 					<Add option="-m64" />
 					<Add option="-mmmx" />
@@ -205,9 +194,6 @@
 				<Compiler>
 					<Add option="-fexpensive-optimizations" />
 					<Add option="-Ofast" />
-					<Add option="-static" />
-					<Add option="-static-libgcc" />
-					<Add option="-static-libstdc++" />
 					<Add option="-mthreads" />
 					<Add option="-m64" />
 					<Add option="-mmmx" />
@@ -244,6 +230,7 @@
 					<Add option="-fbranch-target-load-optimize" />
 					<Add option="-fuse-linker-plugin" />
 					<Add option="-flto" />
+					<Add option="-ffast-math" />
 					<Add option="-fno-math-errno" />
 					<Add option="-funsafe-math-optimizations" />
 					<Add option="-fassociative-math" />
@@ -266,11 +253,8 @@
 					<Add option="-static" />
 					<Add option="-static-libgcc" />
 					<Add option="-static-libstdc++" />
-					<Add option="-fprofile-arcs" />
-					<Add option="-lgcov" />
 					<Add option="-fuse-linker-plugin" />
 					<Add option="-flto" />
-					<Add option="-funsafe-math-optimizations" />
 				</Linker>
 				<ExtraCommands>
 					<Add after='strip -spv &quot;$(TARGET_OUTPUT_FILE)&quot;' />
@@ -284,10 +268,7 @@
 				<Compiler>
 					<Add option="-g" />
 					<Add option="-Og" />
-					<Add option="-ggdb" />
-					<Add option="-static" />
-					<Add option="-static-libgcc" />
-					<Add option="-static-libstdc++" />
+					<Add option="-ggdb3" />
 					<Add option="-m64" />
 					<Add option="-mmmx" />
 					<Add option="-msse" />
@@ -326,9 +307,6 @@
 				<Compiler>
 					<Add option="-fexpensive-optimizations" />
 					<Add option="-Ofast" />
-					<Add option="-static" />
-					<Add option="-static-libgcc" />
-					<Add option="-static-libstdc++" />
 					<Add option="-m64" />
 					<Add option="-mmmx" />
 					<Add option="-msse" />
@@ -364,6 +342,7 @@
 					<Add option="-fbranch-target-load-optimize" />
 					<Add option="-fuse-linker-plugin" />
 					<Add option="-flto" />
+					<Add option="-ffast-math" />
 					<Add option="-fno-math-errno" />
 					<Add option="-funsafe-math-optimizations" />
 					<Add option="-fassociative-math" />
@@ -386,11 +365,8 @@
 					<Add option="-static" />
 					<Add option="-static-libgcc" />
 					<Add option="-static-libstdc++" />
-					<Add option="-fprofile-arcs" />
-					<Add option="-lgcov" />
 					<Add option="-fuse-linker-plugin" />
 					<Add option="-flto" />
-					<Add option="-funsafe-math-optimizations" />
 					<Add library="lib/linux32/libboost_system-gcc48-mt-s-1_53.a" />
 					<Add library="lib/linux32/libboost_chrono-gcc48-mt-s-1_53.a" />
 					<Add library="lib/linux32/libGLEW.a" />
@@ -418,8 +394,7 @@
 				<Compiler>
 					<Add option="-g" />
 					<Add option="-Og" />
-					<Add option="-ggdb" />
-					<Add option="-static" />
+					<Add option="-ggdb3" />
 					<Add option="-m64" />
 					<Add option="-mmmx" />
 					<Add option="-msse" />
@@ -474,9 +449,6 @@
 				<Compiler>
 					<Add option="-fexpensive-optimizations" />
 					<Add option="-Ofast" />
-					<Add option="-static" />
-					<Add option="-static-libgcc" />
-					<Add option="-static-libstdc++" />
 					<Add option="-m64" />
 					<Add option="-mmmx" />
 					<Add option="-msse" />
@@ -512,6 +484,7 @@
 					<Add option="-fbranch-target-load-optimize" />
 					<Add option="-fuse-linker-plugin" />
 					<Add option="-flto" />
+					<Add option="-ffast-math" />
 					<Add option="-fno-math-errno" />
 					<Add option="-funsafe-math-optimizations" />
 					<Add option="-fassociative-math" />
@@ -534,11 +507,8 @@
 					<Add option="-static-libgcc" />
 					<Add option="-static-libstdc++" />
 					<Add option="-pthread" />
-					<Add option="-fprofile-arcs" />
-					<Add option="-lgcov" />
 					<Add option="-fuse-linker-plugin" />
 					<Add option="-flto" />
-					<Add option="-funsafe-math-optimizations" />
 					<Add library="lib/linux64/libvoro++.a" />
 					<Add library="lib/linux64/libboost_filesystem-gcc51-mt-s-1_58.a" />
 					<Add library="lib/linux64/libboost_system-gcc51-mt-s-1_58.a" />
@@ -582,10 +552,7 @@
 				<Compiler>
 					<Add option="-g" />
 					<Add option="-Og" />
-					<Add option="-ggdb" />
-					<Add option="-static" />
-					<Add option="-static-libgcc" />
-					<Add option="-static-libstdc++" />
+					<Add option="-ggdb3" />
 					<Add option="-m64" />
 					<Add option="-mmmx" />
 					<Add option="-msse" />
@@ -610,9 +577,6 @@
 				<Compiler>
 					<Add option="-fexpensive-optimizations" />
 					<Add option="-Ofast" />
-					<Add option="-static" />
-					<Add option="-static-libgcc" />
-					<Add option="-static-libstdc++" />
 					<Add option="-m64" />
 					<Add option="-mmmx" />
 					<Add option="-msse" />
@@ -648,6 +612,7 @@
 					<Add option="-fbranch-target-load-optimize" />
 					<Add option="-fuse-linker-plugin" />
 					<Add option="-flto" />
+					<Add option="-ffast-math" />
 					<Add option="-fno-math-errno" />
 					<Add option="-funsafe-math-optimizations" />
 					<Add option="-fassociative-math" />
@@ -669,11 +634,8 @@
 					<Add option="-static" />
 					<Add option="-static-libgcc" />
 					<Add option="-static-libstdc++" />
-					<Add option="-fprofile-arcs" />
-					<Add option="-lgcov" />
 					<Add option="-fuse-linker-plugin" />
 					<Add option="-flto" />
-					<Add option="-funsafe-math-optimizations" />
 				</Linker>
 				<ExtraCommands>
 					<Add after='strip -spv &quot;$(TARGET_OUTPUT_FILE)&quot;' />
@@ -687,10 +649,7 @@
 				<Compiler>
 					<Add option="-g" />
 					<Add option="-Og" />
-					<Add option="-ggdb" />
-					<Add option="-static" />
-					<Add option="-static-libgcc" />
-					<Add option="-static-libstdc++" />
+					<Add option="-ggdb3" />
 					<Add option="-m64" />
 					<Add option="-mmmx" />
 					<Add option="-msse" />
@@ -741,9 +700,6 @@
 				<Compiler>
 					<Add option="-fexpensive-optimizations" />
 					<Add option="-Ofast" />
-					<Add option="-static" />
-					<Add option="-static-libgcc" />
-					<Add option="-static-libstdc++" />
 					<Add option="-m64" />
 					<Add option="-mmmx" />
 					<Add option="-msse" />
@@ -779,6 +735,7 @@
 					<Add option="-fbranch-target-load-optimize" />
 					<Add option="-fuse-linker-plugin" />
 					<Add option="-flto" />
+					<Add option="-ffast-math" />
 					<Add option="-fno-math-errno" />
 					<Add option="-funsafe-math-optimizations" />
 					<Add option="-fassociative-math" />
@@ -799,10 +756,7 @@
 				<Linker>
 					<Add option="-static-libgcc" />
 					<Add option="-static-libstdc++" />
-					<Add option="-fprofile-arcs" />
-					<Add option="-lgcov" />
 					<Add option="-flto" />
-					<Add option="-funsafe-math-optimizations" />
 					<Add option="-framework OpenGL" />
 					<Add option="-framework IOKit" />
 					<Add option="-framework AppKit" />
