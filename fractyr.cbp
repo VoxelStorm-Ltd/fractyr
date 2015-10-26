@@ -434,9 +434,9 @@
 					<Add option="-static-libgcc" />
 					<Add option="-static-libstdc++" />
 					<Add library="lib/linux64/libvoro++.a" />
-					<Add library="lib/linux64/libboost_system-gcc49-mt-sd-1_55.a" />
-					<Add library="lib/linux64/libboost_filesystem-gcc49-mt-sd-1_55.a" />
-					<Add library="lib/linux64/libboost_thread-gcc49-mt-sd-1_55.a" />
+					<Add library="lib/linux64/libboost_filesystem-gcc51-mt-sd-1_58.a" />
+					<Add library="lib/linux64/libboost_system-gcc51-mt-sd-1_58.a" />
+					<Add library="lib/linux64/libboost_thread-gcc51-mt-sd-1_58.a" />
 					<Add library="lib/linux64/libGLEW.a" />
 					<Add library="lib/linux64/libglfw3.a" />
 					<Add library="Xrandr" />
@@ -460,6 +460,10 @@
 					<Add library="udev" />
 					<Add library="lib/linux64/libXinerama.a" />
 					<Add library="lib/linux64/libz.a" />
+					<Add library="lib/linux64/libXcursor.a" />
+					<Add library="lib/linux64/libXfixes.a" />
+					<Add library="lib/linux64/libXrender.a" />
+					<Add library="lib/linux64/libXext.a" />
 				</Linker>
 			</Target>
 			<Target title="Linux64_Release">
@@ -535,9 +539,9 @@
 					<Add option="-flto" />
 					<Add option="-funsafe-math-optimizations" />
 					<Add library="lib/linux64/libvoro++.a" />
-					<Add library="lib/linux64/libboost_system-gcc49-mt-s-1_55.a" />
-					<Add library="lib/linux64/libboost_filesystem-gcc49-mt-s-1_55.a" />
-					<Add library="lib/linux64/libboost_thread-gcc49-mt-s-1_55.a" />
+					<Add library="lib/linux64/libboost_filesystem-gcc51-mt-s-1_58.a" />
+					<Add library="lib/linux64/libboost_system-gcc51-mt-s-1_58.a" />
+					<Add library="lib/linux64/libboost_thread-gcc51-mt-s-1_58.a" />
 					<Add library="lib/linux64/libGLEW.a" />
 					<Add library="lib/linux64/libglfw3.a" />
 					<Add library="Xrandr" />
@@ -545,7 +549,7 @@
 					<Add library="lib/linux64/libGLU.a" />
 					<Add library="GL" />
 					<Add library="lib/linux64/libfreetype.a" />
-					<Add library="lib/linux64/libOVR_MinGW_Linux64_d.a" />
+					<Add library="lib/linux64/libOVR_MinGW_Linux64.a" />
 					<Add library="lib/linux64/libportaudio.a" />
 					<Add library="lib/linux64/libportaudiocpp.a" />
 					<Add library="asound" />
@@ -561,6 +565,10 @@
 					<Add library="udev" />
 					<Add library="lib/linux64/libXinerama.a" />
 					<Add library="lib/linux64/libz.a" />
+					<Add library="lib/linux64/libXcursor.a" />
+					<Add library="lib/linux64/libXfixes.a" />
+					<Add library="lib/linux64/libXrender.a" />
+					<Add library="lib/linux64/libXext.a" />
 				</Linker>
 				<ExtraCommands>
 					<Add after='strip -spv &quot;$(TARGET_OUTPUT_FILE)&quot;' />
@@ -894,6 +902,9 @@
 			<Add option="-DGLEW_STATIC" />
 			<Add directory="." />
 		</Compiler>
+		<ExtraCommands>
+			<Add before='bash -c &quot;resources/generate_git_version.sh&quot;' />
+		</ExtraCommands>
 		<Unit filename="blob_loader.h" />
 		<Unit filename="buffers/buffer.cpp" />
 		<Unit filename="buffers/buffer.h" />
@@ -959,6 +970,7 @@
 		<Unit filename="oculusstorm/oculusstorm.h" />
 		<Unit filename="platform_defines.h" />
 		<Unit filename="resources/compile_blob.sh" />
+		<Unit filename="resources/generate_git_version.sh" />
 		<Unit filename="resources/music_main_intro.ogg">
 			<Option compile="1" />
 			<Option link="1" />
