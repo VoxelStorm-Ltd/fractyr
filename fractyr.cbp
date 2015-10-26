@@ -39,9 +39,10 @@
 					<Add option="-static" />
 					<Add option="-static-libgcc" />
 					<Add option="-static-libstdc++" />
-					<Add library="lib/win32/libboost_system-mgw49-mt-sd-1_55.a" />
-					<Add library="lib/win32/libboost_filesystem-mgw49-mt-sd-1_55.a" />
-					<Add library="lib/win32/libboost_thread-mgw49-mt-sd-1_55.a" />
+					<Add library="lib/win32/libvoro++.a" />
+					<Add library="lib/win32/libboost_filesystem-mgw51-mt-sd-1_58.a" />
+					<Add library="lib/win32/libboost_system-mgw51-mt-sd-1_58.a" />
+					<Add library="lib/win32/libboost_thread-mgw51-mt-sd-1_58.a" />
 					<Add library="lib/win32/libglew32.a" />
 					<Add library="lib/win32/libglfw3.a" />
 					<Add library="lib/win32/libftgl_static_D.a" />
@@ -60,7 +61,6 @@
 					<Add library="lib/win32/libole32.a" />
 					<Add library="lib/win32/libsetupapi.a" />
 					<Add library="lib/win32/libz.a" />
-					<Add library="lib/win32/libvoro++.a" />
 				</Linker>
 			</Target>
 			<Target title="Win32_Release">
@@ -133,9 +133,10 @@
 					<Add option="-static-libstdc++" />
 					<Add option="-fuse-linker-plugin" />
 					<Add option="-flto" />
-					<Add library="lib/win32/libboost_system-mgw49-mt-s-1_55.a" />
-					<Add library="lib/win32/libboost_filesystem-mgw49-mt-s-1_55.a" />
-					<Add library="lib/win32/libboost_thread-mgw49-mt-s-1_55.a" />
+					<Add library="lib/win32/libvoro++.a" />
+					<Add library="lib/win32/libboost_filesystem-mgw51-mt-s-1_58.a" />
+					<Add library="lib/win32/libboost_system-mgw51-mt-s-1_58.a" />
+					<Add library="lib/win32/libboost_thread-mgw51-mt-s-1_58.a" />
 					<Add library="lib/win32/libglew32.a" />
 					<Add library="lib/win32/libglfw3.a" />
 					<Add library="lib/win32/libftgl_static.a" />
@@ -154,7 +155,6 @@
 					<Add library="lib/win32/libole32.a" />
 					<Add library="lib/win32/libsetupapi.a" />
 					<Add library="lib/win32/libz.a" />
-					<Add library="lib/win32/libvoro++.a" />
 				</Linker>
 				<ExtraCommands>
 					<Add after='strip -spv &quot;$(TARGET_OUTPUT_FILE)&quot;' />
