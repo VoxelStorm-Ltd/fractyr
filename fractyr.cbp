@@ -828,6 +828,12 @@
 					<Add after="resources/osx_package.sh" />
 				</ExtraCommands>
 			</Target>
+			<Target title="Search">
+				<Option platforms="" />
+				<Option output="fractyr" prefix_auto="1" extension_auto="1" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+			</Target>
 		</Build>
 		<VirtualTargets>
 			<Add alias="All_Linux" targets="Linux32_Debug;Linux32_Release;Linux64_Debug;Linux64_Release;" />
@@ -930,6 +936,7 @@
 			<Option target="Win32_Release" />
 			<Option target="Win64_Debug" />
 			<Option target="Win64_Release" />
+			<Option target="Search" />
 		</Unit>
 		<Unit filename="gameplayer.cpp" />
 		<Unit filename="gameplayer.h" />
@@ -955,10 +962,34 @@
 		<Unit filename="resources/music_main_intro.ogg">
 			<Option compile="1" />
 			<Option link="1" />
+			<Option target="Win32_Debug" />
+			<Option target="Win32_Release" />
+			<Option target="Win64_Debug" />
+			<Option target="Win64_Release" />
+			<Option target="Linux32_Debug" />
+			<Option target="Linux32_Release" />
+			<Option target="Linux64_Debug" />
+			<Option target="Linux64_Release" />
+			<Option target="Mac32_Debug" />
+			<Option target="Mac32_Release" />
+			<Option target="Mac64_Debug" />
+			<Option target="Mac64_Release" />
 		</Unit>
 		<Unit filename="resources/music_main_loop.ogg">
 			<Option compile="1" />
 			<Option link="1" />
+			<Option target="Win32_Debug" />
+			<Option target="Win32_Release" />
+			<Option target="Win64_Debug" />
+			<Option target="Win64_Release" />
+			<Option target="Linux32_Debug" />
+			<Option target="Linux32_Release" />
+			<Option target="Linux64_Debug" />
+			<Option target="Linux64_Release" />
+			<Option target="Mac32_Debug" />
+			<Option target="Mac32_Release" />
+			<Option target="Mac64_Debug" />
+			<Option target="Mac64_Release" />
 		</Unit>
 		<Unit filename="resources/osx_app/Fractyr.app/Contents/Info.plist" />
 		<Unit filename="resources/osx_package.sh" />
@@ -989,8 +1020,33 @@
 		<Unit filename="resources/title.ttf">
 			<Option compile="1" />
 			<Option link="1" />
+			<Option target="Win32_Debug" />
+			<Option target="Win32_Release" />
+			<Option target="Win64_Debug" />
+			<Option target="Win64_Release" />
+			<Option target="Linux32_Debug" />
+			<Option target="Linux32_Release" />
+			<Option target="Linux64_Debug" />
+			<Option target="Linux64_Release" />
+			<Option target="Mac32_Debug" />
+			<Option target="Mac32_Release" />
+			<Option target="Mac64_Debug" />
+			<Option target="Mac64_Release" />
 		</Unit>
-		<Unit filename="resources/voxelstorm.ico" />
+		<Unit filename="resources/voxelstorm.ico">
+			<Option target="Win32_Debug" />
+			<Option target="Win32_Release" />
+			<Option target="Win64_Debug" />
+			<Option target="Win64_Release" />
+			<Option target="Linux32_Debug" />
+			<Option target="Linux32_Release" />
+			<Option target="Linux64_Debug" />
+			<Option target="Linux64_Release" />
+			<Option target="Mac32_Debug" />
+			<Option target="Mac32_Release" />
+			<Option target="Mac64_Debug" />
+			<Option target="Mac64_Release" />
+		</Unit>
 		<Unit filename="shader_load.cpp" />
 		<Unit filename="shader_load.h" />
 		<Unit filename="soundstorm/soundstorm.cpp" />
