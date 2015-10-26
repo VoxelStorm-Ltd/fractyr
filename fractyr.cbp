@@ -433,6 +433,7 @@
 				<Linker>
 					<Add option="-static-libgcc" />
 					<Add option="-static-libstdc++" />
+					<Add option="-pthread" />
 					<Add library="lib/linux64/libvoro++.a" />
 					<Add library="lib/linux64/libboost_filesystem-gcc51-mt-sd-1_58.a" />
 					<Add library="lib/linux64/libboost_system-gcc51-mt-sd-1_58.a" />
@@ -456,7 +457,6 @@
 					<Add library="Xi" />
 					<Add library="X11" />
 					<Add library="Xxf86vm" />
-					<Add library="pthread" />
 					<Add library="udev" />
 					<Add library="lib/linux64/libXinerama.a" />
 					<Add library="lib/linux64/libz.a" />
@@ -533,6 +533,7 @@
 					<Add option="-s" />
 					<Add option="-static-libgcc" />
 					<Add option="-static-libstdc++" />
+					<Add option="-pthread" />
 					<Add option="-fprofile-arcs" />
 					<Add option="-lgcov" />
 					<Add option="-fuse-linker-plugin" />
@@ -561,7 +562,6 @@
 					<Add library="Xi" />
 					<Add library="X11" />
 					<Add library="Xxf86vm" />
-					<Add library="pthread" />
 					<Add library="udev" />
 					<Add library="lib/linux64/libXinerama.a" />
 					<Add library="lib/linux64/libz.a" />
