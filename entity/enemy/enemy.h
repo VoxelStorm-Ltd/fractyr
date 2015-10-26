@@ -1,7 +1,7 @@
 #ifndef ENEMY_H_INCLUDED
 #define ENEMY_H_INCLUDED
 
-#include "ship.h"
+#include "entity/ship.h"
 
 class enemy : public ship {
   /// Polymorphic base class for all enemies

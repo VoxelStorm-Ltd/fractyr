@@ -1,6 +1,6 @@
 #include "gruntblaster.h"
-#include "plasma.h"
-#include "ship.h"
+#include "entity/bullet/plasma.h"
+#include "entity/ship.h"
 
 gruntblaster::gruntblaster(ship *parent)
   : weapon(parent) {

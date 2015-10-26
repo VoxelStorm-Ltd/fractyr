@@ -4,13 +4,13 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <voro++.hh>
-#include "entity.h"
+#include "entity/entity.h"
 #include "universe.h"
 #include "world.h"
-#include "grunt.h"
-#include "blaster.h"
-#include "gruntblaster.h"
-#include "core.h"
+#include "entity/enemy/grunt.h"
+#include "entity/enemy/core.h"
+#include "weapon/blaster.h"
+#include "weapon/gruntblaster.h"
 
 #ifndef NDEBUG
   double chunk::total_time_taken = 0;

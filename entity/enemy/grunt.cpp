@@ -1,11 +1,11 @@
 #include "grunt.h"
-#include "buffer_enemy_grunt.h"
-#include "weapon.h"
+#include "buffers/buffer_enemy_grunt.h"
+#include "weapon/weapon.h"
 #include "gameplayer.h"
-#include "playership.h"
+#include "entity/playership.h"
 #include "world.h"
 #include "chunk.h"
-#include "particle.h"
+#include "entity/particle/particle.h"
 
 extern gameplayer player;
 

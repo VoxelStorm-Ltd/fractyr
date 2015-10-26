@@ -1,7 +1,7 @@
 #ifndef BULLET_H_INCLUDED
 #define BULLET_H_INCLUDED
 
-#include "entity.h"
+#include "entity/entity.h"
 
 class bullet : public entity {
   /// Polymorphic base class for projectiles fired by weapons

@@ -2,9 +2,9 @@
 #include <algorithm>
 #include "vmath.h"
 #include "chunk.h"
-#include "entity.h"
-#include "ship.h"
-#include "playership.h"
+#include "entity/entity.h"
+#include "entity/ship.h"
+#include "entity/playership.h"
 #include "gameplayer.h"
 #include "universe.h"
 

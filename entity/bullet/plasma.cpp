@@ -1,5 +1,5 @@
 #include "plasma.h"
-#include "buffer_plasma.h"
+#include "buffers/buffer_plasma.h"
 #include "world.h"
 #include "chunk.h"
 

@@ -2,7 +2,7 @@
 #define ENTITY_H_INCLUDED
 
 #include "vmath.h"
-#include "buffer.h"
+#include "buffers/buffer.h"
 
 class world;        // forward dec
 class chunk;

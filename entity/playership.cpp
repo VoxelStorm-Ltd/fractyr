@@ -1,5 +1,5 @@
 #include "playership.h"
-#include "weapon.h"
+#include "weapon/weapon.h"
 
 playership::playership(world &parent_world,
              chunk *parent_chunk,
