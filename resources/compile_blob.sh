@@ -13,10 +13,16 @@ if [ "$compiler" = "" ]; then
   fi
 fi
 
-if echo "$MACHTYPE" | grep -iq "apple"; then
+if grep -iq ".glsl$" <<< "$infile"; then
+  # additional validation step for glsl shaders
+  shortfilename="$(basename "$infile" | sed 's/_vert.glsl$//;s/_frag.glsl$//')"
+  resources/validate_shader.sh "$shortfilename"
+fi
+
+if grep -iq "apple" <<< "$MACHTYPE"; then
   # os x requires special treatment
   xxd -i "$infile" | sed 's/\(resources[a-zA-Z0-9_]*\)/_binary_\1_x/' | "$compiler" -c -o "$outfile" -x c++ -
-elif echo "$MACHTYPE" | grep -iq "linux"; then
+elif grep -iq "linux" <<< "$MACHTYPE"; then
   # everything else just works with gnu ld
   ld -r -b binary -o "$outfile" "$infile"
 else
