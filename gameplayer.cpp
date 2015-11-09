@@ -6,8 +6,8 @@
 #include "soundstorm/soundstorm.h"
 #include "oculusstorm/oculusstorm.h"
 #include "universe.h"
-#include "ship.h"
-#include "playership.h"
+#include "entity/ship.h"
+#include "entity/playership.h"
 
 extern GLFWwindow *window_main;
 extern oculusstorm *oculus;

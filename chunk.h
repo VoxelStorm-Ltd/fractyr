@@ -4,7 +4,7 @@
 #include <vector>
 #include <voro++.hh>
 #include "vmath.h"
-#include "buffer_chunk.h"
+#include "buffers/buffer_chunk.h"
 #include "world.h"
 
 class world;          // forward dec

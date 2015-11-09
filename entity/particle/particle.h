@@ -1,8 +1,8 @@
 #ifndef PARTICLE_H_INCLUDED
 #define PARTICLE_H_INCLUDED
 
-#include "entity.h"
-#include "buffer_shard.h"
+#include "entity/entity.h"
+#include "buffers/buffer_shard.h"
 
 class particle : public entity {
 public:

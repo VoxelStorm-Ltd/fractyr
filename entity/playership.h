@@ -1,7 +1,7 @@
 #ifndef PLAYERSHIP_H
 #define PLAYERSHIP_H
 
-#include <ship.h>
+#include "entity/ship.h"
 
 
 class playership : public ship {

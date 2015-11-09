@@ -1,5 +1,5 @@
 #include "ship.h"
-#include "weapon.h"
+#include "weapon/weapon.h"
 
 ship::ship(world &parent_world, chunk *parent_chunk,
            Vector3f const &position,

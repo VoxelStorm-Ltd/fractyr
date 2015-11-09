@@ -1,6 +1,6 @@
 #include "blaster.h"
-#include "plasma.h"
-#include "ship.h"
+#include "entity/bullet/plasma.h"
+#include "entity/ship.h"
 
 blaster::blaster(ship *parent)
   : weapon(parent) {
