@@ -313,7 +313,7 @@ void universe::render_progressscreen_hud(float progress, std::string const &mess
   glMatrixMode(GL_PROJECTION);
   glPopMatrix();
   glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
+  glPopMatrix();
   glEnable(GL_DEPTH_TEST);
 }
 
@@ -340,7 +340,7 @@ void universe::render_energy_hud(float energy) {
   glMatrixMode(GL_PROJECTION);
   glPopMatrix();
   glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
+  glPopMatrix();
   glEnable(GL_DEPTH_TEST);
 }
 
@@ -358,7 +358,7 @@ void universe::render_cores_hud(unsigned int cores) {
 
   glColor4f(1.0, 1.0, 0.0, 0.5);
 
-  for (unsigned int i = 0; i < cores; ++i) {
+  for(unsigned int i = 0; i < cores; ++i) {
     glBegin(GL_QUADS);
     glVertex2i(windowsize.x * 0.25 + (20 * i),      15.0);
     glVertex2i(windowsize.x * 0.25 + (20 * i) + 10, 15.0);
@@ -368,7 +368,7 @@ void universe::render_cores_hud(unsigned int cores) {
   }
 
   glColor4f(1.0, 1.0, 0.0, 1.0);
-  for (unsigned int i = cores; i < cores_to_win; ++i) {
+  for(unsigned int i = cores; i < cores_to_win; ++i) {
     glBegin(GL_LINE_STRIP);
     glVertex2i(windowsize.x * 0.25 + (20 * i),      15.0);
     glVertex2i(windowsize.x * 0.25 + (20 * i) + 10, 15.0);
@@ -381,7 +381,7 @@ void universe::render_cores_hud(unsigned int cores) {
   glMatrixMode(GL_PROJECTION);
   glPopMatrix();
   glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
+  glPopMatrix();
   glEnable(GL_DEPTH_TEST);
 }
 void universe::set_graphicslevel(graphicsleveltype newlevel) {
@@ -471,7 +471,7 @@ void universe::loop_menu() {
 }
 
 void universe::loop_fade_in() {
-  for (unsigned int f = 0; f != fadetime; ++f) {
+  for(unsigned int f = 0; f != fadetime; ++f) {
     if(oculus->enabled) {
       // render once for each eye
       player.setup_render_oculus_left();
@@ -520,7 +520,7 @@ void universe::loop_fade_in() {
 }
 
 void universe::loop_fade_out() {
-  for (unsigned int f = 0; f != fadetime; ++f) {
+  for(unsigned int f = 0; f != fadetime; ++f) {
     if(oculus->enabled) {
       // render once for each eye
       player.setup_render_oculus_left();
@@ -569,7 +569,7 @@ void universe::loop_fade_out() {
 }
 
 void universe::loop_fade_out_won() {
-  for (unsigned int f = 0; f != fadetimewon; ++f) {
+  for(unsigned int f = 0; f != fadetimewon; ++f) {
     if(oculus->enabled) {
       // render once for each eye
       player.setup_render_oculus_left();

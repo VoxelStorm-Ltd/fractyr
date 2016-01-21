@@ -28,14 +28,14 @@ namespace AutoVersion {
 
   #define RC_GIT_BRANCH $branch
   #define RC_GIT_BRANCH_STRING "$branch"
-  static const char GIT_BRANCH[] = "$branch";
+  static char const GIT_BRANCH[] = "$branch";
 
   #define RC_GIT_REVISION $sha
   #define RC_GIT_REVISION_FULL $sha_full
   #define RC_GIT_REVISION_STRING "$sha"
   #define RC_GIT_REVISION_FULL_STRING "$sha_full"
-  static const char GIT_REVISION[] = "$sha";
-  static const char GIT_REVISION_FULL[] = "$sha_full";
+  static char const GIT_REVISION[] = "$sha";
+  static char const GIT_REVISION_FULL[] = "$sha_full";
 
   #define RC_GIT_DATE $date_full
   #define RC_GIT_DATE_SHORT $date_short
@@ -43,10 +43,10 @@ namespace AutoVersion {
   #define RC_GIT_DATE_STRING "$date_full"
   #define RC_GIT_DATE_SHORT_STRING "$date_short"
   #define RC_GIT_DATE_SECONDS_STRING "$date_seconds"
-  static const char GIT_DATE[] = "$date_full";
-  static const char GIT_DATE_SHORT[] = "$date_short";
-  static const unsigned int GIT_DATE_SECONDS = $date_seconds;
-  static const char GIT_DATE_SECONDS_STRING[] = "$date_seconds";
+  static char const GIT_DATE[] = "$date_full";
+  static char const GIT_DATE_SHORT[] = "$date_short";
+  static unsigned int const GIT_DATE_SECONDS = $date_seconds;
+  static char const GIT_DATE_SECONDS_STRING[] = "$date_seconds";
 }
 
 #endif // GIT_VERSION_H

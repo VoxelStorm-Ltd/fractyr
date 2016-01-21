@@ -53,7 +53,7 @@ bool playership::fire(unsigned int weapon_id) {
 
 void playership::collided_with(entity *other) {
   #ifndef NDEBUG
-    if (!invincible) {
+    if(!invincible) {
       entity::collided_with(other);
     }
   #else

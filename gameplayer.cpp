@@ -38,7 +38,7 @@ void gameplayer::cache_matrix(double nearplane, double farplane) {
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
 
-  double top    = tan(fov_angle_rad * 0.5) * nearplane;
+  double top    = std::tan(fov_angle_rad * 0.5) * nearplane;
   double bottom = -top;
   double left   = bottom * aspect_ratio;
   double right  = top    * aspect_ratio;
@@ -112,8 +112,8 @@ void gameplayer::setup_render_ortho_restore() {
   glMatrixMode(GL_PROJECTION);
   glPopMatrix();
   glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-	// no need to restore matrices for drawing if we're going to set them up again next frame, but they are needed for picking
+  glPopMatrix();
+  // no need to restore matrices for drawing if we're going to set them up again next frame, but they are needed for picking
   glEnable(GL_DEPTH_TEST);
 }
 
@@ -173,7 +173,7 @@ void gameplayer::update_fov(double new_fov) {
 
 void gameplayer::update_fov_ratio() {
   /// Helper function to calculate field of view ratio from a field of view angle
-  fov_ratio = tan(fov_angle_rad);
+  fov_ratio = std::tan(fov_angle_rad);
   //std::cout << "New FOV ratio: " << fov_ratio << std::endl;
 }
 

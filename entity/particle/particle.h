@@ -18,7 +18,7 @@ public:
            Vector3f const &velocity = Vector3f(0.0, 0.0, 0.0));
   virtual ~particle();
 
-  virtual void collided_with(entity* other) override;
+  virtual void collided_with(entity *other) override;
   virtual entity::entity_type get_entity_type() const override;
 
   void update() override final;

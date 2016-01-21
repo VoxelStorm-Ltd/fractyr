@@ -46,7 +46,7 @@ void world::find_visible_chunks(Vector3i const &chunk_coords,
                                 int range) {
   /// Return a list of chunks visible in this direction from a given chunk, in optimal rendering order
   visible_chunks.clear();
-  visible_chunks.reserve(pow((range * 2) + 1, 3));
+  visible_chunks.reserve(std::pow((range * 2) + 1, 3));
 
   Vector3f view_vector(0.0, 0.0, -1.0);
   view_vector.rotate(view_direction);
@@ -245,7 +245,7 @@ void world::find_visible_chunks(Vector3i const &chunk_coords,
     }
   }
 
-  //std::cout << "DEBUG: visible_chunks.size() " << visible_chunks.size() << " / " << pow((range * 2) + 1, 3) << " (" << visible_chunks.size() * 100 / pow((range * 2) + 1, 3) << "% drawn)" << std::endl;
+  //std::cout << "DEBUG: visible_chunks.size() " << visible_chunks.size() << " / " << std::pow((range * 2) + 1, 3) << " (" << visible_chunks.size() * 100 / std::pow((range * 2) + 1, 3) << "% drawn)" << std::endl;
 }
 
 Vector3f world::check_collision(Vector3i const &chunk_coords,
@@ -349,7 +349,7 @@ void world::update() {
     ent->update();
     if(__builtin_expect(ent->energy <= 0 && ent != player.current_ship, 0)) {
       ent->destroy();
-      if (ent->get_entity_type() == entity::entity_type::CORE) {
+      if(ent->get_entity_type() == entity::entity_type::CORE) {
         player.current_ship->cores_destroyed++;
         std::cout << "DEBUG: Core destroyed!" << std::endl;
       }

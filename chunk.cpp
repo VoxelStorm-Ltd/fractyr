@@ -82,12 +82,12 @@ bool chunk::get_is_solid(Vector3i const &chunk_coords, Vector3f const &local_coo
   //std::cout << "DEBUG: " << x << "," << y << "," << z << std::endl;
 
   // inverted quintic mandelbulb:
-  for (unsigned int i = 0; i != iters; ++i) {
+  for(unsigned int i = 0; i != iters; ++i) {
     x = std::pow(x, 5) - 10.0 * x * x * x * (y * y + z * z) + 5 * x * (std::pow(y, 4) + std::pow(z, 4)) + x0;
     y = std::pow(y, 5) - 10.0 * y * y * y * (z * z + x * x) + 5 * y * (std::pow(z, 4) + std::pow(x, 4)) + y0;
     z = std::pow(z, 5) - 10.0 * z * z * z * (x * x + y * y) + 5 * z * (std::pow(x, 4) + std::pow(y, 4)) + z0;
 
-    if (fabs(x + y + z) > cutoff) {
+    if(std::fabs(x + y + z) > cutoff) {
       //std::cout << "DEBUG: " << x0 << "," << y0 << "," << z0 << std::endl;
       return true;
     }

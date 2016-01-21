@@ -64,7 +64,7 @@ void grunt::update() {
     orientation.normalise();
     orientation_conjugate = orientation.conjugate_copy();
 
-    for (auto weapon : weapons) {
+    for(auto weapon : weapons) {
       weapon->fire();
     }
   } else {

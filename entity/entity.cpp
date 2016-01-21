@@ -110,7 +110,7 @@ void entity::move(Vector3f const &direction) {
   Vector3f test_dir_sum = Vector3f(0, 0, 0);
   unsigned int test_points_collided = 0;
 
-  for (auto test_dir : test_dirs) {
+  for(auto test_dir : test_dirs) {
     Vector3f test_point(test_dir + newposition);
     chunk *test_parent = newparent;
     correct_point(test_point, test_parent);
@@ -123,12 +123,12 @@ void entity::move(Vector3f const &direction) {
   }
 
   // reflect our velocity by the collision vector
-  if (__builtin_expect(test_points_collided != 0 && test_dir_sum != Vector3f(0.0, 0.0, 0.0), 0)) { // If none or all test points are colliding, don't do a collision.
+  if(__builtin_expect(test_points_collided != 0 && test_dir_sum != Vector3f(0.0, 0.0, 0.0), 0)) { // If none or all test points are colliding, don't do a collision.
     Vector3f collision_normal = -test_dir_sum / test_points_collided;
     collision_normal.normalise();
     #ifndef NDEBUG
     if(!player.noclip) {
-      if (this->get_entity_type() == entity_type::PLAYER) {
+      if(this->get_entity_type() == entity_type::PLAYER) {
         //std::cout << "DEBUG: " << test_points_collided << ": " << test_dir_sum << " collision!  Normal " << collision_normal << std::endl;
       }
     #endif // NDEBUG
@@ -151,7 +151,7 @@ void entity::move(Vector3f const &direction) {
     parent->remove_entity(this);
     newparent->add_entity(this);
     #ifndef NDEBUG
-      if (this->get_entity_type() == entity_type::PLAYER) {
+      if(this->get_entity_type() == entity_type::PLAYER) {
         std::cout << "DEBUG: player moved chunks from " << parent->coords << " to " << newparent->coords << std::endl;
       }
     #endif
@@ -256,7 +256,7 @@ float entity::get_collision_damage() const {
 }
 
 void entity::collided_with(entity *other) {
-  if (get_entity_type() != entity::entity_type::ENEMY || other->get_entity_type() != entity::entity_type::ENEMY) {
+  if(get_entity_type() != entity::entity_type::ENEMY || other->get_entity_type() != entity::entity_type::ENEMY) {
     energy -= other->get_collision_damage();
   }
 }
