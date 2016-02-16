@@ -661,7 +661,6 @@
 					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
 				</Compiler>
 				<Linker>
-					<Add option="-static-libgcc" />
 					<Add option="-static-libstdc++" />
 					<Add option="-framework OpenGL" />
 					<Add option="-framework IOKit" />
@@ -689,7 +688,6 @@
 					<Add library="lib/mac64/libbz2.a" />
 					<Add library="lib/mac64/libpng16.a" />
 					<Add library="lib/mac64/libz.a" />
-					<Add library="c++" />
 				</Linker>
 			</Target>
 			<Target title="Mac64_Release">
@@ -754,7 +752,6 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 				</Compiler>
 				<Linker>
-					<Add option="-static-libgcc" />
 					<Add option="-static-libstdc++" />
 					<Add option="-flto" />
 					<Add option="-framework OpenGL" />
@@ -783,7 +780,6 @@
 					<Add library="lib/mac64/libbz2.a" />
 					<Add library="lib/mac64/libpng16.a" />
 					<Add library="lib/mac64/libz.a" />
-					<Add library="c++" />
 				</Linker>
 				<ExtraCommands>
 					<Add after='strip -SXx &quot;$(TARGET_OUTPUT_FILE)&quot;;' />
