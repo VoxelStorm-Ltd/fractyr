@@ -27,3 +27,6 @@ version.h text eol=lf
 #*.sample binary
 #*.xml binary
 #*.layout binary
+
+# Make sure version.h is always merged smoothly
+version.h merge=highest_version_merge
