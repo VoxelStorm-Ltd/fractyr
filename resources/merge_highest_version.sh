@@ -10,7 +10,7 @@ other="$3"
 target="$4"
 
 function get_revision {
-  fgrep REVISION "$1" | cut -d '=' -f 2- | cut -d ';' -f 1 | tr -d ' '
+  grep -F REVISION "$1" | cut -d '=' -f 2- | cut -d ';' -f 1 | tr -d ' '
 }
 
 revision_ancestor=$(get_revision "$ancestor")
