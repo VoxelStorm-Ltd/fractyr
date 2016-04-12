@@ -7,7 +7,7 @@
 # or under OS X, instead of ld, use:
 #   resources/compile_blob.sh resources/shaders/$file_name.$file_ext $object
 
-name=${1%_*}
+name="$(basename "$1" | sed 's/_vert.glsl$//;s/_frag.glsl$//')"
 
 if [ "${1##*_}" = "vert" ]; then
   # skip on vertex shader; validate vert and frag together when called on frag
