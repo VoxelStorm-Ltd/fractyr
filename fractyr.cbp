@@ -893,6 +893,7 @@
 		<Unit filename="font_load.h" />
 		<Unit filename="fractyr.rc">
 			<Option compilerVar="WINDRES" />
+			<Option weight="90" />
 			<Option target="Win32_Debug" />
 			<Option target="Win32_Release" />
 			<Option target="Win64_Debug" />
