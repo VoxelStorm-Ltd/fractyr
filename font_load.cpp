@@ -18,7 +18,7 @@ FTFont *font_load(std::string const &filename, unsigned int size) {
     return nullptr;
   }
   font->CharMap(ft_encoding_unicode);
-  font->FaceSize(size, 72);  // points, display resolution: 10, 72 = 10PPEm, ignored for anything other than a buffer font
+  font->FaceSize(size, 72);                                                     // points, display resolution: 10, 72 = 10PPEm, ignored for anything other than a buffer font
   font->UseDisplayList(false);
   return font;
 }
@@ -32,7 +32,7 @@ FTFont *font_load(unsigned char const *buffer, size_t buffersize, unsigned int s
     return nullptr;
   }
   font->CharMap(ft_encoding_unicode);
-  font->FaceSize(size, 72);  // points, display resolution: 10, 72 = 10PPEm, ignored for anything other than a buffer font
+  font->FaceSize(size, 72);                                                     // points, display resolution: 10, 72 = 10PPEm, ignored for anything other than a buffer font
   font->UseDisplayList(false);
   return font;
 }
@@ -51,7 +51,7 @@ FTFont *font_load3d(std::string const &filename, unsigned int size) {
     return nullptr;
   }
   font->CharMap(ft_encoding_unicode);
-  font->FaceSize(size, 72);  // points, display resolution: 10, 72 = 10PPEm, ignored for anything other than a buffer font
+  font->FaceSize(size, 72);                                                     // points, display resolution: 10, 72 = 10PPEm, ignored for anything other than a buffer font
   font->UseDisplayList(false);
   font->Depth(1.0);
   return font;
@@ -65,7 +65,7 @@ FTFont *font_load3d(unsigned char const *buffer, size_t buffersize, unsigned int
     return nullptr;
   }
   font->CharMap(ft_encoding_unicode);
-  font->FaceSize(size, 72);  // points, display resolution: 10, 72 = 10PPEm, ignored for anything other than a buffer font
+  font->FaceSize(size, 72);                                                     // points, display resolution: 10, 72 = 10PPEm, ignored for anything other than a buffer font
   font->UseDisplayList(false);
   font->Depth(1.0);
   return font;
