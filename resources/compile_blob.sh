@@ -38,9 +38,11 @@ if grep -iq "apple" <<< "$MACHTYPE"; then
 elif grep -iq "linux" <<< "$MACHTYPE"; then
   # everything else just works with gnu ld, but we need to select bitness
   if grep -Fq -- '-m32' <<< "$options"; then
-    ld -m elf_i386 -r -b binary -o "$outfile" "$infile"
+    #ld -m elf_i386 -r -b binary -o "$outfile" "$infile"
+    xxd -i "$infile" | sed 's/\[\] = {/\[\] __attribute__((__aligned__(16))) = {/;s/\(resources[a-zA-Z0-9_]*\)/_binary_\1_x/' | "$compiler" -m32 -c -o "$outfile" -x c++ -
   else
-    ld -r -b binary -o "$outfile" "$infile"
+    #ld -r -b binary -o "$outfile" "$infile"
+    xxd -i "$infile" | sed 's/\[\] = {/\[\] __attribute__((__aligned__(16))) = {/;s/\(resources[a-zA-Z0-9_]*\)/_binary_\1_x/' | "$compiler" -c -o "$outfile" -x c++ -
   fi
 else
   # ...except if we're on windows, and then hoops need to be jumped through for backslashes
