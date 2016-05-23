@@ -24,7 +24,7 @@ fi
 # convert absolute path to relative if it's a subdirectory
 pwd="$(pwd | sed 's/\//\\\//g')\/"
 infile="$(sed "s/$pwd//" <<< "$infile")"
-echo "Relative path $infile"
+#echo "Relative path $infile"
 
 if grep -iq ".glsl$" <<< "$infile"; then
   # additional validation step for glsl shaders
