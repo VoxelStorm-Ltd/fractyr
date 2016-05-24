@@ -110,7 +110,7 @@ void entity::move(Vector3f const &direction) {
   Vector3f test_dir_sum = Vector3f(0, 0, 0);
   unsigned int test_points_collided = 0;
 
-  for(auto test_dir : test_dirs) {
+  for(auto const &test_dir : test_dirs) {
     Vector3f test_point(test_dir + newposition);
     chunk *test_parent = newparent;
     correct_point(test_point, test_parent);

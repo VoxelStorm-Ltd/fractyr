@@ -2,7 +2,7 @@
 #define WORLD_H_INCLUDED
 
 #include <vector>
-#include "vmath.h"
+#include "vectorstorm/vectorstorm.h"
 
 class chunk;
 class entity;

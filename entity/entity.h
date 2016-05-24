@@ -1,7 +1,7 @@
 #ifndef ENTITY_H_INCLUDED
 #define ENTITY_H_INCLUDED
 
-#include "vmath.h"
+#include "vectorstorm/vectorstorm.h"
 #include "buffers/buffer.h"
 
 class world;                                                                    // forward dec

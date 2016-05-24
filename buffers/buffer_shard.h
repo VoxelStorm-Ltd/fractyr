@@ -3,7 +3,7 @@
 
 #include "buffer.h"
 #include <vector>
-#include "vmath.h"
+#include "vectorstorm/vectorstorm.h"
 
 class buffer_shard : public buffer {
 public:
@@ -13,9 +13,9 @@ public:
     Vector3<GLfloat> coords;
     Vector3<GLfloat> normal;
     Vector4<GLfloat> colour;
-    vertex(Vector3<GLfloat> coords,
-           Vector3<GLfloat> normal,
-           Vector4<GLfloat> colour)
+    vertex(Vector3<GLfloat> const &coords,
+           Vector3<GLfloat> const &normal,
+           Vector4<GLfloat> const &colour)
     : coords(coords),
       normal(normal),
       colour(colour) {

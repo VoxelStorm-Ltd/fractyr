@@ -4,7 +4,7 @@
 #include "entity/ship.h"
 
 
-class playership : public ship {
+class playership final : public ship {
 public:
   #ifndef NDEBUG
     bool invincible = false;
@@ -18,10 +18,10 @@ public:
              Quatf const &orientation = Quatf::fromEulerAngles(0.0, 0.0, 0.0));
   virtual ~playership();
   void update() override;
-  void accelerate(Vector3f accel) override;
-  bool fire(unsigned int weapon_id) override;
-  void collided_with(entity *other) override;
-  virtual entity::entity_type get_entity_type() const override;
+  void accelerate(Vector3f const &accel) override final;
+  bool fire(unsigned int weapon_id) override final;
+  void collided_with(entity *other) override final;
+  virtual entity::entity_type get_entity_type() const override final;
 };
 
 #endif // PLAYERSHIP_H

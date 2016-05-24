@@ -1,5 +1,6 @@
 #include "buffer_shard.h"
-//#include "vmath.h"
+#include <iostream>
+//#include "vectorstorm/vectorstorm.h"
 //#include "blob_loader.h"
 #include "shader_load.h"
 

@@ -1,4 +1,5 @@
 #include "buffer_enemy_core.h"
+#include <iostream>
 //#include "blob_loader.h"
 #include "shader_load.h"
 
@@ -120,10 +121,10 @@ void buffer_enemy_core::render() const {
 }
 
 void buffer_enemy_core::cuboid(Vector3f const &pos,
-                                Vector3f const &size,
-                                Vector4f const &colour,
-                                std::vector<vertex> &vbodata,
-                                std::vector<GLuint> &ibodata) const {
+                               Vector3f const &size,
+                               Vector4f const &colour,
+                               std::vector<vertex> &vbodata,
+                               std::vector<GLuint> &ibodata) const {
   Vector3f const size_half(size / 2.0);
   Vector3f const coord000(-size_half + pos);
   Vector3f const coord100(coord000 + Vector3f(size.x, 0.0f,   0.0f));

@@ -3,7 +3,7 @@
 
 #include "buffer.h"
 #include <vector>
-#include "vmath.h"
+#include "vectorstorm/vectorstorm.h"
 
 class buffer_plasma : public buffer {
 public:
@@ -12,8 +12,8 @@ public:
   struct vertex {
     Vector3<GLfloat> coords;
     Vector4<GLfloat> colour;
-    vertex(Vector3<GLfloat> coords,
-           Vector4<GLfloat> colour)
+    vertex(Vector3<GLfloat> const &coords,
+           Vector4<GLfloat> const &colour)
     : coords(coords),
       colour(colour) {
       /// specific constructor

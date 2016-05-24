@@ -23,7 +23,7 @@ public:
 
   void add_weapon(weapon *new_weapon);
 
-  virtual void accelerate(Vector3f accel);
+  virtual void accelerate(Vector3f const &accel);
   void rotate(float yaw, float pitch);
   void roll(float roll);
   virtual bool fire(unsigned int weapon_id);                                    // Attempts to fire current weapon, returns whether successful or not.

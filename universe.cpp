@@ -1,8 +1,9 @@
 #include "universe.h"
+#include <iostream>
+#include <random>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <FTGL/ftgl.h>
-#include <random>
 #include "platform_defines.h"
 #include "blob_loader.h"
 #include "gameplayer.h"

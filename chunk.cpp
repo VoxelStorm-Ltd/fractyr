@@ -1,4 +1,5 @@
 #include "chunk.h"
+#include <iostream>
 #include <random>
 #include <algorithm>
 #include <GL/glew.h>
@@ -122,7 +123,7 @@ Vector3f chunk::check_collision(Vector3f const &coords, float radius) {
     return Vector3f(0.0, 0.0, 0.0);
   }
   //std::cout << "DEBUG: Checking solidity of: " << result << std::endl;
-  if(__builtin_expect(!get_is_solid(result), 1)) {                              // branch prediction: likely not solid
+  if(__builtin_expect(!get_is_solid(Vector3f(result)), 1)) {                    // branch prediction: likely not solid
     return Vector3f(0.0, 0.0, 0.0);
   }
   result.normalise();
@@ -355,7 +356,7 @@ void chunk::setup() {
         if(//neighbours[face] < 0 ||                                            // external faces - container edges have negative IDs
            !cell_is_solid[neighbours[face]]) {                                  // draw faces between solid and air cells
           #ifdef NDEBUG
-            Vector3f const &face_colour(get_colour(cell_coords));
+            Vector3f const &face_colour(get_colour(vector3f(cell_coords)));
           #else
             Vector3f face_colour(get_colour(cell_coords));
             if(neighbours[face] < 0) {

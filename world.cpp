@@ -1,6 +1,7 @@
 #include "world.h"
+#include <iostream>
 #include <algorithm>
-#include "vmath.h"
+#include "vectorstorm/vectorstorm.h"
 #include "chunk.h"
 #include "entity/entity.h"
 #include "entity/ship.h"

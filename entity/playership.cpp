@@ -26,7 +26,7 @@ void playership::update() {
   ship::update();
 }
 
-void playership::accelerate(Vector3f accel) {
+void playership::accelerate(Vector3f const &accel) {
   /// Accelerate this ship along a given vector relative to its orientation
   if(energy > accel.length() + 1) {
     energy -= static_cast<int>(accel.length());

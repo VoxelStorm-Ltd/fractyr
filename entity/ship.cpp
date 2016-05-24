@@ -39,10 +39,11 @@ void ship::add_weapon(weapon *new_weapon) {
   weapons.push_back(new_weapon);
 }
 
-void ship::accelerate(Vector3f accel) {
+void ship::accelerate(Vector3f const &accel) {
   /// Accelerate this ship along a given vector relative to its orientation
-  accel.rotate(orientation_conjugate);
-  velocity += accel * acceleration;
+  auto accel_copy(accel);
+  accel_copy.rotate(orientation_conjugate);
+  velocity += accel_copy * acceleration;
 }
 
 void ship::rotate(float yaw, float pitch) {

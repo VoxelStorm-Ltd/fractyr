@@ -1,8 +1,9 @@
 #include "gameplayer.h"
+#include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <FTGL/ftgl.h>
-#include "vmath.h"
+#include "vectorstorm/vectorstorm.h"
 #include "soundstorm/soundstorm.h"
 #include "oculusstorm/oculusstorm.h"
 #include "universe.h"

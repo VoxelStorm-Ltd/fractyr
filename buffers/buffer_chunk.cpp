@@ -1,4 +1,5 @@
 #include "buffer_chunk.h"
+#include <iostream>
 //#include "blob_loader.h"
 #include "shader_load.h"
 

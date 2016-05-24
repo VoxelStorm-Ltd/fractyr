@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <voro++.hh>
-#include "vmath.h"
+#include "vectorstorm/vectorstorm.h"
 #include "buffers/buffer_chunk.h"
 #include "world.h"
 

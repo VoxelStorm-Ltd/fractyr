@@ -1,4 +1,5 @@
 #include "buffer_enemy_grunt.h"
+#include <iostream>
 //#include "blob_loader.h"
 #include "shader_load.h"
 

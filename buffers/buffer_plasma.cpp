@@ -1,4 +1,5 @@
 #include "buffer_plasma.h"
+#include <iostream>
 //#include "blob_loader.h"
 #include "shader_load.h"
 

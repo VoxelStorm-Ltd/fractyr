@@ -8,7 +8,7 @@
 #include <random>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "vmath.h"
+#include "vectorstorm/vectorstorm.h"
 
 class world;
 class chunk;
