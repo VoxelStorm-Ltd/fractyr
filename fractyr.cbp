@@ -929,6 +929,7 @@
 		<Unit filename="resources/music_main_intro.ogg">
 			<Option compile="1" />
 			<Option link="1" />
+			<Option compiler="gcc" use="1" buildCommand='bash -c &quot;resources/compile_blob.sh \&quot;resources/$file_name.$file_ext\&quot; \&quot;$object\&quot;&quot;' />
 			<Option target="Win32_Debug" />
 			<Option target="Win32_Release" />
 			<Option target="Win64_Debug" />
@@ -945,6 +946,7 @@
 		<Unit filename="resources/music_main_loop.ogg">
 			<Option compile="1" />
 			<Option link="1" />
+			<Option compiler="gcc" use="1" buildCommand='bash -c &quot;resources/compile_blob.sh \&quot;resources/$file_name.$file_ext\&quot; \&quot;$object\&quot;&quot;' />
 			<Option target="Win32_Debug" />
 			<Option target="Win32_Release" />
 			<Option target="Win64_Debug" />
@@ -963,30 +965,37 @@
 		<Unit filename="resources/shaders/chunk_frag.glsl">
 			<Option compile="1" />
 			<Option link="1" />
+			<Option compiler="gcc" use="1" buildCommand='bash -c &quot;resources/compile_blob.sh \&quot;resources/shaders/$file_name.$file_ext\&quot; \&quot;$object\&quot;&quot;' />
 		</Unit>
 		<Unit filename="resources/shaders/chunk_vert.glsl">
 			<Option compile="1" />
 			<Option link="1" />
+			<Option compiler="gcc" use="1" buildCommand='bash -c &quot;resources/compile_blob.sh \&quot;resources/shaders/$file_name.$file_ext\&quot; \&quot;$object\&quot;&quot;' />
 		</Unit>
 		<Unit filename="resources/shaders/enemy_grunt_frag.glsl">
 			<Option compile="1" />
 			<Option link="1" />
+			<Option compiler="gcc" use="1" buildCommand='bash -c &quot;resources/compile_blob.sh \&quot;resources/shaders/$file_name.$file_ext\&quot; \&quot;$object\&quot;&quot;' />
 		</Unit>
 		<Unit filename="resources/shaders/enemy_grunt_vert.glsl">
 			<Option compile="1" />
 			<Option link="1" />
+			<Option compiler="gcc" use="1" buildCommand='bash -c &quot;resources/compile_blob.sh \&quot;resources/shaders/$file_name.$file_ext\&quot; \&quot;$object\&quot;&quot;' />
 		</Unit>
 		<Unit filename="resources/shaders/plasma_frag.glsl">
 			<Option compile="1" />
 			<Option link="1" />
+			<Option compiler="gcc" use="1" buildCommand='bash -c &quot;resources/compile_blob.sh \&quot;resources/shaders/$file_name.$file_ext\&quot; \&quot;$object\&quot;&quot;' />
 		</Unit>
 		<Unit filename="resources/shaders/plasma_vert.glsl">
 			<Option compile="1" />
 			<Option link="1" />
+			<Option compiler="gcc" use="1" buildCommand='bash -c &quot;resources/compile_blob.sh \&quot;resources/shaders/$file_name.$file_ext\&quot; \&quot;$object\&quot;&quot;' />
 		</Unit>
 		<Unit filename="resources/title.ttf">
 			<Option compile="1" />
 			<Option link="1" />
+			<Option compiler="gcc" use="1" buildCommand='bash -c &quot;resources/compile_blob.sh \&quot;resources/$file_name.$file_ext\&quot; \&quot;$object\&quot;&quot;' />
 			<Option target="Win32_Debug" />
 			<Option target="Win32_Release" />
 			<Option target="Win64_Debug" />
