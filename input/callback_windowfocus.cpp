@@ -13,7 +13,7 @@ void callback_windowfocus(GLFWwindow *thiswindow __attribute__((__unused__)), in
   /// Callback for handling window focus and unfocus
   if(focused == GL_TRUE) {
     if(root.state != universe::gamestate::PAUSED) {
-      return;       // don't change states if we aren't paused
+      return;                                                                   // don't change states if we aren't paused
     }
     root.state = universe::gamestate::RUNNING;
     //player.mouse_last = player.cursorpos;

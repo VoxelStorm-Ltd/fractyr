@@ -6,9 +6,9 @@
 
 class particle : public entity {
 public:
-  static buffer_shard buf;                        // this object's graphics buffer
+  static buffer_shard buf;                                                      // this object's graphics buffer
 
-  unsigned int time_to_live = 30;                 // how long to exist for, in frames
+  unsigned int time_to_live = 30;                                               // how long to exist for, in frames
 
 public:
   particle(world &parent_world,

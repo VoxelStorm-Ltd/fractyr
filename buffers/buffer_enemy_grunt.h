@@ -7,7 +7,7 @@
 
 class buffer_enemy_grunt : public buffer {
 public:
-  static GLuint shader;                                // shader program for this buffer type
+  static GLuint shader;                                                         // shader program for this buffer type
 
   struct vertex {
     Vector3<GLfloat> coords;

@@ -7,11 +7,11 @@
 class buffer {
   /// Polymorphic base class for graphics buffer objects, their shaders and render functions
 protected:
-  GLuint vbo      = 0;                                // vertex buffer object
-  GLuint ibo      = 0;                                // index buffer object
-  GLuint numverts = 0;                                // number of vertices in the VBO
+  GLuint vbo      = 0;                                                          // vertex buffer object
+  GLuint ibo      = 0;                                                          // index buffer object
+  GLuint numverts = 0;                                                          // number of vertices in the VBO
 public:
-  bool initialised = false;                           // whether this buffer has been properly initialised
+  bool initialised = false;                                                     // whether this buffer has been properly initialised
 protected:
   buffer();
 public:

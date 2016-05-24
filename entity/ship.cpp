@@ -54,7 +54,7 @@ void ship::rotate(float yaw, float pitch) {
   orientation *= Quatf::fromAxisRot(axis_yaw,   yaw);
   orientation *= Quatf::fromAxisRot(axis_pitch, pitch);
 
-  orientation_conjugate = orientation;    // update the cached conjugate
+  orientation_conjugate = orientation;                                          // update the cached conjugate
   orientation_conjugate.conjugate();
 }
 
@@ -64,7 +64,7 @@ void ship::roll(float roll) {
   axis_roll.rotate(orientation_conjugate);
   orientation *= Quatf::fromAxisRot(axis_roll, roll);
 
-  orientation_conjugate = orientation;    // update the cached conjugate
+  orientation_conjugate = orientation;                                          // update the cached conjugate
   orientation_conjugate.conjugate();
 }
 

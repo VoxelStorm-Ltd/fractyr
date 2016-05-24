@@ -9,14 +9,14 @@
 #include "gameplayer.h"
 
 // globals
-GLFWwindow *window_main = nullptr;              // the main game window
-oculusstorm *oculus     = nullptr;              // oculus rift controller
-FTFont *font_title      = nullptr;              // global font definitions
+GLFWwindow *window_main = nullptr;                                              // the main game window
+oculusstorm *oculus     = nullptr;                                              // oculus rift controller
+FTFont *font_title      = nullptr;                                              // global font definitions
 FTFont *font_loading    = nullptr;
 // initialisation order important here:
-soundstorm sound;                               // audio manager
-gameplayer player;                              // player state and configuration
-universe root;                                  // the container for everything physical
+soundstorm sound;                                                               // audio manager
+gameplayer player;                                                              // player state and configuration
+universe root;                                                                  // the container for everything physical
 
 int main() {
   std::cout << "Fractyr version " << get_version() << " "

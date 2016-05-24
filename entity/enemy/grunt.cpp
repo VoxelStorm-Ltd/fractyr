@@ -46,7 +46,7 @@ void grunt::update() {
 
   #ifndef NDEBUG
     if(player.invisible) {
-      orientation *= Quatf::fromAxisRot(Vector3f(0.0, 1.0, 0.0), 0.1);    // spin gently
+      orientation *= Quatf::fromAxisRot(Vector3f(0.0, 1.0, 0.0), 0.1);          // spin gently
       orientation_conjugate = orientation.conjugate_copy();
       enemy::update();
       return;

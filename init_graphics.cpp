@@ -35,10 +35,10 @@ void universe::init_graphics(Vector2i &windowsize) {
     std::cout << "ERROR: glfwInit() failed" << std::endl;
     _Exit(EXIT_FAILURE);
   }
-  glfwSetErrorCallback(callback_error);         // set the error callback first
+  glfwSetErrorCallback(callback_error);                                         // set the error callback first
 
   if(!oculus) {
-    oculus = new oculusstorm(60000.0, 50.0);    // initialise the oculus rift before graphics init
+    oculus = new oculusstorm(60000.0, 50.0);                                    // initialise the oculus rift before graphics init
   }
   int nummonitors = 0;
   GLFWmonitor **monitor_list = glfwGetMonitors(&nummonitors);
@@ -96,7 +96,7 @@ void universe::init_graphics(Vector2i &windowsize) {
       windowsize.y = videomode_primary->height;
       glfwWindowHint(GLFW_REFRESH_RATE, videomode_primary->refreshRate);
     } else {
-      oculusmonitor = NULL;     // windowed mode
+      oculusmonitor = NULL;                                                     // windowed mode
     }
   }
   // set up window hints in advance
@@ -107,7 +107,7 @@ void universe::init_graphics(Vector2i &windowsize) {
   glfwWindowHint(GLFW_STENCIL_BITS, 0);
   //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
   //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_FALSE);   // forward compat disables all deprecated functions - we don't want that
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_FALSE);                         // forward compat disables all deprecated functions - we don't want that
   //glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
   //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
   //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
@@ -120,26 +120,26 @@ void universe::init_graphics(Vector2i &windowsize) {
   window_main = glfwCreateWindow(windowsize.x,
                                  windowsize.y,
                                  "Fractyr",
-                                 oculusmonitor,       // NULL here means run windowed
+                                 oculusmonitor,                                 // NULL here means run windowed
                                  NULL);
   if(!window_main) {
     // exit if this didn't work
     std::cout << "ERROR: glfwOpenWindow returned NULL; exiting." << std::endl;
     _Exit(EXIT_FAILURE);
   }
-  if(windowsize.x > videomode_primary->width) {       // make sure the window isn't bigger than the screen
+  if(windowsize.x > videomode_primary->width) {                                 // make sure the window isn't bigger than the screen
     windowsize.x = videomode_primary->width;
   }
   if(windowsize.y > videomode_primary->height) {
     windowsize.y = videomode_primary->height;
   }
   if(!fullscreen) {
-    glfwSetWindowPos(window_main, (videomode_primary->width  / 2) - (windowsize.x / 2),   // try to centre the window
+    glfwSetWindowPos(window_main, (videomode_primary->width  / 2) - (windowsize.x / 2), // try to centre the window
                      (videomode_primary->height / 2) - (windowsize.y / 2));
   }
   glfwMakeContextCurrent(window_main);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glfwShowWindow(window_main);  // only display the window once in position
+  glfwShowWindow(window_main);                                                  // only display the window once in position
   glfwSetWindowTitle(window_main, "Fractyr: Loading...");
 
   // callbacks
@@ -187,41 +187,41 @@ void universe::init_graphics(Vector2i &windowsize) {
   std::cout << "GL antialiasing mode: " << antialiasing << " buffers: " << antialiasing_buffers << ", samples: " << antialiasing_samples << std::endl;
   std::cout << "GL depth buffer: " << depthbits << " bits" << std::endl;
 
-  glFrontFace(GL_CCW);      // set up counter-clockwise polygon winding
-  glCullFace(GL_BACK);      // may be redundant to cull back-faces
+  glFrontFace(GL_CCW);                                                          // set up counter-clockwise polygon winding
+  glCullFace(GL_BACK);                                                          // may be redundant to cull back-faces
   glEnable(GL_CULL_FACE);
-  glEnable(GL_DEPTH_TEST);  // go on, use the zbuffer
-  glDisable(GL_DITHER);     // may marginally increase shading quality, but may be ignored in 24/32bit colour mode by the driver, has performance penalty
+  glEnable(GL_DEPTH_TEST);                                                      // go on, use the zbuffer
+  glDisable(GL_DITHER);                                                         // may marginally increase shading quality, but may be ignored in 24/32bit colour mode by the driver, has performance penalty
   glDisable(GL_LIGHTING);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  //glEnable(GL_MINMAX);      // allow min and max colour tables for HDR effects
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);      // GL_FILL or GL_LINE
-  glShadeModel(GL_SMOOTH);  // SMOOTH or FLAT
+  //glEnable(GL_MINMAX);                                                        // allow min and max colour tables for HDR effects
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);                                    // GL_FILL or GL_LINE
+  glShadeModel(GL_SMOOTH);                                                      // SMOOTH or FLAT
   glDisable(GL_NORMALIZE);
   //glDisable(GL_RESCALE_NORMALS);
   //glEnable(GL_TEXTURE);
   //glEnable(GL_TEXTURE_2D);
-  //glClientActiveTexture(GL_TEXTURE0);                     // for subsequent glTexCoordPointer calls, see http://stackoverflow.com/a/2227825/1678468
+  //glClientActiveTexture(GL_TEXTURE0);                                         // for subsequent glTexCoordPointer calls, see http://stackoverflow.com/a/2227825/1678468
 
   // smoothing setup
-  glDisable(GL_POLYGON_SMOOTH);                           // these are generally obsolete and break with some blending; antialiasing should be used instead
+  glDisable(GL_POLYGON_SMOOTH);                                                 // these are generally obsolete and break with some blending; antialiasing should be used instead
   glDisable(GL_POINT_SMOOTH);
-  glDisable(GL_LINE_SMOOTH);                              // with shaders, line smoothing grinds to a halt on ATI OpenGL2.1 hardware, see http://lists.apple.com/archives/mac-opengl/2008/Apr/msg00043.html
+  glDisable(GL_LINE_SMOOTH);                                                    // with shaders, line smoothing grinds to a halt on ATI OpenGL2.1 hardware, see http://lists.apple.com/archives/mac-opengl/2008/Apr/msg00043.html
   glHint(GL_LINE_SMOOTH_HINT,    GL_FASTEST);
   glHint(GL_POLYGON_SMOOTH_HINT, GL_FASTEST);
-  glLineWidth(1.0);                                       // any other value than 1.0 will break with shaders on ATI OpenGL2.1 hardware, see http://lists.apple.com/archives/mac-opengl/2008/Apr/msg00043.html
+  glLineWidth(1.0);                                                             // any other value than 1.0 will break with shaders on ATI OpenGL2.1 hardware, see http://lists.apple.com/archives/mac-opengl/2008/Apr/msg00043.html
 
   // fog settings
   glDisable(GL_FOG);
 
-  glDisable(GL_COLOR_MATERIAL);                                               // needs to come afetr glColorMaterial
+  glDisable(GL_COLOR_MATERIAL);                                                 // needs to come afetr glColorMaterial
 
   if(oculus->enabled) {
     // cache the matrics
     oculus->cachematrices();
     // set any other settings necessary for operation
-    glEnable(GL_SCISSOR_TEST);    // needed for glClear to work in multiple viewports without overwriting whole screen
+    glEnable(GL_SCISSOR_TEST);                                                  // needed for glClear to work in multiple viewports without overwriting whole screen
   }
 
   glClearColor(0.0, 0.0, 0.0, 1.0);

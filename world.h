@@ -10,13 +10,13 @@ class entity;
 class world {
   /// Container class for chunks, objects and their relevant functions
 public:
-  static int constexpr size = 8;                            // how many chunks in each direction
-  float const drag = 1.0;                                   // equal to 0.5 * mass-density of the fluid
+  static int constexpr size = 8;                                                // how many chunks in each direction
+  float const drag = 1.0;                                                       // equal to 0.5 * mass-density of the fluid
 
 private:
-  std::vector<std::vector<std::vector<chunk*>>> chunks;     // 3D vector of chunk pointers, initially null
-  std::vector<entity*> entities;                            // every entity that exists in the world
-  std::vector<chunk*> visible_chunks;                       // List of chunks which are currently visible.
+  std::vector<std::vector<std::vector<chunk*>>> chunks;                         // 3D vector of chunk pointers, initially null
+  std::vector<entity*> entities;                                                // every entity that exists in the world
+  std::vector<chunk*> visible_chunks;                                           // List of chunks which are currently visible.
 
 public:
   world();

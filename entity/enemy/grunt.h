@@ -3,11 +3,11 @@
 
 #include "enemy.h"
 
-class buffer_enemy_grunt;      // forward dec
+class buffer_enemy_grunt;                                                       // forward dec
 
 class grunt : public enemy {
 public:
-  static buffer_enemy_grunt buf;                  // this object's graphics buffer
+  static buffer_enemy_grunt buf;                                                // this object's graphics buffer
 protected:
   float scale = 1.0;
 

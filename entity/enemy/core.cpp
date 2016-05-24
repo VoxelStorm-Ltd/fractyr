@@ -42,7 +42,7 @@ void core::update() {
   /// Update this enemy's AI actions
   // TODO: The tracking gets confused if (I think) the player crosses the z axis, slerp should deal with this fine but isn't for some reason.
 
-  orientation *= Quatf::fromAxisRot(Vector3f(0.0, 0.0, 1.0), 1.0);    // spin fast
+  orientation *= Quatf::fromAxisRot(Vector3f(0.0, 0.0, 1.0), 1.0);              // spin fast
   orientation_conjugate = orientation.conjugate_copy();
   enemy::update();
 }

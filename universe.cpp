@@ -67,20 +67,20 @@ universe::universe()
     timestep_chrono(std::chrono::milliseconds(static_cast<unsigned int>(timestep * 1000) - 1)) { // -1 to go a bit over
   /// Default constructor
   std::cout << "Initialising universe..." << std::endl;
-  //sound.set_listener_position_and_rotation(Vector3f(0.0, 0.0, 0.0), Quatf::fromEulerAngles(0.0, 180.0, 0.0));   // so that -x = left, +x = right
+  //sound.set_listener_position_and_rotation(Vector3f(0.0, 0.0, 0.0), Quatf::fromEulerAngles(0.0, 180.0, 0.0)); // so that -x = left, +x = right
   // initialise sound effects
   // TODO
   // initialise music
-  sound.music_load(BLOB(music_main_intro_ogg), BLOB_SIZE(music_main_intro_ogg));   // id 0
-  sound.music_load(BLOB(music_main_loop_ogg),  BLOB_SIZE(music_main_loop_ogg));    // id 1
-  sound.start_streamer();                 // only do this after all music has been loaded
+  sound.music_load(BLOB(music_main_intro_ogg), BLOB_SIZE(music_main_intro_ogg)); // id 0
+  sound.music_load(BLOB(music_main_loop_ogg),  BLOB_SIZE(music_main_loop_ogg)); // id 1
+  sound.start_streamer();                                                       // only do this after all music has been loaded
 }
 
 universe::~universe() {
   /// Default destructor
   // no reason to waste user time at exit by cleaning up things that don't affect hardware
-  delete_shaders();                             // release shader programs
-  delete_buffers();                             // release graphics buffers
+  delete_shaders();                                                             // release shader programs
+  delete_buffers();                                                             // release graphics buffers
 }
 
 void universe::init() {
@@ -93,14 +93,14 @@ void universe::init() {
   player.setup_input();
 
   set_graphicslevel(graphicsleveltype::NICEST);
-  init_buffers();                               // needs to come before progress screen
+  init_buffers();                                                               // needs to come before progress screen
   render_progressscreen(0.0, "Loading");
 
   restart();
 
   std::cout << "Initialisation complete." << std::endl;
   // this must be absolutely last:
-  glfwSetTime(0.0);           // reset the timer for the start of the main loop
+  glfwSetTime(0.0);                                                             // reset the timer for the start of the main loop
 }
 
 void universe::restart() {
@@ -124,7 +124,7 @@ void universe::restart() {
   }
   */
 
-  glfwSetInputMode(            window_main, GLFW_CURSOR, GLFW_CURSOR_NORMAL);     // release the cursor
+  glfwSetInputMode(            window_main, GLFW_CURSOR, GLFW_CURSOR_NORMAL);   // release the cursor
   glfwSetCursorPosCallback(    window_main, callback_mousepos);
   glfwSetMouseButtonCallback(  window_main, callback_mousebutton);
   glfwSetKeyCallback(          window_main, callback_key);
@@ -134,11 +134,11 @@ void universe::restart() {
   glfwSetWindowCloseCallback(  window_main, callback_windowclose);
   glfwSetWindowFocusCallback(  window_main, callback_windowfocus);
   glfwSetWindowIconifyCallback(window_main, callback_windowminimise);
-  glfwSetInputMode(window_main, GLFW_CURSOR, GLFW_CURSOR_DISABLED);     // for mouselook
+  glfwSetInputMode(window_main, GLFW_CURSOR, GLFW_CURSOR_DISABLED);             // for mouselook
 
-  sound.music_clear(0);                         // clear the decks
+  sound.music_clear(0);                                                         // clear the decks
   sound.music_clear(1);
-  sound.music_queue(0, 0);                      // start the music
+  sound.music_queue(0, 0);                                                      // start the music
   sound.music_queue(0, 1);
   //sound.music_queue(1, 2);
   //sound.music_queue(1, 3);
@@ -248,11 +248,11 @@ void universe::delete_shaders() {
 
 void universe::render() {
   /// Draw everything
-  glClearColor(0.92, 0.95, 1.00, 1.0);      // 2329 Kid Glove normalised to 1
+  glClearColor(0.92, 0.95, 1.00, 1.0);                                          // 2329 Kid Glove normalised to 1
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   // TODO: don't bother clearing colour buffer
 
-  if(__builtin_expect(!player.current_ship, 0)) {     // branch prediction: unlikely that the player will have no ship
+  if(__builtin_expect(!player.current_ship, 0)) {                               // branch prediction: unlikely that the player will have no ship
     return;
   }
   player.current_ship->render_from();
@@ -262,7 +262,7 @@ void universe::render() {
 
 void universe::render_progressscreen(float progress, std::string const &message) {
   /// Render a single frame of a progress bar, values from 0 to 1
-  glfwPollEvents();             // poll events so the OS doesn't think we're unresponsive.
+  glfwPollEvents();                                                             // poll events so the OS doesn't think we're unresponsive.
   if(oculus->enabled) {
     // render once for each eye
     player.setup_render_oculus_left_locked();
@@ -386,9 +386,9 @@ void universe::render_cores_hud(unsigned int cores) {
 }
 void universe::set_graphicslevel(graphicsleveltype newlevel) {
   /// Adjust the graphics settings
-  if(newlevel != graphicslevel) {         // reinitialise the window, if necessary
+  if(newlevel != graphicslevel) {                                               // reinitialise the window, if necessary
     std::cout << "Level changed, old " << (int)graphicslevel << " new " << (int)newlevel << std::endl;
-    switch(newlevel) {                    // set the broad options here
+    switch(newlevel) {                                                          // set the broad options here
     case graphicsleveltype::NICEST:
       antialiasing = 8;
       glEnable(GL_MULTISAMPLE);
@@ -408,20 +408,20 @@ void universe::set_graphicslevel(graphicsleveltype newlevel) {
     //std::cout << "Level unchanged, old " << (int)graphicslevel << " new " << (int)newlevel << std::endl;
     graphicslevel = newlevel;
   }
-  switch(newlevel) {                      // always carry these out again
+  switch(newlevel) {                                                            // always carry these out again
   case graphicsleveltype::NICEST:
-    glShadeModel(GL_SMOOTH);  // SMOOTH or FLAT
-    glHint(GL_GENERATE_MIPMAP_HINT,       GL_NICEST);       // GL_FASTEST, GL_NICEST or GL_DONT_CARE
+    glShadeModel(GL_SMOOTH);                                                    // SMOOTH or FLAT
+    glHint(GL_GENERATE_MIPMAP_HINT,       GL_NICEST);                           // GL_FASTEST, GL_NICEST or GL_DONT_CARE
     glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
     break;
   case graphicsleveltype::COMPROMISE:
-    glShadeModel(GL_SMOOTH);  // SMOOTH or FLAT
-    glHint(GL_GENERATE_MIPMAP_HINT,       GL_DONT_CARE);    // GL_FASTEST, GL_NICEST or GL_DONT_CARE
+    glShadeModel(GL_SMOOTH);                                                    // SMOOTH or FLAT
+    glHint(GL_GENERATE_MIPMAP_HINT,       GL_DONT_CARE);                        // GL_FASTEST, GL_NICEST or GL_DONT_CARE
     glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_DONT_CARE);
     break;
   case graphicsleveltype::FASTEST:
-    glShadeModel(GL_SMOOTH);  // SMOOTH or FLAT
-    glHint(GL_GENERATE_MIPMAP_HINT,       GL_FASTEST);      // GL_FASTEST, GL_NICEST or GL_DONT_CARE
+    glShadeModel(GL_SMOOTH);                                                    // SMOOTH or FLAT
+    glHint(GL_GENERATE_MIPMAP_HINT,       GL_FASTEST);                          // GL_FASTEST, GL_NICEST or GL_DONT_CARE
     glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_FASTEST);
     break;
   }
@@ -463,7 +463,7 @@ void universe::reinitialise_window() {
 
   glfwSetKeyCallback(window_main, callback_key);
   glfwSetWindowRefreshCallback(window_main, callback_windowrefresh);
-  glfwSetInputMode(window_main, GLFW_CURSOR, GLFW_CURSOR_DISABLED);     // for mouselook
+  glfwSetInputMode(window_main, GLFW_CURSOR, GLFW_CURSOR_DISABLED);             // for mouselook
 }
 
 void universe::loop_menu() {
@@ -724,7 +724,7 @@ void universe::loop_main() {
 
 void universe::loop_pause() {
   /// Show a responsive pause screen, waiting for the player's command to resume
-  glfwSetInputMode(window_main, GLFW_CURSOR, GLFW_CURSOR_NORMAL);     // release the cursor
+  glfwSetInputMode(window_main, GLFW_CURSOR, GLFW_CURSOR_NORMAL);               // release the cursor
   glfwSetKeyCallback(window_main, callback_key_pause);
   glfwSetCursorPosCallback(window_main, callback_mousepos_pause);
   while(state == gamestate::PAUSED) {
@@ -746,14 +746,14 @@ void universe::loop_pause() {
     timenexttickstart = std::chrono::high_resolution_clock::now() + timestep_chrono;
   }
   if(state != gamestate::QUITTING) {
-    state = gamestate::RUNNING;     // reset to running mode
+    state = gamestate::RUNNING;                                                 // reset to running mode
   }
-  glfwSetInputMode(window_main, GLFW_CURSOR, GLFW_CURSOR_DISABLED);     // for mouselook
+  glfwSetInputMode(window_main, GLFW_CURSOR, GLFW_CURSOR_DISABLED);             // for mouselook
 }
 
 void universe::update() {
   /// Update the physics of everything in this universe
-  if(__builtin_expect(!!(current_world), 0)) {     // branch prediction: unlikely that there will be no current world
+  if(__builtin_expect(!!(current_world), 0)) {                                  // branch prediction: unlikely that there will be no current world
     // cast needed because not negating the pointer breaks branch prediction, see http://ideone.com/T6oy78
     current_world->update();
   }

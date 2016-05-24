@@ -4,7 +4,7 @@
 #include "vmath.h"
 #include "buffers/buffer.h"
 
-class world;        // forward dec
+class world;                                                                    // forward dec
 class chunk;
 
 class entity {
@@ -19,19 +19,19 @@ public:
     CORE
   };
 protected:
-  world &parent_world;                    // what world we're in
-  chunk *parent = nullptr;                // what chunk we're currently in
-  Vector3f position;                      // coords within a chunk, metres
-  Vector3f velocity;                      // where it's moving, metres per second
-  Quatf orientation;                      // which way we're pointing
-  Quatf orientation_conjugate;            // conjugation of entity::orientation, cached
+  world &parent_world;                                                          // what world we're in
+  chunk *parent = nullptr;                                                      // what chunk we're currently in
+  Vector3f position;                                                            // coords within a chunk, metres
+  Vector3f velocity;                                                            // where it's moving, metres per second
+  Quatf orientation;                                                            // which way we're pointing
+  Quatf orientation_conjugate;                                                  // conjugation of entity::orientation, cached
 
-  float mass   = 1.0;                     // how much this weighs, kilograms
-  float drag   = 0.0;                     // how much drag this entity experiences (coefficient of drag * cross-sectional area)
+  float mass   = 1.0;                                                           // how much this weighs, kilograms
+  float drag   = 0.0;                                                           // how much drag this entity experiences (coefficient of drag * cross-sectional area)
 
 public:
-  float energy = 100.0;                   // general stat used for health/moving/firing.
-  float radius = 0.0;                     // bounding sphere, metres
+  float energy = 100.0;                                                         // general stat used for health/moving/firing.
+  float radius = 0.0;                                                           // bounding sphere, metres
 
   entity(world &parent_world,
          chunk *parent_chunk,

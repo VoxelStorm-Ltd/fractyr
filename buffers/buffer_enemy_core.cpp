@@ -23,7 +23,7 @@ buffer_enemy_core::~buffer_enemy_core() {
 void buffer_enemy_core::load_shader() {
   /// Load and initialise the terrain shaders
   if(shader != 0) {
-    return;         // only load the shader once
+    return;                                                                     // only load the shader once
   }
   shader = shader_load(std::string(reinterpret_cast<char const*>(BLOB(shaders_enemy_grunt_vert_glsl)),
                                    BLOB_SIZE(                         shaders_enemy_grunt_vert_glsl)),

@@ -14,12 +14,12 @@ void callback_mousebutton(GLFWwindow *thiswindow __attribute__((unused)),
   /// React to mouse button presses and releases
   switch(button) {
   case GLFW_MOUSE_BUTTON_LEFT:
-    if(action == GLFW_PRESS) {                      // mouse 1 down
+    if(action == GLFW_PRESS) {                                                  // mouse 1 down
       // TODO
     }
     break;
   case GLFW_MOUSE_BUTTON_RIGHT:
-    if(action == GLFW_PRESS) {                      // mouse 2 down
+    if(action == GLFW_PRESS) {                                                  // mouse 2 down
       // TODO
     }
     break;

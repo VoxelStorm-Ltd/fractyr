@@ -18,7 +18,7 @@ void callback_windowminimise(GLFWwindow *thiswindow __attribute__((__unused__)),
     glfwSetCursorPosCallback(thiswindow, callback_mousepos_pause);
   } else {
     if(root.state != universe::gamestate::PAUSED) {
-      return;       // don't change states if we aren't paused
+      return;                                                                   // don't change states if we aren't paused
     }
     root.state = universe::gamestate::RUNNING;
     //player.mouse_last = player.cursorpos;

@@ -116,7 +116,7 @@ void entity::move(Vector3f const &direction) {
     correct_point(test_point, test_parent);
 
     Vector3f const &collision_normal(parent_world.check_collision(test_parent->coords, test_point, radius));
-    if(__builtin_expect(collision_normal != Vector3f(0.0f, 0.0f, 0.0f), 0)) {     // branch prediction hint: unlikely (the usual case will be no collision)
+    if(__builtin_expect(collision_normal != Vector3f(0.0f, 0.0f, 0.0f), 0)) {   // branch prediction hint: unlikely (the usual case will be no collision)
       ++test_points_collided;
       test_dir_sum += test_dir;
     }
@@ -174,7 +174,7 @@ void entity::move_force(Vector3f const &direction) {
 
 void entity::correct_point(Vector3i &chunk_coords, Vector3f &coords) {
   /// Take a pair of speculative coords that may be out of bounds and return a valid pair of coords and chunk coords
-  if(__builtin_expect(coords.x > chunk::size, 0)) {      // branch prediction hint: unlikely (the usual case will not be chunk changes)
+  if(__builtin_expect(coords.x > chunk::size, 0)) {                             // branch prediction hint: unlikely (the usual case will not be chunk changes)
     coords.x -= chunk::size;
     chunk_coords.x += 1;
     world::correct_chunk_coords(chunk_coords);
@@ -208,7 +208,7 @@ void entity::correct_point(Vector3i &chunk_coords, Vector3f &coords) {
 
 void entity::correct_point(Vector3f &coords, chunk *&thischunk) {
   /// Take a coord in a chunk, that may be out of bounds, and return a valid pair of coords and chunk coords
-  if(__builtin_expect(coords.x > chunk::size, 0)) {      // branch prediction hint: unlikely (the usual case will not be chunk changes)
+  if(__builtin_expect(coords.x > chunk::size, 0)) {                             // branch prediction hint: unlikely (the usual case will not be chunk changes)
     coords.x -= chunk::size;
     thischunk = thischunk->parent->get_chunk(thischunk->coords + Vector3i(1, 0, 0));
   }
@@ -243,7 +243,7 @@ Vector3f entity::check_collision(Vector3f const &other_coords, float other_radiu
   /// Check if the point is colliding with this entity, and if so, return the surface normal vector
   Vector3f vec(other_coords - position);
   float const distance = radius + other_radius;
-  if(vec.lengthSq() < distance * distance) {      // using squared functions to avoid a square root
+  if(vec.lengthSq() < distance * distance) {                                    // using squared functions to avoid a square root
     vec.normalise();
     return vec;
   } else {

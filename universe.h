@@ -17,10 +17,10 @@ class universe {
 private:
   // fps counter setup
   std::chrono::time_point<std::chrono::high_resolution_clock, std::chrono::duration<double>> time_fpsupdate;
-  static double constexpr fpsinterval = 10.0;           // how many seconds between reporting performance
+  static double constexpr fpsinterval = 10.0;                                   // how many seconds between reporting performance
   unsigned int frames_last_interval = 0;
   static double constexpr fpscap = 60.0;
-  static double constexpr timestep = 1.0 / fpscap;      // assume we're running at a fixed 60fps
+  static double constexpr timestep = 1.0 / fpscap;                              // assume we're running at a fixed 60fps
   std::chrono::duration<double> const timestep_chrono;
   std::chrono::time_point<std::chrono::high_resolution_clock, std::chrono::duration<double>> timenexttickstart;
 
@@ -55,22 +55,22 @@ public:
     LOST,
     MENU
   };
-  gamestate state = gamestate::RUNNING;                 // what to do with the main loop
-  unsigned int fps = 0;                                 // fps counter
+  gamestate state = gamestate::RUNNING;                                         // what to do with the main loop
+  unsigned int fps = 0;                                                         // fps counter
   #ifndef NDEBUG
-    bool fullscreen = false;                            // whether we're currently running fullscreen or windowed
+    bool fullscreen = false;                                                    // whether we're currently running fullscreen or windowed
   #else
-    bool fullscreen = true;                             // fullscreen default for release build
+    bool fullscreen = true;                                                     // fullscreen default for release build
   #endif
 
-  static std::mt19937 randomgen;                        // global random number generator
-  static unsigned int randomseed;                       // global random seed for this session
+  static std::mt19937 randomgen;                                                // global random number generator
+  static unsigned int randomseed;                                               // global random seed for this session
 
-  world *current_world = nullptr;                       // the current level
+  world *current_world = nullptr;                                               // the current level
 
   static unsigned int constexpr numgrunts = 300;
   static unsigned int constexpr numcores = 20;
-  static unsigned int constexpr cores_to_win = 5;   // number of cores required to win
+  static unsigned int constexpr cores_to_win = 5;                               // number of cores required to win
 
   static unsigned int constexpr fadetime    = 120;
   static unsigned int constexpr fadetimewon = 300;

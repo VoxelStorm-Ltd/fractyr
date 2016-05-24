@@ -13,7 +13,7 @@ bullet::~bullet() {
 }
 
 void bullet::collided_with(entity *other __attribute__((unused))) {
-  energy = 0; // Destroy this bullet.
+  energy = 0;                                                                   // Destroy this bullet.
 }
 
 entity::entity_type bullet::get_entity_type() const {

@@ -58,25 +58,25 @@ void gameplayer::setup_render_perspective() {
 
   // dimension source: http://cdn.kk.org.s3.amazonaws.com/cooltools/2013/01/human-dimensions-6.jpeg
   // tweaked based on own measurements & tests:
-  glTranslatef(0.0, -0.25, 0.13);                                   // neck model
-  glRotatef(rotation_pitch, 1.0, 0.0, 0.0);                         // head rotation
+  glTranslatef(0.0, -0.25, 0.13);                                               // neck model
+  glRotatef(rotation_pitch, 1.0, 0.0, 0.0);                                     // head rotation
   glRotatef(rotation_yaw + pre_rotation, 0.0, 1.0, 0.0);
-  //sound.set_listener_rotation(Quatf::fromAxisRot(Vector3f(0.0, -1.0, 0.0), rotation_yaw + pre_rotation));   // we don't care about pitch here
+  //sound.set_listener_rotation(Quatf::fromAxisRot(Vector3f(0.0, -1.0, 0.0), rotation_yaw + pre_rotation)); // we don't care about pitch here
 }
 
 void gameplayer::setup_render_oculus_left() {
   /// Oculus Rift perspective rendering, left eye
   oculus->setup_left();
-  glTranslatef(0.0, -0.25, 0.13);                                   // neck model (see above)
+  glTranslatef(0.0, -0.25, 0.13);                                               // neck model (see above)
   glMultMatrixf(oculus->getmatrix().inverse());
   glRotated(pre_rotation, 0.0, 1.0, 0.0);
-  //sound.set_listener_rotation(oculus->getquat());                   // only do this in one eye's setup to avoid duplication
+  //sound.set_listener_rotation(oculus->getquat());                             // only do this in one eye's setup to avoid duplication
 }
 
 void gameplayer::setup_render_oculus_right() {
   /// Oculus Rift perspective rendering, right eye
   oculus->setup_right();
-  glTranslatef(0.0, -0.25, 0.13);                                   // neck model (see above)
+  glTranslatef(0.0, -0.25, 0.13);                                               // neck model (see above)
   glMultMatrixf(oculus->getmatrix().inverse());
   glRotated(pre_rotation, 0.0, 1.0, 0.0);
 }
@@ -84,14 +84,14 @@ void gameplayer::setup_render_oculus_right() {
 void gameplayer::setup_render_oculus_left_locked() {
   /// Oculus Rift perspective rendering, left eye, ignoring tracker data
   oculus->setup_left();
-  glTranslatef(0.0, -0.25, 0.13);                                   // neck model (see above)
+  glTranslatef(0.0, -0.25, 0.13);                                               // neck model (see above)
   glRotated(pre_rotation, 0.0, 1.0, 0.0);
 }
 
 void gameplayer::setup_render_oculus_right_locked() {
   /// Oculus Rift perspective rendering, right eye, ignoring tracker data
   oculus->setup_right();
-  glTranslatef(0.0, -0.25, 0.13);                                   // neck model (see above)
+  glTranslatef(0.0, -0.25, 0.13);                                               // neck model (see above)
   glRotated(pre_rotation, 0.0, 1.0, 0.0);
 }
 
@@ -119,7 +119,7 @@ void gameplayer::setup_render_ortho_restore() {
 
 void gameplayer::render_hud() {
   /// Render the heads-up display for the player
-  if(__builtin_expect(show_help, 0)) {      // branch prediction hint: unlikely
+  if(__builtin_expect(show_help, 0)) {                                          // branch prediction hint: unlikely
     unsigned int constexpr insetouter = 30;
     unsigned int constexpr insetinner = 8;
     setup_render_ortho();
@@ -146,15 +146,15 @@ void gameplayer::render_hud() {
     setup_render_ortho_restore();
     return;
   }
-  if(__builtin_expect(!show_hud, 0)) {      // branch prediction hint: unlikely
-    return;   // if HUD is hidden, skip this
+  if(__builtin_expect(!show_hud, 0)) {                                          // branch prediction hint: unlikely
+    return;                                                                     // if HUD is hidden, skip this
   }
 
   // draw some crosshairs at the cursor location
   int constexpr cursorsize = 8;
   glColor4f(1.0, 1.0, 1.0, 1.0);
   glBegin(GL_LINES);
-  glVertex2i(cursorpos.x, cursorpos.y - cursorsize);    // crosshair
+  glVertex2i(cursorpos.x, cursorpos.y - cursorsize);                            // crosshair
   glVertex2i(cursorpos.x, cursorpos.y + cursorsize);
   glVertex2i(cursorpos.x - cursorsize, cursorpos.y);
   glVertex2i(cursorpos.x + cursorsize, cursorpos.y);
@@ -195,7 +195,7 @@ void gameplayer::update_aspect_ratio() {
   }
   aspect_ratio = static_cast<double>(windowsize.x) / static_cast<double>(windowsize.y);
   std::cout << "New window size " << windowsize << " aspect ratio " << aspect_ratio << std::endl;
-  cache_matrix();   // update the cached projection matrix
+  cache_matrix();                                                               // update the cached projection matrix
 }
 
 void gameplayer::clamp_pitch() {
@@ -296,12 +296,12 @@ void gameplayer::move_mouse(Vector2f const &mouse_pos) {
   /// React to mouse position updates
   // Quake mouselook code is here for reference: https://github.com/id-Software/Quake/blob/bf4ac424ce754894ac8f1dae6a3981954bc9852d/WinQuake/in_win.c
   Vector2f mouse_diff(mouse_pos - mouse_last);
-  mouse_diff *= mouse_sensitivity * fov_angle;      // apply sensitivity
+  mouse_diff *= mouse_sensitivity * fov_angle;                                  // apply sensitivity
   //rotation_yaw = fmodf(rotation_yaw + mouse_diff.x, 360.0);
   //rotation_pitch += mouse_diff.y;
   //clamp_pitch();
 
-  if(__builtin_expect(!current_ship, 0)) {        // branch prediction: unlikely to not have a ship
+  if(__builtin_expect(!current_ship, 0)) {                                      // branch prediction: unlikely to not have a ship
     return;
   }
   current_ship->rotate(mouse_diff.x, mouse_diff.y);
@@ -397,7 +397,7 @@ void gameplayer::input_zoom_in(float amount) {
     fov_angle = fov_limit_min;
   }
   update_fov(fov_angle);
-  cache_matrix();   // update the cached projection matrix
+  cache_matrix();                                                               // update the cached projection matrix
 }
 void gameplayer::input_zoom_out(float amount) {
   /// Widen the view angle, amount must be positive
@@ -407,7 +407,7 @@ void gameplayer::input_zoom_out(float amount) {
     fov_angle = fov_limit_max;
   }
   update_fov(fov_angle);
-  cache_matrix();   // update the cached projection matrix
+  cache_matrix();                                                               // update the cached projection matrix
 }
 void gameplayer::input_zoom(float amount) {
   /// As above but suitable for joystick and mousewheel use, can be given a negative amount
@@ -425,7 +425,7 @@ void gameplayer::input_zoom(float amount) {
   }
   //std::cout << "DEBUG: FOV now " << fov_angle << std::endl;
   update_fov(fov_angle);
-  cache_matrix();   // update the cached projection matrix
+  cache_matrix();                                                               // update the cached projection matrix
 }
 void gameplayer::input_fire1(float amount __attribute__((__unused__))) {
   current_ship->fire(0);

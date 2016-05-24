@@ -3,13 +3,13 @@
 
 #include "bullet.h"
 
-class buffer_plasma;      // forward dec
+class buffer_plasma;                                                            // forward dec
 
 class plasma : public bullet {
 public:
-  static buffer_plasma buf;                       // this object's graphics buffer
+  static buffer_plasma buf;                                                     // this object's graphics buffer
 
-  unsigned int time_to_live = 180;                // how long to exist for, in frames
+  unsigned int time_to_live = 180;                                              // how long to exist for, in frames
 
 public:
   plasma(world &parent_world,

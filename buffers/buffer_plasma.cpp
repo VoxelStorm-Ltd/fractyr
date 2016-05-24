@@ -22,7 +22,7 @@ buffer_plasma::~buffer_plasma() {
 void buffer_plasma::load_shader() {
   /// Load and initialise the terrain shaders
   if(shader != 0) {
-    return;         // only load the shader once
+    return;                                                                     // only load the shader once
   }
   shader = shader_load(std::string(reinterpret_cast<char const*>(BLOB(shaders_plasma_vert_glsl)),
                                    BLOB_SIZE(                         shaders_plasma_vert_glsl)),
@@ -68,13 +68,13 @@ void buffer_plasma::setup() {
   vbodata.emplace_back(Vector3f( 0.0, 0.0, -0.5), Vector4f(1.0, 1.0, 0.0, 1.0));
   vbodata.emplace_back(Vector3f(-0.2, 0.0,  0.0), Vector4f(1.0, 1.0, 0.0, 0.8));
   vbodata.emplace_back(Vector3f( 0.0, 0.0,  4.0), Vector4f(1.0, 1.0, 0.0, 0.2));
-  ibodata.emplace_back(offset + 0);   // front face
+  ibodata.emplace_back(offset + 0);                                             // front face
   ibodata.emplace_back(offset + 1);
   ibodata.emplace_back(offset + 2);
   ibodata.emplace_back(offset + 2);
   ibodata.emplace_back(offset + 3);
   ibodata.emplace_back(offset + 0);
-  ibodata.emplace_back(offset + 0);   // back face
+  ibodata.emplace_back(offset + 0);                                             // back face
   ibodata.emplace_back(offset + 3);
   ibodata.emplace_back(offset + 2);
   ibodata.emplace_back(offset + 2);
