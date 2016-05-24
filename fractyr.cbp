@@ -392,10 +392,10 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-g" />
-					<Add option="-Og" />
-					<Add option="-ggdb3" />
 					<Add option="-m64" />
+					<Add option="-Og" />
+					<Add option="-g" />
+					<Add option="-ggdb3" />
 					<Add option="-mmmx" />
 					<Add option="-msse" />
 					<Add option="-msse2" />
@@ -406,8 +406,9 @@
 					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
 				</Compiler>
 				<Linker>
-					<Add option="-static-libgcc" />
 					<Add option="-static-libstdc++" />
+					<Add option="-static-libgcc" />
+					<Add option="-m64" />
 					<Add option="-pthread" />
 					<Add library="lib/linux64/libvoro++.a" />
 					<Add library="lib/linux64/libboost_filesystem-gcc51-mt-sd-1_58.a" />
@@ -434,6 +435,7 @@
 					<Add library="Xxf86vm" />
 					<Add library="udev" />
 					<Add library="lib/linux64/libXinerama.a" />
+					<Add library="lib/linux64/libpng16.a" />
 					<Add library="lib/linux64/libz.a" />
 					<Add library="lib/linux64/libXcursor.a" />
 					<Add library="lib/linux64/libXfixes.a" />
@@ -448,8 +450,9 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-fexpensive-optimizations" />
-					<Add option="-Ofast" />
+					<Add option="-flto" />
 					<Add option="-m64" />
+					<Add option="-Ofast" />
 					<Add option="-mmmx" />
 					<Add option="-msse" />
 					<Add option="-msse2" />
@@ -483,7 +486,6 @@
 					<Add option="-freorder-blocks-and-partition" />
 					<Add option="-fbranch-target-load-optimize" />
 					<Add option="-fuse-linker-plugin" />
-					<Add option="-flto" />
 					<Add option="-ffast-math" />
 					<Add option="-fno-math-errno" />
 					<Add option="-funsafe-math-optimizations" />
@@ -503,12 +505,13 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 				</Compiler>
 				<Linker>
+					<Add option="-flto" />
 					<Add option="-s" />
-					<Add option="-static-libgcc" />
 					<Add option="-static-libstdc++" />
+					<Add option="-static-libgcc" />
+					<Add option="-m64" />
 					<Add option="-pthread" />
 					<Add option="-fuse-linker-plugin" />
-					<Add option="-flto" />
 					<Add library="lib/linux64/libvoro++.a" />
 					<Add library="lib/linux64/libboost_filesystem-gcc51-mt-s-1_58.a" />
 					<Add library="lib/linux64/libboost_system-gcc51-mt-s-1_58.a" />
@@ -534,6 +537,7 @@
 					<Add library="Xxf86vm" />
 					<Add library="udev" />
 					<Add library="lib/linux64/libXinerama.a" />
+					<Add library="lib/linux64/libpng16.a" />
 					<Add library="lib/linux64/libz.a" />
 					<Add library="lib/linux64/libXcursor.a" />
 					<Add library="lib/linux64/libXfixes.a" />
