@@ -5,6 +5,9 @@
 #include "world.h"
 #include "chunk.h"
 #include "gameplayer.h"
+#ifndef NDEBUG
+  #include <iostream>
+#endif // NDEBUG
 
 extern gameplayer player;
 

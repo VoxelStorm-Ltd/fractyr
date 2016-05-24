@@ -1,5 +1,8 @@
 #include "ship.h"
 #include "weapon/weapon.h"
+#ifndef NDEBUG
+  #include <iostream>
+#endif // NDEBUG
 
 ship::ship(world &parent_world, chunk *parent_chunk,
            Vector3f const &position,

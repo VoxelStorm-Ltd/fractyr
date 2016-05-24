@@ -358,7 +358,7 @@ void chunk::setup() {
           #ifdef NDEBUG
             Vector3f const &face_colour(get_colour(vector3f(cell_coords)));
           #else
-            Vector3f face_colour(get_colour(cell_coords));
+            Vector3f face_colour(get_colour(vector3f(cell_coords)));
             if(neighbours[face] < 0) {
               face_colour.assign(1.0, 0.0, 0.0);                                // mark container-cut surfaces red
             }

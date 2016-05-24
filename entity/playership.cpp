@@ -1,5 +1,8 @@
 #include "playership.h"
 #include "weapon/weapon.h"
+#ifndef NDEBUG
+  #include <iostream>
+#endif // NDEBUG
 
 playership::playership(world &parent_world,
              chunk *parent_chunk,
