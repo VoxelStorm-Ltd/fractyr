@@ -15,10 +15,13 @@ link_options="$5"
 #echo "Link options: $link_options (eol)"
 
 if [ "$compiler" = "" ]; then
-  compiler="g++5"
-  if [ -z "$(which "$compiler")" ]; then
-    compiler="g++"
-  fi
+  compiler="g++-6"
+fi
+if [ -z "$(which "$compiler")" ]; then
+  compiler="g++-5"
+fi
+if [ -z "$(which "$compiler")" ]; then
+  compiler="g++"
 fi
 
 # convert absolute path to relative if it's a subdirectory
@@ -36,6 +39,20 @@ if grep -iq "apple" <<< "$MACHTYPE"; then
   # os x requires special treatment
   xxd -i "$infile" | sed 's/\(resources[a-zA-Z0-9_]*\)/_binary_\1_x/' | "$compiler" -c -o "$outfile" -x c++ -
 elif grep -iq "linux" <<< "$MACHTYPE"; then
+  # de-parallelise blob compiles on linux to prevent OOM situations with high parallelism
+  #process_limit=4
+  process_limit=3
+  process_to_watch="xxd\|cc1plus"
+  process_list=$(ps aux | grep "$process_to_watch")
+  process_count=$(wc -l <<< "$process_list")
+  while [ "$process_count" -ge "$process_limit" ]; do
+    other_pid=$(tail -1 <<< "$process_list" | tr -s ' ' | cut -d ' ' -f 2)
+    #echo "De-parallelising blob compiler: waiting for process $other_pid to finish ($process_count total)..."
+    sleep 2
+    process_list=$(ps aux | grep "$process_to_watch")
+    process_count=$(wc -l <<< "$process_list")
+  done
+
   # everything else just works with gnu ld, but we need to select bitness
   if grep -Fq -- '-m32' <<< "$options"; then
     #ld -m elf_i386 -r -b binary -o "$outfile" "$infile"
