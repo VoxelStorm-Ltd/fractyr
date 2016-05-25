@@ -71,6 +71,13 @@ rm -r "$tempdir"&
 echo "Verifying uploaded version..."
 sleep 1
 newversion=$(get_online_version)
+echo -n "Waiting to confirm processed version has updated correctly..."
+while [ "$newversion" = "$oldversion" ]; do
+  echo -n "."
+  sleep 2
+  newversion=$(get_online_version)
+done
+echo
 
 if [ "$newversion" == "$version" ]; then
   echo "Uploaded version of $repo verified as $newversion."
