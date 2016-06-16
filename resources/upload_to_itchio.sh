@@ -13,6 +13,9 @@ if grep -iq "apple" <<< "$MACHTYPE"; then
     butler="resources/itchio_butler_mac64.exe"
   fi
   tempdir="$TMPDIR"
+  if [ -z "$tempdir" ]; then
+    tempdir="./temp_itchio_$repo"
+  fi
 elif grep -iq "linux" <<< "$MACHTYPE"; then
   # linux
   platform="linux-64"
@@ -54,25 +57,35 @@ oldversion=$(get_online_version)
 
 echo "Existing version of $repo is $oldversion in $channel."
 if [ "$oldversion" == "$version" ]; then
-  echo "Nothing to do - our version is the latest."
-  exit
+  if [ "$1" = "--force" ]; then
+    echo "Versions are the same, but forcing an update anyway."
+  else
+    echo "Nothing to do - our version is the latest."
+    exit
+  fi
 fi
 
-binpath=$(grep -F '<Target title="'"$platform_cbx"'">' "$repodir/"*.cbp -A5 | grep -F 'Option output=' | head -1 | cut -d '"' -f 2)
+if grep -iq "apple" <<< "$MACHTYPE"; then
+  # on OS X, we upload the packaged disk image
+  app_skel_dirs=("$repodir/resources/osx_app/"*.app)
+  app_skel_dir=${app_skel_dirs[0]}
+  binpath=~/Desktop/"$(basename "$app_skel_dir" .app)".dmg
+else
+  binpath="$repodir/$(grep -F '<Target title="'"$platform_cbx"'">' "$repodir/"*.cbp -A5 | grep -F 'Option output=' | head -1 | cut -d '"' 
+-f 2)"
+fi
 echo "Copying $binpath to temporary location..."
 mkdir -p "$tempdir" || exit 1
-cp "$repodir/$binpath" "$tempdir/" || exit 1
+cp "$binpath" "$tempdir/" || exit 1
 echo "Uploading $repo version $version to $channel..."
 
 "$butler" push "$tempdir" "voxelstorm/$repo:$repo-for-$platform" --userversion "$version"
 
 rm -r "$tempdir"&
 
-echo "Verifying uploaded version..."
-sleep 1
+echo -n "Verifying uploaded version..."
 newversion=$(get_online_version)
-echo -n "Waiting to confirm processed version has updated correctly..."
-while [ "$newversion" = "$oldversion" ]; do
+while [ "$newversion" = "$oldversion" ] && [ "$oldversion" != "$version" ]; do
   echo -n "."
   sleep 2
   newversion=$(get_online_version)
