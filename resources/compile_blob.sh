@@ -31,7 +31,13 @@ infile="$(sed "s/$pwd//" <<< "$infile")"
 
 if grep -iq ".glsl$" <<< "$infile"; then
   # additional validation step for glsl shaders
-  shortfilename="$(basename "$infile" | sed 's/_vert.glsl$//;s/_frag.glsl$//')"
+  if grep -iq "apple" <<< "$MACHTYPE" || grep -iq "linux" <<< "$MACHTYPE"; then
+    shortfilename="$(basename "$infile" | sed 's/_vert.glsl$//;s/_frag.glsl$//')"
+  else
+    # fix those windows slashes so basename can work on them
+    shortfilename="$(basename "$(sed 's/\\/\//g' <<< "$infile")" | sed 's/_vert.glsl$//;s/_frag.glsl$//')"
+    echo "shortfilename $shortfilename"
+  fi
   resources/validate_shader.sh "$shortfilename"
 fi
 
@@ -64,5 +70,8 @@ elif grep -iq "linux" <<< "$MACHTYPE"; then
 else
   # ...except if we're on windows, and then hoops need to be jumped through for backslashes
   outfile="$(sed 's/\\/\//g' <<< "$outfile")"
+  # and the input file needs to be made relative in a different way
+  infile="$(sed 's/.*resources\\/resources\//' <<< "$infile")"
+  echo "infile final $infile"
   ld -r -b binary -o "$outfile" "$infile"
 fi
