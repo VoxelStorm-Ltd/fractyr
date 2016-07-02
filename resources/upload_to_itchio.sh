@@ -42,6 +42,8 @@ if ! [ -f "$butler" ]; then
   exit 1
 fi
 
+"$butler" upgrade --assume-yes
+
 function get_online_version {
   #wget -q -O - "https://itch.io/api/1/x/wharf/latest?target=voxelstorm/$repo&channel_name=$channel" \
   #  --user-agent="VoxelStorm Game Uploader" \
@@ -71,8 +73,7 @@ if grep -iq "apple" <<< "$MACHTYPE"; then
   app_skel_dir=${app_skel_dirs[0]}
   binpath=~/Desktop/"$(basename "$app_skel_dir" .app)".dmg
 else
-  binpath="$repodir/$(grep -F '<Target title="'"$platform_cbx"'">' "$repodir/"*.cbp -A5 | grep -F 'Option output=' | head -1 | cut -d '"' 
--f 2)"
+  binpath="$repodir/$(grep -F '<Target title="'"$platform_cbx"'">' "$repodir/"*.cbp -A5 | grep -F 'Option output=' | head -1 | cut -d '"' -f 2)"
 fi
 echo "Copying $binpath to temporary location..."
 mkdir -p "$tempdir" || exit 1
