@@ -47,7 +47,9 @@ if grep -iq "apple" <<< "$MACHTYPE"; then
 elif grep -iq "linux" <<< "$MACHTYPE"; then
   # de-parallelise blob compiles on linux to prevent OOM situations with high parallelism
   #process_limit=4
-  process_limit=3
+  #process_limit=3
+  process_limit=$(grep -c ^processor /proc/cpuinfo)
+  #((process_limit--))
   process_to_watch="xxd\|cc1plus"
   process_list=$(ps aux | grep "$process_to_watch")
   process_count=$(wc -l <<< "$process_list")
