@@ -1051,8 +1051,6 @@
 		<Unit filename="vectorstorm/sigmoid.h" />
 		<Unit filename="vectorstorm/sincos.h" />
 		<Unit filename="vectorstorm/sqrt_fast.h" />
-		<Unit filename="vectorstorm/stl_extensions.h" />
-		<Unit filename="vectorstorm/stl_extensions_forward.h" />
 		<Unit filename="vectorstorm/vector/vector2.h" />
 		<Unit filename="vectorstorm/vector/vector2_forward.h" />
 		<Unit filename="vectorstorm/vector/vector2_types.h" />
