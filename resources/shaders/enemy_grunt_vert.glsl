@@ -17,8 +17,8 @@ void main() {
   normal_frag = normal;
   colour_frag = colour;
 
-  reflectdir_frag = gl_NormalMatrix * reflect(lightdir, normal);
+  reflectdir_frag = gl_Normalmatrix * reflect(lightdir, normal);
 
-  gl_Position = gl_ModelViewProjectionMatrix * coords;
-  coords_camlocal_frag = (gl_ModelViewMatrix * coords).xyz;
+  gl_Position = gl_ModelViewProjectionmatrix * coords;
+  coords_camlocal_frag = (gl_ModelViewmatrix * coords).xyz;
 }

@@ -9,5 +9,5 @@ varying vec4 colour_frag;
 
 void main() {
   colour_frag = colour;
-  gl_Position = gl_ModelViewProjectionMatrix * coords;
+  gl_Position = gl_ModelViewProjectionmatrix * coords;
 }
