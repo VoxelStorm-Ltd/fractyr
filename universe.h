@@ -80,7 +80,7 @@ public:
 
   void init();
 private:
-  void init_graphics(Vector2i &windowsize);
+  void init_graphics(vector2i &windowsize);
 public:
   void restart();
   void replace_entities();
@@ -115,7 +115,7 @@ public:
   void update();
 
   // chunk operations and queries
-  chunk *get_chunk(Vector3i const &chunk_coords);
+  chunk *get_chunk(vector3i const &chunk_coords);
 };
 
 #endif // UNIVERSE_H_INCLUDED

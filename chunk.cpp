@@ -1,24 +1,14 @@
 #include "chunk.h"
 #include <iostream>
-#include <random>
-#include <algorithm>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <voro++.hh>
-#include "entity/entity.h"
 #include "universe.h"
-#include "world.h"
-#include "entity/enemy/grunt.h"
 #include "entity/enemy/core.h"
-#include "weapon/blaster.h"
-#include "weapon/gruntblaster.h"
 
 #ifndef NDEBUG
   double chunk::total_time_taken = 0;
   unsigned int chunk::total_chunks_generated = 0;
 #endif
 
-chunk::chunk(Vector3i const &chunk_coords, world &parent)
+chunk::chunk(vector3i const &chunk_coords, world &parent)
   : parent(&parent),
     coords(chunk_coords),
     con(-size * chunk_margin, size + (size * chunk_margin),                     // the minimum and maximum x coordinates
@@ -42,11 +32,11 @@ chunk::~chunk() {
   }
 }
 
-Vector3i const &chunk::get_coords() const {
+vector3i const &chunk::get_coords() const {
   return coords;
 }
 
-unsigned int chunk::get_unique_seed(Vector3i const &chunk_coords) {
+unsigned int chunk::get_unique_seed(vector3i const &chunk_coords) {
   /// Return a guaranteed unique seed for these chunk coordinates
   return (((chunk_coords.x * world::size) + chunk_coords.y) * world::size) + chunk_coords.z;
 }
@@ -55,7 +45,7 @@ unsigned int chunk::get_unique_seed() const {
   return get_unique_seed(coords);
 }
 
-bool chunk::get_is_solid(Vector3i const &chunk_coords, Vector3f const &local_coords) {
+bool chunk::get_is_solid(vector3i const &chunk_coords, vector3f const &local_coords) {
   /// Test a coordinate for solidity
   /*
     Quintic Mandelbulb world generation.
@@ -67,7 +57,7 @@ bool chunk::get_is_solid(Vector3i const &chunk_coords, Vector3f const &local_coo
   unsigned int constexpr iters = 5;
   float constexpr cutoff = 100000.0;
   float constexpr scale = 1.5 / static_cast<float>(world::size);
-  Vector3f const coords_composite((local_coords / size) + static_cast<Vector3f>(chunk_coords));
+  vector3f const coords_composite((local_coords / size) + static_cast<vector3f>(chunk_coords));
 
   //std::cout << "DEBUG: " << local_coords << std::endl;
   //std::cout << "DEBUG: " << coords_composite << std::endl;
@@ -96,35 +86,35 @@ bool chunk::get_is_solid(Vector3i const &chunk_coords, Vector3f const &local_coo
 
   return false;
 }
-bool chunk::get_is_solid(Vector3f const &local_coords) const {
+bool chunk::get_is_solid(vector3f const &local_coords) const {
   /// Wrapper function for the static
   return get_is_solid(coords, local_coords);
 }
 
-Vector3f chunk::get_colour(Vector3i const &chunk_coords, Vector3f const &local_coords) {
+vector3f chunk::get_colour(vector3i const &chunk_coords, vector3f const &local_coords) {
   /// Return the colour at these coordinates
-  Vector3f face_colour(0.92, 0.95, 1.00);                                       // 2329 Kid Glove normalised to 1
+  vector3f face_colour(0.92, 0.95, 1.00);                                       // 2329 Kid Glove normalised to 1
   if(fmodf(local_coords.x, 10.0) < 1.0) {
     face_colour.assign(1.0, 1.0, 0.0);                                          // test gold chunks
   }
   return face_colour;
 }
-Vector3f chunk::get_colour(Vector3f const &local_coords) const {
+vector3f chunk::get_colour(vector3f const &local_coords) const {
   /// Wrapper function for the static
   return get_colour(coords, local_coords);
 }
 
-Vector3f chunk::check_collision(Vector3f const &coords, float radius) {
+vector3f chunk::check_collision(vector3f const &coords, float radius) {
   /// Check if a given point is colliding, and if so, return a normal vector to the collision surface
   // NOTE: coords can be less than 0 or greater than chunk::size by up to chunk_margin
-  Vector3d result;
+  vector3d result;
   int cell_id;
   if(__builtin_expect(!con.find_voronoi_cell(coords.x, coords.y, coords.z, result.x, result.y, result.z, cell_id), 0)) { // branch prediction: likely found
-    return Vector3f(0.0, 0.0, 0.0);
+    return vector3f(0.0, 0.0, 0.0);
   }
   //std::cout << "DEBUG: Checking solidity of: " << result << std::endl;
-  if(__builtin_expect(!get_is_solid(Vector3f(result)), 1)) {                    // branch prediction: likely not solid
-    return Vector3f(0.0, 0.0, 0.0);
+  if(__builtin_expect(!get_is_solid(vector3f(result)), 1)) {                    // branch prediction: likely not solid
+    return vector3f(0.0, 0.0, 0.0);
   }
   result.normalise();
   return result;
@@ -138,7 +128,7 @@ void chunk::update() {
   for(auto it = entities.begin(); it != entities.end(); ++it) {
     for(auto it2 = it+1; it2 != entities.end(); ++it2) {
       //std::cout << "Checking collision between " << *it << " and " << *it2 << std::endl;
-      if((*it)->check_collision((*it2)->get_position(), (*it2)->radius).lengthSq() > 0) {
+      if((*it)->check_collision((*it2)->get_position(), (*it2)->radius).length_sq() > 0) {
           (*it)->collided_with(*it2);
           (*it2)->collided_with(*it);
       }
@@ -159,9 +149,9 @@ void chunk::remove_entity(entity *thisentity) {
   // TODO: for larger entity lists, instead sort and use std::binary_search
 }
 
-void chunk::render(Vector3i const &view_chunk_coords) const {
+void chunk::render(vector3i const &view_chunk_coords) const {
   /// Draw the contents of this chunk as viewed from coords
-  Vector3i offset(coords - view_chunk_coords);
+  vector3i offset(coords - view_chunk_coords);
   int constexpr worldsize_half = world::size / 2;
   if(offset.x > worldsize_half) {
     offset.x -= world::size;
@@ -222,20 +212,20 @@ void chunk::setup() {
 
   // populate this chunk and its neigbours' particles so we get a seamless join
   unsigned int num_points = 0;
-  Vector3i offset;
+  vector3i offset;
   for(offset.x = -1; offset.x != 2; ++offset.x) {
     for(offset.y = -1; offset.y != 2; ++offset.y) {
       for(offset.z = -1; offset.z != 2; ++offset.z) {
-        Vector3i chunk_coords(coords + offset);
+        vector3i chunk_coords(coords + offset);
         world::correct_chunk_coords(chunk_coords);                              // wrap them if appropriate
         srand(get_unique_seed(chunk_coords));                                   // seed predictably by coords
-        Vector3f const chunk_offset(offset * size);
+        vector3f const chunk_offset(offset * size);
         for(int i = 0; i != max_points; ++i) {
         //for(unsigned int i = 0; i != coords.y * 10; ++i) {
-          Vector3f const cell_point((static_cast<float>(rand()) * size / RAND_MAX) + chunk_offset.x,
+          vector3f const cell_point((static_cast<float>(rand()) * size / RAND_MAX) + chunk_offset.x,
                                     (static_cast<float>(rand()) * size / RAND_MAX) + chunk_offset.y,
                                     (static_cast<float>(rand()) * size / RAND_MAX) + chunk_offset.z);
-          //std::cout << "DEBUG: making point " << static_cast<Vector3i>(cell_point) << std::endl;
+          //std::cout << "DEBUG: making point " << static_cast<vector3i>(cell_point) << std::endl;
           if(cell_point.x < -size         * chunk_margin  ||
              cell_point.x >  size + (size * chunk_margin) ||
              cell_point.y < -size         * chunk_margin  ||
@@ -263,7 +253,7 @@ void chunk::setup() {
   }
   // decide whether a cell is an air cell or a solid cell
   do {
-    Vector3d cell_coords;
+    vector3d cell_coords;
     cell_loop.pos(cell_coords.x, cell_coords.y, cell_coords.z);
     if(cell_coords.x < -size         * chunk_margin  ||
        cell_coords.x >  size + (size * chunk_margin) ||
@@ -275,8 +265,8 @@ void chunk::setup() {
       // NOTE: this may produce erroneous output
       continue;                                                                 // don't consider any cell that is outside of the test margin
     }
-    Vector3i checked_chunk_coords(coords);
-    Vector3f checked_cell_coords(cell_coords);
+    vector3i checked_chunk_coords(coords);
+    vector3f checked_cell_coords(cell_coords);
     entity::correct_point(checked_chunk_coords, checked_cell_coords);
     cell_is_solid[cell_loop.pid()] = get_is_solid(checked_chunk_coords, checked_cell_coords); // cache the cell save check
   } while(cell_loop.inc());
@@ -290,7 +280,7 @@ void chunk::setup() {
     if(!cell_is_solid[cell_loop.pid()]) {
       continue;                                                                 // skip this cell if it's an air cell
     }
-    Vector3d cell_coords;
+    vector3d cell_coords;
     cell_loop.pos(cell_coords.x, cell_coords.y, cell_coords.z);
     if(cell_coords.x < 0.0  ||
        cell_coords.x > size ||
@@ -356,9 +346,9 @@ void chunk::setup() {
         if(//neighbours[face] < 0 ||                                            // external faces - container edges have negative IDs
            !cell_is_solid[neighbours[face]]) {                                  // draw faces between solid and air cells
           #ifdef NDEBUG
-            Vector3f const &face_colour(get_colour(vector3f(cell_coords)));
+            vector3f const &face_colour(get_colour(vector3f(cell_coords)));
           #else
-            Vector3f face_colour(get_colour(vector3f(cell_coords)));
+            vector3f face_colour(get_colour(vector3f(cell_coords)));
             if(neighbours[face] < 0) {
               face_colour.assign(1.0, 0.0, 0.0);                                // mark container-cut surfaces red
             }
@@ -367,7 +357,7 @@ void chunk::setup() {
           int const vert_index0 = 3 * face_verts[vert_offset + 1];
           int const vert_index1 = 3 * face_verts[vert_offset + 2];
           int const vert_index2 = 3 * face_verts[vert_offset + 3];
-          Vector3f face_normal((verts[vert_index0 + 1] - verts[vert_index1 + 1]) *
+          vector3f face_normal((verts[vert_index0 + 1] - verts[vert_index1 + 1]) *
                                (verts[vert_index2 + 2] - verts[vert_index0 + 2]) -
                                (verts[vert_index2 + 1] - verts[vert_index0 + 1]) *
                                (verts[vert_index0 + 2] - verts[vert_index1 + 2]),
@@ -384,7 +374,7 @@ void chunk::setup() {
           unsigned int offset = vbodata.size();
           for(int i = 0; i < face_verts[vert_offset]; ++i) {
             unsigned int const vert_index = 3 * face_verts[vert_offset + i + 1];
-            vbodata.emplace_back(Vector3f(verts[vert_index], verts[vert_index + 1], verts[vert_index + 2]), // vertex coords
+            vbodata.emplace_back(vector3f(verts[vert_index], verts[vert_index + 1], verts[vert_index + 2]), // vertex coords
                                  face_normal,                                   // vertex normal
                                  face_colour);                                  // vertex colour:
           }

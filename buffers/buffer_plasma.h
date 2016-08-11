@@ -10,12 +10,12 @@ public:
   static GLuint shader;                                                         // shader program for this buffer type
 
   struct vertex {
-    Vector3<GLfloat> coords;
-    Vector4<GLfloat> colour;
-    vertex(Vector3<GLfloat> const &coords,
-           Vector4<GLfloat> const &colour)
-    : coords(coords),
-      colour(colour) {
+    vector3<GLfloat> coords;
+    vector4<GLfloat> colour;
+    vertex(vector3<GLfloat> const &this_coords,
+           vector4<GLfloat> const &this_colour)
+    : coords(this_coords),
+      colour(this_colour) {
       /// specific constructor
     }
   };

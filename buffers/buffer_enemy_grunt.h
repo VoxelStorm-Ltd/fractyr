@@ -10,15 +10,15 @@ public:
   static GLuint shader;                                                         // shader program for this buffer type
 
   struct vertex {
-    Vector3<GLfloat> coords;
-    Vector3<GLfloat> normal;
-    Vector4<GLfloat> colour;
-    vertex(Vector3<GLfloat> const &coords,
-           Vector3<GLfloat> const &normal,
-           Vector4<GLfloat> const &colour)
-    : coords(coords),
-      normal(normal),
-      colour(colour) {
+    vector3<GLfloat> coords;
+    vector3<GLfloat> normal;
+    vector4<GLfloat> colour;
+    vertex(vector3<GLfloat> const &this_coords,
+           vector3<GLfloat> const &this_normal,
+           vector4<GLfloat> const &this_colour)
+    : coords(this_coords),
+      normal(this_normal),
+      colour(this_colour) {
       /// specific constructor
     }
   };
@@ -34,7 +34,7 @@ public:
   static void destroy_shader();
   void setup();
   void render() const override final;
-  void cuboid(Vector3f const &pos, Vector3f const &size, Vector4f const &colour, std::vector<vertex> &vbodata, std::vector<GLuint> &ibodata) const;
+  void cuboid(vector3f const &pos, vector3f const &size, vector4f const &colour, std::vector<vertex> &vbodata, std::vector<GLuint> &ibodata) const;
 };
 
 #endif // BUFFER_ENEMY_GRUNT_H_INCLUDED

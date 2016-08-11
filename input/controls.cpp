@@ -1,7 +1,4 @@
 #include "gameplayer.h"
-//#include <cmath>
-//#include <GL/glew.h>
-//#include <GLFW/glfw3.h>
 
 void gameplayer::pollcontrols(GLFWwindow *thiswindow) {
   /// Any controls where we just care about the current state, not keyup/down events

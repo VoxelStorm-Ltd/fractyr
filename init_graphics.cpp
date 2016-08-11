@@ -1,11 +1,6 @@
 #include "universe.h"
 #include <iostream>
-//#include <cstdlib>
-//#include <iostream>
-//#include <GL/glew.h>
-//#include <GLFW/glfw3.h>
-//#include "vectorstorm/vectorstorm.h"
-//#include "platform_defines.h"
+#include "platform_defines.h"
 #include "oculusstorm/oculusstorm.h"
 
 // callbacks
@@ -29,7 +24,7 @@ std::string get_version();
 extern GLFWwindow *window_main;
 extern oculusstorm *oculus;
 
-void universe::init_graphics(Vector2i &windowsize) {
+void universe::init_graphics(vector2i &windowsize) {
   std::cout << "Initialising graphics..." << std::endl;
   // initialise the opengl window
   if(glfwInit() != GL_TRUE) {

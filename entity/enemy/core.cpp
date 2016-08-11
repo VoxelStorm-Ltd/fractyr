@@ -1,10 +1,6 @@
 #include "core.h"
 #include "buffers/buffer_enemy_core.h"
-#include "weapon/weapon.h"
 #include "gameplayer.h"
-#include "entity/playership.h"
-#include "world.h"
-#include "chunk.h"
 #include "entity/particle/particle.h"
 
 extern gameplayer player;
@@ -13,8 +9,8 @@ buffer_enemy_core core::buf;
 
 core::core(world &parent_world,
              chunk *parent_chunk,
-             Vector3f const &position,
-             Quatf const &orientation,
+             vector3f const &position,
+             quatf const &orientation,
              float scale)
   : enemy(parent_world, parent_chunk, position, orientation),
     scale(scale) {
@@ -42,7 +38,7 @@ void core::update() {
   /// Update this enemy's AI actions
   // TODO: The tracking gets confused if (I think) the player crosses the z axis, slerp should deal with this fine but isn't for some reason.
 
-  orientation *= Quatf::fromAxisRot(Vector3f(0.0, 0.0, 1.0), 1.0);              // spin fast
+  orientation *= quatf::from_axis_rot(vector3f(0.0, 0.0, 1.0), 1.0);              // spin fast
   orientation_conjugate = orientation.conjugate_copy();
   enemy::update();
 }
@@ -54,7 +50,7 @@ void core::destroy() {
                  parent,
                  position,
                  orientation,
-                 velocity + Vector3f((static_cast<float>(rand()) / RAND_MAX) - 0.5,
+                 velocity + vector3f((static_cast<float>(rand()) / RAND_MAX) - 0.5,
                                      (static_cast<float>(rand()) / RAND_MAX) - 0.5,
                                      (static_cast<float>(rand()) / RAND_MAX) - 0.5) * 0.5);
   }

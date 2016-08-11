@@ -16,7 +16,7 @@ public:
   static float constexpr size = 800.0 / world::size;                            // chunk size per side
 
   world *parent = nullptr;                                                      // what world it belongs to
-  Vector3i coords;                                                              // where this chunk is
+  vector3i coords;                                                              // where this chunk is
 
 private:
   std::vector<entity*> entities;                                                // everything that's currently in this chunk
@@ -44,21 +44,21 @@ private:
   #endif
 
 public:
-  chunk(Vector3i const &chunk_coords, world &parent);
+  chunk(vector3i const &chunk_coords, world &parent);
   ~chunk();
 
   // query
-  Vector3i const &get_coords() const;
-  static unsigned int get_unique_seed(Vector3i const &chunk_coords);
+  vector3i const &get_coords() const;
+  static unsigned int get_unique_seed(vector3i const &chunk_coords);
   unsigned int        get_unique_seed() const;
   // generators
-  static bool get_is_solid(  Vector3i const &chunk_coords, Vector3f const &local_coords);
-  bool        get_is_solid(  Vector3f const &local_coords) const;
-  static Vector3f get_colour(Vector3i const &chunk_coords, Vector3f const &local_coords);
-  Vector3f        get_colour(Vector3f const &local_coords) const;
+  static bool get_is_solid(  vector3i const &chunk_coords, vector3f const &local_coords);
+  bool        get_is_solid(  vector3f const &local_coords) const;
+  static vector3f get_colour(vector3i const &chunk_coords, vector3f const &local_coords);
+  vector3f        get_colour(vector3f const &local_coords) const;
 
   // collisions
-  Vector3f check_collision(Vector3f const &coords, float radius);
+  vector3f check_collision(vector3f const &coords, float radius);
 
   // update
   void update();
@@ -66,7 +66,7 @@ public:
   void remove_entity(entity *thisentity);
 
   // drawing
-  void render(Vector3i const &view_chunk_coords) const;
+  void render(vector3i const &view_chunk_coords) const;
   void delete_buffers();
   void setup_buffers();
   void setup();

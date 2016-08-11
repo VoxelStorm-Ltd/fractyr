@@ -1,12 +1,12 @@
 #include "enemy.h"
-#include "world.h"
-#include "chunk.h"
+//#include "world.h"
+//#include "chunk.h"
 
-enemy::enemy(world &parent_world,
+enemy::enemy(world &this_parent_world,
              chunk *parent_chunk,
-             Vector3f const &position,
-             Quatf const &orientation)
-  : ship(parent_world, parent_chunk, position, orientation) {
+             vector3f const &this_position,
+             quatf const &this_orientation)
+  : ship(this_parent_world, parent_chunk, this_position, this_orientation) {
   /// Default constructor
 }
 

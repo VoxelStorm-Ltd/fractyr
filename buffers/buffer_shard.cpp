@@ -1,7 +1,6 @@
 #include "buffer_shard.h"
 #include <iostream>
-//#include "vectorstorm/vectorstorm.h"
-//#include "blob_loader.h"
+#include "blob_loader.h"
 #include "shader_load.h"
 
 // linked binary resource blob symbols using blob_loader.h
@@ -71,12 +70,12 @@ void buffer_shard::setup() {
   float angle_2 = (static_cast<float>(rand()) / RAND_MAX) * 360.0;
   float angle_3 = (static_cast<float>(rand()) / RAND_MAX) * 360.0;
 
-  vbodata.emplace_back(Vector3f(0.0, 0.0, 0.0), Vector3f(0.0, 1.0, 0.0), Vector4f(0.9, 0.0, 0.0, 1.0));
+  vbodata.emplace_back(vector3f(0.0, 0.0, 0.0), vector3f(0.0, 1.0, 0.0), vector4f(0.9, 0.0, 0.0, 1.0));
   vbodata.back().normal.rotate(angle_1, angle_2, angle_3);
-  vbodata.emplace_back(Vector3f(0.6, 0.0, 0.0), Vector3f(0.0, 1.0, 0.0), Vector4f(0.9, 0.0, 0.0, 1.0));
+  vbodata.emplace_back(vector3f(0.6, 0.0, 0.0), vector3f(0.0, 1.0, 0.0), vector4f(0.9, 0.0, 0.0, 1.0));
   vbodata.back().coords.rotate(angle_1, angle_2, angle_3);
   vbodata.back().normal.rotate(angle_1, angle_2, angle_3);
-  vbodata.emplace_back(Vector3f(0.0, 0.0, 0.6), Vector3f(0.0, 1.0, 0.0), Vector4f(0.9, 0.0, 0.0, 1.0));
+  vbodata.emplace_back(vector3f(0.0, 0.0, 0.6), vector3f(0.0, 1.0, 0.0), vector4f(0.9, 0.0, 0.0, 1.0));
   vbodata.back().coords.rotate(angle_1, angle_2, angle_3);
   vbodata.back().normal.rotate(angle_1, angle_2, angle_3);
   ibodata.emplace_back(0);
