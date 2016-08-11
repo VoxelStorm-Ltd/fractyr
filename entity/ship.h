@@ -13,17 +13,17 @@ protected:
 
 public:
   ship(world &parent_world, chunk *parent_chunk,
-       Vector3f const &position,
-       Quatf const &orientation = Quatf::fromEulerAngles(0.0, 0.0, 0.0));
+       vector3f const &position,
+       quatf const &orientation = quatf::from_euler_angles(0.0, 0.0, 0.0));
   virtual ~ship();
 
-  Vector3f get_weapon_position();
+  vector3f get_weapon_position();
 
   void update() override;
 
   void add_weapon(weapon *new_weapon);
 
-  virtual void accelerate(Vector3f const &accel);
+  virtual void accelerate(vector3f const &accel);
   void rotate(float yaw, float pitch);
   void roll(float roll);
   virtual bool fire(unsigned int weapon_id);                                    // Attempts to fire current weapon, returns whether successful or not.

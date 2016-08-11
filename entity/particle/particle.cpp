@@ -4,9 +4,9 @@ buffer_shard particle::buf;
 
 particle::particle(world &parent_world,
                    chunk *parent_chunk,
-                   Vector3f const &position,
-                   Quatf const &orientation,
-                   Vector3f const &new_velocity)
+                   vector3f const &position,
+                   quatf const &orientation,
+                   vector3f const &new_velocity)
   : entity(parent_world, parent_chunk, position, orientation) {
   /// Default constructor
   velocity = new_velocity;

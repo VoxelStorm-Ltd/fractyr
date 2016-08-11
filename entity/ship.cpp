@@ -4,10 +4,11 @@
   #include <iostream>
 #endif // NDEBUG
 
-ship::ship(world &parent_world, chunk *parent_chunk,
-           Vector3f const &position,
-           Quatf const &orientation)
-  : entity(parent_world, parent_chunk, position, orientation) {
+ship::ship(world &this_parent_world,
+           chunk *parent_chunk,
+           vector3f const &this_position,
+           quatf const &this_orientation)
+  : entity(this_parent_world, parent_chunk, this_position, this_orientation) {
   /// Default constructor
   mass = 10000.0;
   drag = 3.0 * 5.0 * 5.0;
@@ -21,9 +22,9 @@ ship::~ship() {
   }
 }
 
-Vector3f ship::get_weapon_position() {
+vector3f ship::get_weapon_position() {
   /// Return the vector position of the weapon's mount point
-  Vector3f offset(0.0, -0.5, -2.0);
+  vector3f offset(0.0, -0.5, -2.0);
   offset.rotate(orientation_conjugate);
   offset += position;
   return offset;
@@ -42,7 +43,7 @@ void ship::add_weapon(weapon *new_weapon) {
   weapons.push_back(new_weapon);
 }
 
-void ship::accelerate(Vector3f const &accel) {
+void ship::accelerate(vector3f const &accel) {
   /// Accelerate this ship along a given vector relative to its orientation
   auto accel_copy(accel);
   accel_copy.rotate(orientation_conjugate);
@@ -51,12 +52,12 @@ void ship::accelerate(Vector3f const &accel) {
 
 void ship::rotate(float yaw, float pitch) {
   /// Rotate this ship by yaw and pitch angles relative to its orientation
-  Vector3f axis_yaw(  0.0f, 1.0f, 0.0f);
-  Vector3f axis_pitch(1.0f, 0.0f, 0.0f);
+  vector3f axis_yaw(  0.0f, 1.0f, 0.0f);
+  vector3f axis_pitch(1.0f, 0.0f, 0.0f);
   axis_yaw.rotate(  orientation_conjugate);
   axis_pitch.rotate(orientation_conjugate);
-  orientation *= Quatf::fromAxisRot(axis_yaw,   yaw);
-  orientation *= Quatf::fromAxisRot(axis_pitch, pitch);
+  orientation *= quatf::from_axis_rot(axis_yaw,   yaw);
+  orientation *= quatf::from_axis_rot(axis_pitch, pitch);
 
   orientation_conjugate = orientation;                                          // update the cached conjugate
   orientation_conjugate.conjugate();
@@ -64,9 +65,9 @@ void ship::rotate(float yaw, float pitch) {
 
 void ship::roll(float roll) {
   /// Rotate this ship through a roll angle relative to its orientation
-  Vector3f axis_roll(0.0f, 0.0f, 1.0f);
+  vector3f axis_roll(0.0f, 0.0f, 1.0f);
   axis_roll.rotate(orientation_conjugate);
-  orientation *= Quatf::fromAxisRot(axis_roll, roll);
+  orientation *= quatf::from_axis_rot(axis_roll, roll);
 
   orientation_conjugate = orientation;                                          // update the cached conjugate
   orientation_conjugate.conjugate();

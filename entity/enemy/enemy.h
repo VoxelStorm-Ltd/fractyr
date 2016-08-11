@@ -8,8 +8,8 @@ class enemy : public ship {
 protected:
   enemy(world &parent_world,
         chunk *parent_chunk,
-        Vector3f const &position,
-        Quatf const &orientation = Quatf::fromEulerAngles(0.0, 0.0, 0.0));
+        vector3f const &position,
+        quatf const &orientation = quatf::from_euler_angles(0.0, 0.0, 0.0));
 public:
   virtual ~enemy();
 

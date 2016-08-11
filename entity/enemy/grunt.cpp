@@ -13,8 +13,8 @@ buffer_enemy_grunt grunt::buf;
 
 grunt::grunt(world &parent_world,
              chunk *parent_chunk,
-             Vector3f const &position,
-             Quatf const &orientation,
+             vector3f const &position,
+             quatf const &orientation,
              float scale)
   : enemy(parent_world, parent_chunk, position, orientation),
     scale(scale) {
@@ -42,24 +42,24 @@ void grunt::update() {
   /// Update this enemy's AI actions
   // TODO: The tracking gets confused if (I think) the player crosses the z axis, slerp should deal with this fine but isn't for some reason.
 
-  Vector3f aimpos = -get_offset(*player.current_ship);
+  vector3f aimpos = -get_offset(*player.current_ship);
 
   #ifndef NDEBUG
     if(player.invisible) {
-      orientation *= Quatf::fromAxisRot(Vector3f(0.0, 1.0, 0.0), 0.1);          // spin gently
+      orientation *= quatf::from_axis_rot(vector3f(0.0, 1.0, 0.0), 0.1);          // spin gently
       orientation_conjugate = orientation.conjugate_copy();
       enemy::update();
       return;
     }
   #endif
 
-  if(__builtin_expect(aimpos.lengthSq() < 10000, 0)) {
+  if(__builtin_expect(aimpos.length_sq() < 10000, 0)) {
     aimpos += (player.current_ship->get_velocity() - velocity) * (aimpos.length() / (weapons[0]->get_shot_speed() * 2.0));
     velocity.x += (rand() / static_cast<float>(RAND_MAX) - 0.5) / 100.0;
     velocity.y += (rand() / static_cast<float>(RAND_MAX) - 0.5) / 100.0;
     velocity.z += (rand()  /static_cast<float>(RAND_MAX) - 0.5) / 100.0;
 
-    Quatf const &target_orientation = Quatf::fromMatrix(Matrix4f::createLookAt(Vector3f(0.0, 0.0, 0.0), aimpos, Vector3f(0.0, 0.0, 1.0)));
+    quatf const &target_orientation = quatf::from_matrix(matrix4f::create_look_at(vector3f(0.0, 0.0, 0.0), aimpos, vector3f(0.0, 0.0, 1.0)));
     orientation = orientation.slerp(0.05, target_orientation);
     orientation.normalise();
     orientation_conjugate = orientation.conjugate_copy();
@@ -68,7 +68,7 @@ void grunt::update() {
       weapon->fire();
     }
   } else {
-    velocity = Vector3f(0.0, 0.0, 0.0);
+    velocity = vector3f(0.0, 0.0, 0.0);
   }
   enemy::update();
 }
@@ -80,7 +80,7 @@ void grunt::destroy() {
                  parent,
                  position,
                  orientation,
-                 velocity + Vector3f((static_cast<float>(rand()) / RAND_MAX) - 0.5,
+                 velocity + vector3f((static_cast<float>(rand()) / RAND_MAX) - 0.5,
                                      (static_cast<float>(rand()) / RAND_MAX) - 0.5,
                                      (static_cast<float>(rand()) / RAND_MAX) - 0.5) * 0.5);
   }

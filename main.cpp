@@ -1,6 +1,4 @@
-#include <GL/glew.h>
 #include <iostream>
-//#include <GLFW/glfw3.h>
 #include <FTGL/ftgl.h>
 #include "platform_defines.h"
 #include "soundstorm/soundstorm.h"

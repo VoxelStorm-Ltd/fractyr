@@ -11,9 +11,9 @@ class playership;                                                               
 
 class gameplayer {
 private:
-  Vector2f mouse_sensitivity;                                                   // degrees per pixel moved for both horizontal and vertical mouse movement
-  Vector2f mouse_last;                                                          // mouse coords relative to origin
-  Vector2i windowsize;                                                          // in pixels, set by glfw - modifying this directly changes nothing
+  vector2f mouse_sensitivity;                                                   // degrees per pixel moved for both horizontal and vertical mouse movement
+  vector2f mouse_last;                                                          // mouse coords relative to origin
+  vector2i windowsize;                                                          // in pixels, set by glfw - modifying this directly changes nothing
   static float constexpr fov_limit_max = 50.0;                                  // maximum field of view
   static float constexpr fov_limit_min = 10.0;                                  // maximum zoom
   float fov_angle = 0.0;                                                        // cached field of view, degrees
@@ -29,10 +29,10 @@ private:
 
   std::vector<std::string> helptext;                                            // help screen text
 
-  Matrix4f projection;                                                          // cached projection matrix
+  matrix4f projection;                                                          // cached projection matrix
 
 public:
-  Vector2f cursorpos;                                                           // on-screen cursor position
+  vector2f cursorpos;                                                           // on-screen cursor position
 
   // state
   playership *current_ship = nullptr;                                           // what entity we're currently controlling
@@ -93,12 +93,12 @@ public:
   // view adjustments
   void update_fov(double fov = 90);
   void update_fov_ratio();
-  Vector2i const &get_windowsize() const;
-  void update_window(Vector2i const &newwindowsize);
+  vector2i const &get_windowsize() const;
+  void update_window(vector2i const &newwindowsize);
   void update_aspect_ratio();
   void clamp_pitch();
-  Vector3f const &get_position() const;
-  void set_position(Vector3f const &newposition);
+  vector3f const &get_position() const;
+  void set_position(vector3f const &newposition);
   float const &get_rotation_yaw() const;
   float const &get_rotation_pitch() const;
 
@@ -106,7 +106,7 @@ public:
   void setup_input();
   void select_gamepad(int newgamepad);
   void pollcontrols(GLFWwindow *thiswindow);
-  void move_mouse(Vector2f const &mouse_pos);
+  void move_mouse(vector2f const &mouse_pos);
   void bind(controlbinding::controltype type, int control, controlbinding::inputfunctiontype function, bool repeat = true, float deadzone = 0.0, float scale = 1.0);
   void unbind(controlbinding::controltype type, int control);
   void unbind(controlbinding::inputfunctiontype function);

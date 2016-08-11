@@ -21,10 +21,10 @@ public:
 protected:
   world &parent_world;                                                          // what world we're in
   chunk *parent = nullptr;                                                      // what chunk we're currently in
-  Vector3f position;                                                            // coords within a chunk, metres
-  Vector3f velocity;                                                            // where it's moving, metres per second
-  Quatf orientation;                                                            // which way we're pointing
-  Quatf orientation_conjugate;                                                  // conjugation of entity::orientation, cached
+  vector3f position;                                                            // coords within a chunk, metres
+  vector3f velocity;                                                            // where it's moving, metres per second
+  quatf orientation;                                                            // which way we're pointing
+  quatf orientation_conjugate;                                                  // conjugation of entity::orientation, cached
 
   float mass   = 1.0;                                                           // how much this weighs, kilograms
   float drag   = 0.0;                                                           // how much drag this entity experiences (coefficient of drag * cross-sectional area)
@@ -35,30 +35,30 @@ public:
 
   entity(world &parent_world,
          chunk *parent_chunk,
-         Vector3f const &position,
-         Quatf const &orientation = Quatf::fromEulerAngles(0.0, 0.0, 0.0));
+         vector3f const &position,
+         quatf const &orientation = quatf::from_euler_angles(0.0, 0.0, 0.0));
   virtual ~entity();
 
   world *get_parent_world() const;
   chunk *get_parent() const;
-  Vector3f const &get_position() const;
-  static Vector3f get_offset(Vector3i const &start_chunk_coords, Vector3f const &start_coords, Vector3i const &end_chunk_coords,  Vector3f const &end_coords);
-  Vector3f get_offset(Vector3i const &other_chunk_coords, Vector3f const &other_coords) const;
-  Vector3f get_offset(entity const &other_entity) const;
-  Vector3f get_world_position() const;
-  Vector3f const &get_velocity() const;
-  Quatf const &get_orientation() const;
-  Quatf const &get_orientation_conjugate() const;
+  vector3f const &get_position() const;
+  static vector3f get_offset(vector3i const &start_chunk_coords, vector3f const &start_coords, vector3i const &end_chunk_coords,  vector3f const &end_coords);
+  vector3f get_offset(vector3i const &other_chunk_coords, vector3f const &other_coords) const;
+  vector3f get_offset(entity const &other_entity) const;
+  vector3f get_world_position() const;
+  vector3f const &get_velocity() const;
+  quatf const &get_orientation() const;
+  quatf const &get_orientation_conjugate() const;
   virtual entity_type get_entity_type() const;
 
   virtual void update();
-  void move(Vector3f const &direction);
-  void move_force(Vector3f const &direction);
-  static void correct_point(Vector3i &chunk_coords, Vector3f &coords);
-  static void correct_point(Vector3f &coords, chunk *&thischunk);
+  void move(vector3f const &direction);
+  void move_force(vector3f const &direction);
+  static void correct_point(vector3i &chunk_coords, vector3f &coords);
+  static void correct_point(vector3f &coords, chunk *&thischunk);
   virtual void destroy();
 
-  Vector3f check_collision(Vector3f const &other_coords, float other_radius) const;
+  vector3f check_collision(vector3f const &other_coords, float other_radius) const;
   virtual float get_collision_damage() const;
   virtual void collided_with(entity *other);
 

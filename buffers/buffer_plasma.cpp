@@ -1,6 +1,6 @@
 #include "buffer_plasma.h"
 #include <iostream>
-//#include "blob_loader.h"
+#include "blob_loader.h"
 #include "shader_load.h"
 
 // linked binary resource blob symbols using blob_loader.h
@@ -65,10 +65,10 @@ void buffer_plasma::setup() {
   ibodata.reserve(12);
 
   unsigned int offset = vbodata.size();
-  vbodata.emplace_back(Vector3f( 0.2, 0.0,  0.0), Vector4f(1.0, 1.0, 0.0, 0.8));
-  vbodata.emplace_back(Vector3f( 0.0, 0.0, -0.5), Vector4f(1.0, 1.0, 0.0, 1.0));
-  vbodata.emplace_back(Vector3f(-0.2, 0.0,  0.0), Vector4f(1.0, 1.0, 0.0, 0.8));
-  vbodata.emplace_back(Vector3f( 0.0, 0.0,  4.0), Vector4f(1.0, 1.0, 0.0, 0.2));
+  vbodata.emplace_back(vector3f( 0.2, 0.0,  0.0), vector4f(1.0, 1.0, 0.0, 0.8));
+  vbodata.emplace_back(vector3f( 0.0, 0.0, -0.5), vector4f(1.0, 1.0, 0.0, 1.0));
+  vbodata.emplace_back(vector3f(-0.2, 0.0,  0.0), vector4f(1.0, 1.0, 0.0, 0.8));
+  vbodata.emplace_back(vector3f( 0.0, 0.0,  4.0), vector4f(1.0, 1.0, 0.0, 0.2));
   ibodata.emplace_back(offset + 0);                                             // front face
   ibodata.emplace_back(offset + 1);
   ibodata.emplace_back(offset + 2);

@@ -1,22 +1,14 @@
 #include "universe.h"
 #include <iostream>
-#include <random>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include <FTGL/ftgl.h>
-#include "platform_defines.h"
 #include "blob_loader.h"
 #include "gameplayer.h"
 #include "oculusstorm/oculusstorm.h"
 #include "soundstorm/soundstorm.h"
-#include "world.h"
-#include "buffers/buffer_chunk.h"
 #include "buffers/buffer_plasma.h"
 #include "buffers/buffer_enemy_grunt.h"
 #include "buffers/buffer_enemy_core.h"
-#include "buffers/buffer_shard.h"
 #include "chunk.h"
-#include "entity/ship.h"
 #include "entity/playership.h"
 #include "weapon/blaster.h"
 #include "weapon/gruntblaster.h"
@@ -68,7 +60,7 @@ universe::universe()
     timestep_chrono(std::chrono::milliseconds(static_cast<unsigned int>(timestep * 1000) - 1)) { // -1 to go a bit over
   /// Default constructor
   std::cout << "Initialising universe..." << std::endl;
-  //sound.set_listener_position_and_rotation(Vector3f(0.0, 0.0, 0.0), Quatf::fromEulerAngles(0.0, 180.0, 0.0)); // so that -x = left, +x = right
+  //sound.set_listener_position_and_rotation(vector3f(0.0, 0.0, 0.0), quatf::from_euler_angles(0.0, 180.0, 0.0)); // so that -x = left, +x = right
   // initialise sound effects
   // TODO
   // initialise music
@@ -86,7 +78,7 @@ universe::~universe() {
 
 void universe::init() {
   /// Runtime initialisation that must be run before main loops, but cannot occur in the global constructor for whatever reason
-  Vector2i windowsize(800, 600);
+  vector2i windowsize(800, 600);
   init_graphics(windowsize);
   init_shaders();
 
@@ -119,8 +111,8 @@ void universe::restart() {
   replace_entities();
   // slide the player ship down until we're not in a solid surface
   /*
-  while(player.current_ship->check_collision(player.current_ship->get_position(), 4.0) != Vector3f(0.0, 0.0, 0.0)) {
-    player.current_ship->move_force(Vector3f(0.1, 0.2, 0.3));
+  while(player.current_ship->check_collision(player.current_ship->get_position(), 4.0) != vector3f(0.0, 0.0, 0.0)) {
+    player.current_ship->move_force(vector3f(0.1, 0.2, 0.3));
     std::cout << "DEBUG: Player coords now " << player.current_ship->get_parent()->get_coords() << ", " << player.current_ship->get_position() << std::endl;
   }
   */
@@ -155,8 +147,8 @@ void universe::replace_entities() {
   current_world->clear_entities();
   std::cout << "DEBUG: Placing player" << std::endl;
   player.current_ship = new playership(*current_world,
-                                       current_world->get_chunk(Vector3i(1, 1, 5)),
-                                       Vector3f(chunk::size / 3, chunk::size / 3, chunk::size / 3));
+                                       current_world->get_chunk(vector3i(1, 1, 5)),
+                                       vector3f(chunk::size / 3, chunk::size / 3, chunk::size / 3));
   player.current_ship->add_weapon(new blaster(player.current_ship));
 
   std::default_random_engine enemygen;
@@ -168,10 +160,10 @@ void universe::replace_entities() {
   // Place grunts
   for(unsigned int i = 0; i != numgrunts; ++i) {
     for(unsigned int tries = 10; tries != 0; --tries) {
-      chunk *gruntchunk = current_world->get_chunk(Vector3i(enemy_chunk_pos_dist(enemygen), enemy_chunk_pos_dist(enemygen), enemy_chunk_pos_dist(enemygen)));
-      Vector3f gruntpos = Vector3f(enemy_local_pos_dist(enemygen), enemy_local_pos_dist(enemygen), enemy_local_pos_dist(enemygen));
+      chunk *gruntchunk = current_world->get_chunk(vector3i(enemy_chunk_pos_dist(enemygen), enemy_chunk_pos_dist(enemygen), enemy_chunk_pos_dist(enemygen)));
+      vector3f gruntpos = vector3f(enemy_local_pos_dist(enemygen), enemy_local_pos_dist(enemygen), enemy_local_pos_dist(enemygen));
       if(!gruntchunk->get_is_solid(gruntpos)) {
-        grunt *grunt1 = new grunt(*current_world, gruntchunk, gruntpos, Quatf::fromEulerAngles(0.0, 0.0, 0.0), 1.0);
+        grunt *grunt1 = new grunt(*current_world, gruntchunk, gruntpos, quatf::from_euler_angles(0.0, 0.0, 0.0), 1.0);
         grunt1->add_weapon(new gruntblaster(grunt1));
         break;
       }
@@ -181,10 +173,10 @@ void universe::replace_entities() {
   // And cores
   for(unsigned int i = 0; i != numcores; ++i) {
     for(unsigned int tries = 50; tries != 0; --tries) {
-      chunk *corechunk = current_world->get_chunk(Vector3i(enemy_chunk_pos_dist(enemygen), enemy_chunk_pos_dist(enemygen), enemy_chunk_pos_dist(enemygen)));
-      Vector3f corepos = Vector3f(enemy_local_pos_dist(enemygen), enemy_local_pos_dist(enemygen), enemy_local_pos_dist(enemygen));
+      chunk *corechunk = current_world->get_chunk(vector3i(enemy_chunk_pos_dist(enemygen), enemy_chunk_pos_dist(enemygen), enemy_chunk_pos_dist(enemygen)));
+      vector3f corepos = vector3f(enemy_local_pos_dist(enemygen), enemy_local_pos_dist(enemygen), enemy_local_pos_dist(enemygen));
       if(!corechunk->get_is_solid(corepos)) {
-        new core(*current_world, corechunk, corepos, Quatf::fromEulerAngles(0.0, 0.0, 0.0), 1.0);
+        new core(*current_world, corechunk, corepos, quatf::from_euler_angles(0.0, 0.0, 0.0), 1.0);
         break;
       }
     }
@@ -281,7 +273,7 @@ void universe::render_progressscreen(float progress, std::string const &message)
 }
 
 void universe::render_progressscreen_hud(float progress, std::string const &message) {
-  Vector2i const windowsize(player.get_windowsize());
+  vector2i const windowsize(player.get_windowsize());
 
   glMatrixMode(GL_PROJECTION);
   glPushMatrix();
@@ -294,8 +286,8 @@ void universe::render_progressscreen_hud(float progress, std::string const &mess
 
   float const font_title_advance = font_title->Advance("Fractyr", 7);
   float const font_loading_advance = font_loading->Advance(message.c_str(), message.length());
-  Vector2i const titlepos(  (windowsize.x - font_title_advance)   / 2.0, (windowsize.y * 0.60));
-  Vector2i const messagepos((windowsize.x - font_loading_advance) / 2.0, (windowsize.y * 0.25) + 10.0);
+  vector2i const titlepos(  (windowsize.x - font_title_advance)   / 2.0, (windowsize.y * 0.60));
+  vector2i const messagepos((windowsize.x - font_loading_advance) / 2.0, (windowsize.y * 0.25) + 10.0);
   glColor4f(0.0, 0.0, 0.0, 1.0);
   font_loading->Render(message.c_str(), message.length(), FTPoint(messagepos.x, messagepos.y), FTPoint(), FTGL::RENDER_FRONT);
   font_title->Render("Fractyr", 7, FTPoint(titlepos.x, titlepos.y - 2), FTPoint(), FTGL::RENDER_FRONT);
@@ -319,7 +311,7 @@ void universe::render_progressscreen_hud(float progress, std::string const &mess
 }
 
 void universe::render_energy_hud(float energy) {
-  Vector2i const windowsize(player.get_windowsize());
+  vector2i const windowsize(player.get_windowsize());
 
   glMatrixMode(GL_PROJECTION);
   glPushMatrix();
@@ -346,7 +338,7 @@ void universe::render_energy_hud(float energy) {
 }
 
 void universe::render_cores_hud(unsigned int cores) {
-  Vector2i const windowsize(player.get_windowsize());
+  vector2i const windowsize(player.get_windowsize());
 
   glMatrixMode(GL_PROJECTION);
   glPushMatrix();
@@ -454,7 +446,7 @@ void universe::reinitialise_window() {
   window_main = nullptr;
   glfwTerminate();
   std::cout << "Re-initialising GLFW and graphics..." << std::endl;
-  Vector2i windowsize(800, 600);
+  vector2i windowsize(800, 600);
   init_graphics(windowsize);
   init_shaders();
   player.update_window(windowsize);
@@ -487,7 +479,7 @@ void universe::loop_fade_in() {
       player.render_hud();
     }
 
-    Vector2i const windowsize(player.get_windowsize());
+    vector2i const windowsize(player.get_windowsize());
 
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -536,7 +528,7 @@ void universe::loop_fade_out() {
       player.render_hud();
     }
 
-    Vector2i const windowsize(player.get_windowsize());
+    vector2i const windowsize(player.get_windowsize());
 
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -585,7 +577,7 @@ void universe::loop_fade_out_won() {
       player.render_hud();
     }
 
-    Vector2i const windowsize(player.get_windowsize());
+    vector2i const windowsize(player.get_windowsize());
 
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -762,7 +754,7 @@ void universe::update() {
   player.update();
 }
 
-chunk *universe::get_chunk(Vector3i const &chunk_coords) {
+chunk *universe::get_chunk(vector3i const &chunk_coords) {
   /// Wrapper function
   #ifndef NDEBUG
     if(!current_world) {

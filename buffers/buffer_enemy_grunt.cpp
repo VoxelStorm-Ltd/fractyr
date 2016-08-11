@@ -1,6 +1,6 @@
 #include "buffer_enemy_grunt.h"
 #include <iostream>
-//#include "blob_loader.h"
+#include "blob_loader.h"
 #include "shader_load.h"
 
 // linked binary resource blob symbols using blob_loader.h
@@ -67,21 +67,21 @@ void buffer_enemy_grunt::setup() {
   vbodata.reserve(4 * 6 * numcubes);
   ibodata.reserve(6 * 6 * numcubes);
 
-  Vector4f const bodycolour(     0.3, 0.3, 0.3, 1.0);
-  Vector4f const guncolour(      0.9, 0.0, 0.0, 1.0);
-  Vector4f const thrustercolour( 0.8, 0.4, 0.0, 1.0);
+  vector4f const bodycolour(     0.3, 0.3, 0.3, 1.0);
+  vector4f const guncolour(      0.9, 0.0, 0.0, 1.0);
+  vector4f const thrustercolour( 0.8, 0.4, 0.0, 1.0);
 
   //Body
-  cuboid(Vector3f(0.0, 0.0, 0.0), Vector3f(3.0, 0.5, 0.5), bodycolour, vbodata, ibodata);
-  cuboid(Vector3f(0.0, 0.0, 0.0), Vector3f(0.5, 3.0, 0.5), bodycolour, vbodata, ibodata);
+  cuboid(vector3f(0.0, 0.0, 0.0), vector3f(3.0, 0.5, 0.5), bodycolour, vbodata, ibodata);
+  cuboid(vector3f(0.0, 0.0, 0.0), vector3f(0.5, 3.0, 0.5), bodycolour, vbodata, ibodata);
 
   //Guns
-  cuboid(Vector3f(-1.0, 0.0, -1.0), Vector3f(0.5, 0.5, 1.5), guncolour, vbodata, ibodata);
-  cuboid(Vector3f( 1.0, 0.0, -1.0), Vector3f(0.5, 0.5, 1.5), guncolour, vbodata, ibodata);
+  cuboid(vector3f(-1.0, 0.0, -1.0), vector3f(0.5, 0.5, 1.5), guncolour, vbodata, ibodata);
+  cuboid(vector3f( 1.0, 0.0, -1.0), vector3f(0.5, 0.5, 1.5), guncolour, vbodata, ibodata);
 
   //Thrusters
-  cuboid(Vector3f(0.0, -1.0, 0.5), Vector3f(0.5, 0.5, 0.5), thrustercolour, vbodata, ibodata);
-  cuboid(Vector3f(0.0,  1.0, 0.5), Vector3f(0.5, 0.5, 0.5), thrustercolour, vbodata, ibodata);
+  cuboid(vector3f(0.0, -1.0, 0.5), vector3f(0.5, 0.5, 0.5), thrustercolour, vbodata, ibodata);
+  cuboid(vector3f(0.0,  1.0, 0.5), vector3f(0.5, 0.5, 0.5), thrustercolour, vbodata, ibodata);
 
   vbodata.shrink_to_fit();
   ibodata.shrink_to_fit();
@@ -125,28 +125,28 @@ void buffer_enemy_grunt::render() const {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void buffer_enemy_grunt::cuboid(Vector3f const &pos,
-                                Vector3f const &size,
-                                Vector4f const &colour,
+void buffer_enemy_grunt::cuboid(vector3f const &pos,
+                                vector3f const &size,
+                                vector4f const &colour,
                                 std::vector<vertex> &vbodata,
                                 std::vector<GLuint> &ibodata) const {
-  Vector3f const size_half(size / 2.0);
-  Vector3f const coord000(-size_half + pos);
-  Vector3f const coord100(coord000 + Vector3f(size.x, 0.0f,   0.0f));
-  Vector3f const coord010(coord000 + Vector3f(0.0f,   size.y, 0.0f));
-  Vector3f const coord110(coord000 + Vector3f(size.x, size.y, 0.0f));
+  vector3f const size_half(size / 2.0);
+  vector3f const coord000(-size_half + pos);
+  vector3f const coord100(coord000 + vector3f(size.x, 0.0f,   0.0f));
+  vector3f const coord010(coord000 + vector3f(0.0f,   size.y, 0.0f));
+  vector3f const coord110(coord000 + vector3f(size.x, size.y, 0.0f));
 
-  Vector3f const coord001(coord000 + Vector3f(0.0f,   0.0f,   size.z));
-  Vector3f const coord101(coord001 + Vector3f(size.x, 0.0f,   0.0f));
-  Vector3f const coord011(coord001 + Vector3f(0.0f,   size.y, 0.0f));
-  Vector3f const coord111(coord001 + Vector3f(size.x, size.y, 0.0f));
+  vector3f const coord001(coord000 + vector3f(0.0f,   0.0f,   size.z));
+  vector3f const coord101(coord001 + vector3f(size.x, 0.0f,   0.0f));
+  vector3f const coord011(coord001 + vector3f(0.0f,   size.y, 0.0f));
+  vector3f const coord111(coord001 + vector3f(size.x, size.y, 0.0f));
 
-  Vector3f const normal0( 0.0,  0.0, -1.0);
-  Vector3f const normal1(-1.0,  0.0,  0.0);
-  Vector3f const normal2( 0.0,  1.0,  0.0);
-  Vector3f const normal3( 0.0,  0.0,  1.0);
-  Vector3f const normal4( 1.0,  0.0,  0.0);
-  Vector3f const normal5( 0.0, -1.0,  0.0);
+  vector3f const normal0( 0.0,  0.0, -1.0);
+  vector3f const normal1(-1.0,  0.0,  0.0);
+  vector3f const normal2( 0.0,  1.0,  0.0);
+  vector3f const normal3( 0.0,  0.0,  1.0);
+  vector3f const normal4( 1.0,  0.0,  0.0);
+  vector3f const normal5( 0.0, -1.0,  0.0);
 
 
   // front face

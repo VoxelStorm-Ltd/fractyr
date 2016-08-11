@@ -23,10 +23,10 @@ public:
   ~world();
 
   // chunk operations and queries
-  static void correct_chunk_coords(Vector3i &chunk_coords);
-  chunk *get_chunk(Vector3i const &chunk_coords);
-  void find_visible_chunks(Vector3i const &chunk_coords, Quatf const &view_direction, int range);
-  Vector3f check_collision(Vector3i const &chunk_coords, Vector3f const &coords, float radius);
+  static void correct_chunk_coords(vector3i &chunk_coords);
+  chunk *get_chunk(vector3i const &chunk_coords);
+  void find_visible_chunks(vector3i const &chunk_coords, quatf const &view_direction, int range);
+  vector3f check_collision(vector3i const &chunk_coords, vector3f const &coords, float radius);
   void delete_buffers();
   void setup_buffers();
   void preload_chunks();
@@ -39,7 +39,7 @@ public:
   void remove_entity(entity *thisentity);
 
   // rendering
-  void render(Vector3i const &chunk_coords, Quatf const &view_direction);
+  void render(vector3i const &chunk_coords, quatf const &view_direction);
 };
 
 #endif // WORLD_H_INCLUDED

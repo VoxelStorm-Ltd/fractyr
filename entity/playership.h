@@ -14,11 +14,11 @@ public:
 
   playership(world &parent_world,
              chunk *parent_chunk,
-             Vector3f const &position,
-             Quatf const &orientation = Quatf::fromEulerAngles(0.0, 0.0, 0.0));
+             vector3f const &position,
+             quatf const &orientation = quatf::from_euler_angles(0.0, 0.0, 0.0));
   virtual ~playership();
   void update() override;
-  void accelerate(Vector3f const &accel) override final;
+  void accelerate(vector3f const &accel) override final;
   bool fire(unsigned int weapon_id) override final;
   void collided_with(entity *other) override final;
   virtual entity::entity_type get_entity_type() const override final;

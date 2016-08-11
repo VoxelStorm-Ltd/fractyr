@@ -34,7 +34,7 @@ gameplayer::~gameplayer() {
 }
 
 void gameplayer::cache_matrix(double nearplane, double farplane) {
-  /// Pre-compute the projection matrix and store it
+  /// Pre-compute the projection Matrix and store it
   /// This needs to be executed within a valid OpenGL context
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -50,7 +50,7 @@ void gameplayer::cache_matrix(double nearplane, double farplane) {
 }
 
 void gameplayer::setup_render_perspective() {
-  /// Set up the projection matrix to the correct specifications
+  /// Set up the projection Matrix to the correct specifications
   glMatrixMode(GL_PROJECTION);
   glLoadMatrixf(projection);
 
@@ -62,7 +62,7 @@ void gameplayer::setup_render_perspective() {
   glTranslatef(0.0, -0.25, 0.13);                                               // neck model
   glRotatef(rotation_pitch, 1.0, 0.0, 0.0);                                     // head rotation
   glRotatef(rotation_yaw + pre_rotation, 0.0, 1.0, 0.0);
-  //sound.set_listener_rotation(Quatf::fromAxisRot(Vector3f(0.0, -1.0, 0.0), rotation_yaw + pre_rotation)); // we don't care about pitch here
+  //sound.set_listener_rotation(quatf::from_axis_rot(vector3f(0.0, -1.0, 0.0), rotation_yaw + pre_rotation)); // we don't care about pitch here
 }
 
 void gameplayer::setup_render_oculus_left() {
@@ -178,11 +178,11 @@ void gameplayer::update_fov_ratio() {
   //std::cout << "New FOV ratio: " << fov_ratio << std::endl;
 }
 
-Vector2i const &gameplayer::get_windowsize() const {
+vector2i const &gameplayer::get_windowsize() const {
   return windowsize;
 }
 
-void gameplayer::update_window(Vector2i const &newwindowsize) {
+void gameplayer::update_window(vector2i const &newwindowsize) {
   /// Resize the window to the new size, and update aspect ratio
   windowsize = newwindowsize;
   glViewport(0, 0, windowsize.x, windowsize.y);
@@ -196,7 +196,7 @@ void gameplayer::update_aspect_ratio() {
   }
   aspect_ratio = static_cast<double>(windowsize.x) / static_cast<double>(windowsize.y);
   std::cout << "New window size " << windowsize << " aspect ratio " << aspect_ratio << std::endl;
-  cache_matrix();                                                               // update the cached projection matrix
+  cache_matrix();                                                               // update the cached projection Matrix
 }
 
 void gameplayer::clamp_pitch() {
@@ -293,10 +293,10 @@ void gameplayer::select_gamepad(int newgamepad) {
   std::cout << "  " << axiscount << " axes, " << buttoncount << " buttons" << std::endl;
 }
 
-void gameplayer::move_mouse(Vector2f const &mouse_pos) {
+void gameplayer::move_mouse(vector2f const &mouse_pos) {
   /// React to mouse position updates
   // Quake mouselook code is here for reference: https://github.com/id-Software/Quake/blob/bf4ac424ce754894ac8f1dae6a3981954bc9852d/WinQuake/in_win.c
-  Vector2f mouse_diff(mouse_pos - mouse_last);
+  vector2f mouse_diff(mouse_pos - mouse_last);
   mouse_diff *= mouse_sensitivity * fov_angle;                                  // apply sensitivity
   //rotation_yaw = fmodf(rotation_yaw + mouse_diff.x, 360.0);
   //rotation_pitch += mouse_diff.y;
@@ -349,22 +349,22 @@ void gameplayer::update() {
 }
 
 void gameplayer::input_move_forward(float amount) {
-  current_ship->accelerate(Vector3f(0.0, 0.0, -amount));
+  current_ship->accelerate(vector3f(0.0, 0.0, -amount));
 }
 void gameplayer::input_move_back(float amount) {
-  current_ship->accelerate(Vector3f(0.0, 0.0, amount));
+  current_ship->accelerate(vector3f(0.0, 0.0, amount));
 }
 void gameplayer::input_move_left(float amount) {
-  current_ship->accelerate(Vector3f(-amount, 0.0, 0.0));
+  current_ship->accelerate(vector3f(-amount, 0.0, 0.0));
 }
 void gameplayer::input_move_right(float amount) {
-  current_ship->accelerate(Vector3f(amount, 0.0, 0.0));
+  current_ship->accelerate(vector3f(amount, 0.0, 0.0));
 }
 void gameplayer::input_move_up(float amount) {
-  current_ship->accelerate(Vector3f(0.0, amount, 0.0));
+  current_ship->accelerate(vector3f(0.0, amount, 0.0));
 }
 void gameplayer::input_move_down(float amount) {
-  current_ship->accelerate(Vector3f(0.0, -amount, 0.0));
+  current_ship->accelerate(vector3f(0.0, -amount, 0.0));
 }
 void gameplayer::input_roll_left(float amount) {
   current_ship->roll(-amount);
@@ -398,7 +398,7 @@ void gameplayer::input_zoom_in(float amount) {
     fov_angle = fov_limit_min;
   }
   update_fov(fov_angle);
-  cache_matrix();                                                               // update the cached projection matrix
+  cache_matrix();                                                               // update the cached projection Matrix
 }
 void gameplayer::input_zoom_out(float amount) {
   /// Widen the view angle, amount must be positive
@@ -408,7 +408,7 @@ void gameplayer::input_zoom_out(float amount) {
     fov_angle = fov_limit_max;
   }
   update_fov(fov_angle);
-  cache_matrix();                                                               // update the cached projection matrix
+  cache_matrix();                                                               // update the cached projection Matrix
 }
 void gameplayer::input_zoom(float amount) {
   /// As above but suitable for joystick and mousewheel use, can be given a negative amount
@@ -426,7 +426,7 @@ void gameplayer::input_zoom(float amount) {
   }
   //std::cout << "DEBUG: FOV now " << fov_angle << std::endl;
   update_fov(fov_angle);
-  cache_matrix();                                                               // update the cached projection matrix
+  cache_matrix();                                                               // update the cached projection Matrix
 }
 void gameplayer::input_fire1(float amount __attribute__((__unused__))) {
   current_ship->fire(0);
