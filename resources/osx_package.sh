@@ -15,7 +15,7 @@ echo "Copying release files into $app_skel_dir (chosen from ${#app_skel_dirs[@]}
 
 binary_dir="$app_skel_dir/Contents/MacOS"
 mkdir -p "$binary_dir"
-cp bin/Release/* "$binary_dir"/
+cp bin/Mac64/Release/* "$binary_dir"/
 
 # find out the size of our app
 size_blocks=$(du -s "$app_skel_dir" | cut -f 1)
