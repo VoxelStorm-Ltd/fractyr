@@ -43,7 +43,12 @@ if ! [ -f "$butler" ]; then
   exit 1
 fi
 
-"$butler" upgrade --head --assume-yes
+"$butler" upgrade --head --assume-yes && \
+if grep -q "^resources/" <<< "$butler"; then
+  # remove cached butler versions from the repository if they're saved here
+  rm "$butler.new.gz"
+  rm "$butler.old"
+fi
 
 function get_online_version {
   channel_to_check="$1"

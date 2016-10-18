@@ -11,6 +11,12 @@
   #define PLATFORM_LINUX
 #endif
 
+#if __x86_64__
+  #define PLATFORM_64BIT
+#else
+  #define PLATFORM_32BIT
+#endif
+
 #if defined __BIG_ENDIAN && __BYTE_ORDER == __BIG_ENDIAN
   #define PLATFORM_BIGENDIAN
 #else
