@@ -14,13 +14,18 @@ link_options="$5"
 #echo "Options: $options (eol)"
 #echo "Link options: $link_options (eol)"
 
+if [ -z "$infile" ]; then
+  echo "Usage: $0 infile outfile compiler options link_options" >&2
+  exit 1
+fi
+
 if [ "$compiler" = "" ]; then
   compiler="g++-6"
 fi
-if [ -z "$(which "$compiler")" ]; then
+if [ -z "$(which "$compiler" 2>/dev/null)" ]; then
   compiler="g++-5"
 fi
-if [ -z "$(which "$compiler")" ]; then
+if [ -z "$(which "$compiler" 2>/dev/null)" ]; then
   compiler="g++"
 fi
 
@@ -74,6 +79,6 @@ else
   outfile="$(sed 's/\\/\//g' <<< "$outfile")"
   # and the input file needs to be made relative in a different way
   infile="$(sed 's/.*resources\\/resources\//' <<< "$infile")"
-  echo "infile final $infile"
+  #echo "infile final $infile"
   ld -r -b binary -o "$outfile" "$infile"
 fi
