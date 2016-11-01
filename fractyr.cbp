@@ -31,6 +31,7 @@
 					<Add option="-msse2" />
 					<Add option="-m3dnow" />
 					<Add option="-fexceptions" />
+    			<Add option="-fno-pie" />
 					<Add option="-DLOGGING" />
 					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
 					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
@@ -176,6 +177,7 @@
 					<Add option="-msse2" />
 					<Add option="-m3dnow" />
 					<Add option="-fexceptions" />
+    			<Add option="-fno-pie" />
 					<Add option="-DLOGGING" />
 					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
 					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
@@ -275,6 +277,7 @@
 					<Add option="-msse2" />
 					<Add option="-m3dnow" />
 					<Add option="-fexceptions" />
+    			<Add option="-fno-pie" />
 					<Add option="-DLOGGING" />
 					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
 					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
@@ -401,6 +404,7 @@
 					<Add option="-msse2" />
 					<Add option="-m3dnow" />
 					<Add option="-fexceptions" />
+    			<Add option="-fno-pie" />
 					<Add option="-DLOGGING" />
 					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
 					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
@@ -563,6 +567,7 @@
 					<Add option="-msse2" />
 					<Add option="-m3dnow" />
 					<Add option="-fexceptions" />
+    			<Add option="-fno-pie" />
 					<Add option="-DLOGGING" />
 					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
 					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
@@ -660,6 +665,7 @@
 					<Add option="-msse2" />
 					<Add option="-m3dnow" />
 					<Add option="-fexceptions" />
+    			<Add option="-fno-pie" />
 					<Add option="-DLOGGING" />
 					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
 					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
@@ -855,6 +861,9 @@
 			<Add option="-DGLEW_STATIC" />
 			<Add directory="." />
 		</Compiler>
+    <Linker>
+      <Add option="-no-pie" />
+    </Linker>
 		<ExtraCommands>
 			<Add before='bash -c &quot;resources/generate_git_version.sh&quot;' />
 		</ExtraCommands>
