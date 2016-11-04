@@ -14,12 +14,12 @@ varying float fog_frag;
 
 void main() {
   const vec3 lightdir = vec3(0.267261, 0.534522, 0.801784);
-  reflectdir_frag = gl_Normalmatrix * reflect(lightdir, normal);
+  reflectdir_frag = gl_NormalMatrix * reflect(lightdir, normal);
   normal_frag = normal;
   colour_frag = colour;
 
-  gl_Position = gl_ModelViewProjectionmatrix * coords;
-  coords_camlocal_frag = (gl_ModelViewmatrix * coords).xyz;
+  gl_Position = gl_ModelViewProjectionMatrix * coords;
+  coords_camlocal_frag = (gl_ModelViewMatrix * coords).xyz;
 
   fog_frag = length(coords_camlocal_frag) / 300.0;
 }
