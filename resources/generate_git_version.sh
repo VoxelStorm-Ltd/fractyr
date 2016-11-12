@@ -3,6 +3,10 @@
 
 outfile="git_version.h"
 
+if [ ! -f "$outfile" ]; then
+  touch "$outfile"
+fi
+
 branch="$(git rev-parse --abbrev-ref HEAD)"
 #branch="$(git branch | sed -n '/\* /s///p')"
 #sha_full="$(git rev-parse HEAD)"
