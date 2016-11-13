@@ -27,7 +27,7 @@ elif grep -iq "linux" <<< "$MACHTYPE"; then
   if ! [ -f "$butler" ]; then
     butler="resources/itchio_butler_linux64.exe"
   fi
-  tempdir="/dev/shm/temp_itchio"
+  tempdir="$(mktemp -d -p /dev/shm -t "itchio-$repo-XXXXXX")"
 else
   # windows
   platforms=("windows-64" "windows-32")
