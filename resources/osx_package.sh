@@ -15,6 +15,7 @@ echo "Copying release files into $app_skel_dir (chosen from ${#app_skel_dirs[@]}
 
 binary_dir="$app_skel_dir/Contents/MacOS"
 mkdir -p "$binary_dir"
+binfiles=$(ls bin/Mac64/Release/*)
 cp bin/Mac64/Release/* "$binary_dir"/
 
 # find out the size of our app
@@ -34,18 +35,26 @@ if [ "$?" != "0" ]; then
   exit 1;
 fi
 # mount it
-devices=$(hdiutil attach "$dmg" | cut -f 1)
+devices=$(hdiutil attach -readwrite "$dmg" | cut -f 1)
 device=$(echo $devices | cut -f 2 -d ' ')
 mountpoint=$(mount | grep "^$device on" | cut -d ' ' -f 3)
 echo "$dmg mounted as $device on $mountpoint, copying app..."
 
-cp -r "$app_skel_dir" "$mountpoint"
+cp -r -v "$app_skel_dir" "$mountpoint"
+cp_success=$?
 
 # unmount it
 hdiutil detach "$device"
 
 # clean up the duplicate binary files
-rm "$binary_dir"/*
+for binfile in $binfiles; do
+  rm "$binary_dir/$(basename "$binfile")"
+done
+
+if [ "$cp_success" != "0" ]; then
+  echo "Copying failed!"
+  exit 1
+fi
 
 # convert to read-only
 tempimage="/tmp/temp.dmg"
