@@ -53,13 +53,13 @@ void grunt::update() {
     }
   #endif
 
-  if(__builtin_expect(aimpos.length_sq() < 10000, 0)) {
-    aimpos += (player.current_ship->get_velocity() - velocity) * (aimpos.length() / (weapons[0]->get_shot_speed() * 2.0));
-    velocity.x += (rand() / static_cast<float>(RAND_MAX) - 0.5) / 100.0;
-    velocity.y += (rand() / static_cast<float>(RAND_MAX) - 0.5) / 100.0;
-    velocity.z += (rand()  /static_cast<float>(RAND_MAX) - 0.5) / 100.0;
+  if(__builtin_expect(aimpos.length_sq() < 10000.0f, false)) {
+    aimpos += (player.current_ship->get_velocity() - velocity) * (aimpos.length() / (weapons[0]->get_shot_speed() * 2.0f));
+    velocity.x += (rand() / static_cast<float>(RAND_MAX) - 0.5f) / 100.0f;
+    velocity.y += (rand() / static_cast<float>(RAND_MAX) - 0.5f) / 100.0f;
+    velocity.z += (rand() / static_cast<float>(RAND_MAX) - 0.5f) / 100.0f;
 
-    quatf const &target_orientation = quatf::from_matrix(matrix4f::create_look_at(vector3f(0.0, 0.0, 0.0), aimpos, vector3f(0.0, 0.0, 1.0)));
+    quatf const &target_orientation = quatf::from_matrix(matrix4f::create_look_at(vector3f(0.0f, 0.0f, 0.0f), aimpos, vector3f(0.0f, 0.0f, 1.0f)).get_rotation());
     orientation = orientation.slerp(0.05, target_orientation);
     orientation.normalise();
     orientation_conjugate = orientation.conjugate_copy();
@@ -80,9 +80,9 @@ void grunt::destroy() {
                  parent,
                  position,
                  orientation,
-                 velocity + vector3f((static_cast<float>(rand()) / RAND_MAX) - 0.5,
-                                     (static_cast<float>(rand()) / RAND_MAX) - 0.5,
-                                     (static_cast<float>(rand()) / RAND_MAX) - 0.5) * 0.5);
+                 velocity + vector3f((static_cast<float>(rand()) / RAND_MAX) - 0.5f,
+                                     (static_cast<float>(rand()) / RAND_MAX) - 0.5f,
+                                     (static_cast<float>(rand()) / RAND_MAX) - 0.5f) * 0.5f);
   }
 }
 

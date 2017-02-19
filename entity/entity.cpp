@@ -49,7 +49,7 @@ vector3f entity::get_offset(vector3i const &start_chunk_coords,
   if(chunk_offset.x < -world::size / 2) chunk_offset.x += world::size;
   if(chunk_offset.y < -world::size / 2) chunk_offset.y += world::size;
   if(chunk_offset.z < -world::size / 2) chunk_offset.z += world::size;
-  return vector3f(start_coords - end_coords) + (chunk_offset * chunk::size);
+  return vector3f((start_coords - end_coords) + vector3f(chunk_offset * chunk::size));
 }
 vector3f entity::get_offset(vector3i const &other_chunk_coords,
                             vector3f const &other_coords) const {
@@ -61,7 +61,7 @@ vector3f entity::get_offset(entity const &other_entity) const {
   return get_offset(other_entity.get_parent()->coords, other_entity.get_position());
 }
 vector3f entity::get_world_position() const {
-  return position + (parent->coords * chunk::size);
+  return position + vector3f(parent->coords * chunk::size);
 }
 vector3f const &entity::get_velocity() const {
   return velocity;
