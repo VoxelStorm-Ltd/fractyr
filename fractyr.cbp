@@ -31,7 +31,7 @@
 					<Add option="-msse2" />
 					<Add option="-m3dnow" />
 					<Add option="-fexceptions" />
-    			<Add option="-fno-pie" />
+					<Add option="-fno-pie" />
 					<Add option="-DLOGGING" />
 					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
 					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
@@ -177,7 +177,7 @@
 					<Add option="-msse2" />
 					<Add option="-m3dnow" />
 					<Add option="-fexceptions" />
-    			<Add option="-fno-pie" />
+					<Add option="-fno-pie" />
 					<Add option="-DLOGGING" />
 					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
 					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
@@ -277,7 +277,7 @@
 					<Add option="-msse2" />
 					<Add option="-m3dnow" />
 					<Add option="-fexceptions" />
-    			<Add option="-fno-pie" />
+					<Add option="-fno-pie" />
 					<Add option="-DLOGGING" />
 					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
 					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
@@ -404,7 +404,7 @@
 					<Add option="-msse2" />
 					<Add option="-m3dnow" />
 					<Add option="-fexceptions" />
-    			<Add option="-fno-pie" />
+					<Add option="-fno-pie" />
 					<Add option="-DLOGGING" />
 					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
 					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
@@ -552,104 +552,6 @@
 					<Add after='strip -spv &quot;$(TARGET_OUTPUT_FILE)&quot;' />
 				</ExtraCommands>
 			</Target>
-			<Target title="Mac32_Debug">
-				<Option output="bin/Debug/Fractyr_Mac32_debug" prefix_auto="1" extension_auto="0" />
-				<Option object_output="obj/Mac32_Debug/" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-g" />
-					<Add option="-Og" />
-					<Add option="-ggdb3" />
-					<Add option="-m64" />
-					<Add option="-mmmx" />
-					<Add option="-msse" />
-					<Add option="-msse2" />
-					<Add option="-m3dnow" />
-					<Add option="-fexceptions" />
-    			<Add option="-fno-pie" />
-					<Add option="-DLOGGING" />
-					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
-					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
-				</Compiler>
-				<Linker>
-					<Add option="-static" />
-					<Add option="-static-libgcc" />
-					<Add option="-static-libstdc++" />
-				</Linker>
-			</Target>
-			<Target title="Mac32_Release">
-				<Option output="bin/Release/Fractyr_Mac32" prefix_auto="1" extension_auto="0" />
-				<Option object_output="obj/Mac32_Release/" />
-				<Option type="0" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-fexpensive-optimizations" />
-					<Add option="-Ofast" />
-					<Add option="-m64" />
-					<Add option="-mmmx" />
-					<Add option="-msse" />
-					<Add option="-msse2" />
-					<Add option="-m3dnow" />
-					<Add option="-maccumulate-outgoing-args" />
-					<Add option="-fgcse-sm" />
-					<Add option="-fgcse-las" />
-					<Add option="-fgcse-after-reload" />
-					<Add option="-fsched-spec-load" />
-					<Add option="-fsched-spec-load-dangerous" />
-					<Add option="-fmerge-all-constants" />
-					<Add option="-fmodulo-sched" />
-					<Add option="-fmodulo-sched-allow-regmoves" />
-					<Add option="-funsafe-loop-optimizations" />
-					<Add option="-fsched-pressure" />
-					<Add option="-fsched-stalled-insns=0" />
-					<Add option="-fsched-stalled-insns-dep=32" />
-					<Add option="-fsched2-use-superblocks" />
-					<Add option="-fipa-pta" />
-					<Add option="-ftracer" />
-					<Add option="-fno-var-tracking-assignments" />
-					<Add option="-fpeel-loops" />
-					<Add option="-funroll-loops" />
-					<Add option="-funswitch-loops" />
-					<Add option="-ftree-loop-if-convert" />
-					<Add option="-ftree-loop-distribution" />
-					<Add option="-ftree-loop-im" />
-					<Add option="-ftree-loop-ivcanon" />
-					<Add option="-fivopts" />
-					<Add option="-fvariable-expansion-in-unroller" />
-					<Add option="-freorder-blocks-and-partition" />
-					<Add option="-fbranch-target-load-optimize" />
-					<Add option="-fuse-linker-plugin" />
-					<Add option="-flto" />
-					<Add option="-ffast-math" />
-					<Add option="-fno-math-errno" />
-					<Add option="-funsafe-math-optimizations" />
-					<Add option="-fassociative-math" />
-					<Add option="-freciprocal-math" />
-					<Add option="-fno-signed-zeros" />
-					<Add option="-fno-trapping-math" />
-					<Add option="--param max-gcse-memory=1000000000" />
-					<Add option="--param max-inline-insns-single=10000" />
-					<Add option="--param max-inline-insns-auto=10000" />
-					<Add option="--param inline-min-speedup=20" />
-					<Add option="--param large-function-insns=10000" />
-					<Add option="--param large-function-growth=2000" />
-					<Add option="--param large-unit-insns=20000" />
-					<Add option="--param inline-unit-growth=200" />
-					<Add option="-DNDEBUG" />
-					<Add option="-DBOOST_DISABLE_ASSERTS" />
-				</Compiler>
-				<Linker>
-					<Add option="-static" />
-					<Add option="-static-libgcc" />
-					<Add option="-static-libstdc++" />
-					<Add option="-fuse-linker-plugin" />
-					<Add option="-flto" />
-				</Linker>
-				<ExtraCommands>
-					<Add after='strip -spv &quot;$(TARGET_OUTPUT_FILE)&quot;' />
-				</ExtraCommands>
-			</Target>
 			<Target title="Mac64_Debug">
 				<Option output="bin/Debug/Fractyr_Mac64_debug" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj/Mac64_Debug/" />
@@ -665,7 +567,7 @@
 					<Add option="-msse2" />
 					<Add option="-m3dnow" />
 					<Add option="-fexceptions" />
-    			<Add option="-fno-pie" />
+					<Add option="-fno-pie" />
 					<Add option="-DLOGGING" />
 					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
 					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
@@ -807,8 +709,7 @@
 			<Add alias="All_Linux" targets="Linux32_Debug;Linux32_Release;Linux64_Debug;Linux64_Release;" />
 			<Add alias="All_Linux32" targets="Linux32_Debug;Linux32_Release;" />
 			<Add alias="All_Linux64" targets="Linux64_Release;Linux64_Debug;" />
-			<Add alias="All_Mac" targets="Mac32_Debug;Mac32_Release;Mac64_Debug;Mac64_Release;" />
-			<Add alias="All_Mac32" targets="Mac32_Debug;Mac32_Release;" />
+			<Add alias="All_Mac" targets="Mac64_Debug;Mac64_Release;" />
 			<Add alias="All_Mac64" targets="Mac64_Debug;Mac64_Release;" />
 			<Add alias="All_Win" targets="Win32_Debug;Win32_Release;Win64_Release;Win64_Debug;" />
 			<Add alias="All_Win32" targets="Win32_Release;Win32_Debug;" />
@@ -861,9 +762,9 @@
 			<Add option="-DGLEW_STATIC" />
 			<Add directory="." />
 		</Compiler>
-    <Linker>
-      <Add option="-no-pie" />
-    </Linker>
+		<Linker>
+			<Add option="-no-pie" />
+		</Linker>
 		<ExtraCommands>
 			<Add before='bash -c &quot;resources/generate_git_version.sh&quot;' />
 		</ExtraCommands>
@@ -947,8 +848,6 @@
 			<Option target="Linux32_Release" />
 			<Option target="Linux64_Debug" />
 			<Option target="Linux64_Release" />
-			<Option target="Mac32_Debug" />
-			<Option target="Mac32_Release" />
 			<Option target="Mac64_Debug" />
 			<Option target="Mac64_Release" />
 		</Unit>
@@ -964,8 +863,6 @@
 			<Option target="Linux32_Release" />
 			<Option target="Linux64_Debug" />
 			<Option target="Linux64_Release" />
-			<Option target="Mac32_Debug" />
-			<Option target="Mac32_Release" />
 			<Option target="Mac64_Debug" />
 			<Option target="Mac64_Release" />
 		</Unit>
@@ -1013,8 +910,6 @@
 			<Option target="Linux32_Release" />
 			<Option target="Linux64_Debug" />
 			<Option target="Linux64_Release" />
-			<Option target="Mac32_Debug" />
-			<Option target="Mac32_Release" />
 			<Option target="Mac64_Debug" />
 			<Option target="Mac64_Release" />
 		</Unit>
@@ -1027,8 +922,6 @@
 			<Option target="Linux32_Release" />
 			<Option target="Linux64_Debug" />
 			<Option target="Linux64_Release" />
-			<Option target="Mac32_Debug" />
-			<Option target="Mac32_Release" />
 			<Option target="Mac64_Debug" />
 			<Option target="Mac64_Release" />
 		</Unit>
