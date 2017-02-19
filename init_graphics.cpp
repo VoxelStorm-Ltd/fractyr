@@ -191,14 +191,14 @@ void universe::init_graphics(vector2i &windowsize) {
   glDisable(GL_LIGHTING);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  //glEnable(GL_MINMAX);                                                        // allow min and max colour tables for HDR effects
+  //glEnable(GL_MINMAX);                                                          // allow min and max colour tables for HDR effects
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);                                    // GL_FILL or GL_LINE
   glShadeModel(GL_SMOOTH);                                                      // SMOOTH or FLAT
   glDisable(GL_NORMALIZE);
   //glDisable(GL_RESCALE_NORMALS);
   //glEnable(GL_TEXTURE);
   //glEnable(GL_TEXTURE_2D);
-  //glClientActiveTexture(GL_TEXTURE0);                                         // for subsequent glTexCoordPointer calls, see http://stackoverflow.com/a/2227825/1678468
+  //glClientActiveTexture(GL_TEXTURE0);                                           // for subsequent glTexCoordPointer calls, see http://stackoverflow.com/a/2227825/1678468
 
   // smoothing setup
   glDisable(GL_POLYGON_SMOOTH);                                                 // these are generally obsolete and break with some blending; antialiasing should be used instead

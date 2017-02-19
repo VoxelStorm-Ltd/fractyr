@@ -293,8 +293,8 @@ void chunk::setup() {
     if(con.compute_cell(cell, cell_loop)) {
       // Gather information about the computed Voronoi cell
       std::vector<float> verts;
-      //verts.reserve(180);                                                     // measured max
-      //verts.reserve(82);                                                      // measured average
+      //verts.reserve(180);                                                       // measured max
+      //verts.reserve(82);                                                        // measured average
       verts.reserve(3 * cell.p);                                                // actual requirement
       // re-implemented from voro::voronoicell_base::vertices()
       double *ptsp = cell.pts;
@@ -303,13 +303,13 @@ void chunk::setup() {
         verts.emplace_back(cell_coords.y + static_cast<float>(*(ptsp++)) * 0.5f);
         verts.emplace_back(cell_coords.z + static_cast<float>(*(ptsp++)) * 0.5f);
       }
-      //normals.reserve(96);                                                    // measured max
-      //normals.reserve(47);                                                    // measured average
+      //normals.reserve(96);                                                      // measured max
+      //normals.reserve(47);                                                      // measured average
       std::vector<int> face_verts;
-      //face_verts.reserve(233);                                                // measured max
+      //face_verts.reserve(233);                                                  // measured max
       face_verts.reserve(97);                                                   // measured average
       std::vector<int> neighbours;
-      //neighbours.reserve(33);                                                 // measured max
+      //neighbours.reserve(33);                                                   // measured max
       neighbours.reserve(16);                                                   // measured average
       // re-implemented from merge of voro::voronoicell_base::face_vertices() and voro::voronoicell_base::neighbors()
       int vp(0);

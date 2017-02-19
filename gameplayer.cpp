@@ -71,7 +71,7 @@ void gameplayer::setup_render_oculus_left() {
   glTranslatef(0.0, -0.25, 0.13);                                               // neck model (see above)
   glMultMatrixf(oculus->getmatrix().inverse());
   glRotated(pre_rotation, 0.0, 1.0, 0.0);
-  //sound.set_listener_rotation(oculus->getquat());                             // only do this in one eye's setup to avoid duplication
+  //sound.set_listener_rotation(oculus->getquat());                               // only do this in one eye's setup to avoid duplication
 }
 
 void gameplayer::setup_render_oculus_right() {

@@ -242,7 +242,7 @@ vector3f entity::check_collision(vector3f const &other_coords, float other_radiu
   /// Check if the point is colliding with this entity, and if so, return the surface normal vector
   vector3f vec(other_coords - position);
   float const distance = radius + other_radius;
-  if(vec.length_sq() < distance * distance) {                                    // using squared functions to avoid a square root
+  if(vec.length_sq() < distance * distance) {                                   // using squared functions to avoid a square root
     vec.normalise();
     return vec;
   } else {

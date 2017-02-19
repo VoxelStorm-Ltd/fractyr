@@ -25,8 +25,8 @@ private:
 
   // Create a non-periodic particle container
   static float constexpr point_density = 0.0006;                                // points per cubic metre; default 0.0006 = 600 per 100m^3
-  //static float constexpr point_density = 0.000005;                            // points per cubic metre; default 0.0006 = 600 per 100m^3
-  //static float constexpr point_density = 0.001;                               // points per cubic metre; default 0.0006 = 600 per 100m^3
+  //static float constexpr point_density = 0.000005;                              // points per cubic metre; default 0.0006 = 600 per 100m^3
+  //static float constexpr point_density = 0.001;                                 // points per cubic metre; default 0.0006 = 600 per 100m^3
   static unsigned int constexpr max_points = point_density * size * size * size;
   static float constexpr chunk_margin = 0.25;                                   // how far outside each chunk we compute the voronoi space to avoid discontinuities at edges
   static unsigned int constexpr ideal_points_per_block = 8;                     // the optimal number of points per block in a container
