@@ -3,8 +3,6 @@
 #include "weapon/weapon.h"
 #include "gameplayer.h"
 #include "entity/playership.h"
-#include "world.h"
-#include "chunk.h"
 #include "entity/particle/particle.h"
 
 extern gameplayer player;
