@@ -14,9 +14,17 @@ app_name=$(basename "$app_skel_dir" .app)
 echo "Copying release files into $app_skel_dir (chosen from ${#app_skel_dirs[@]} app dirs)"
 
 binary_dir="$app_skel_dir/Contents/MacOS"
+framework_dir="$app_skel_dir/Contents/Frameworks"
 mkdir -p "$binary_dir"
+mkdir -p "$framework_dir"
 binfiles=$(ls bin/Mac64/Release/*)
-cp bin/Mac64/Release/* "$binary_dir"/
+cp "$binfiles" "$binary_dir"/
+
+# apply the framework fix
+for binary in "$binary_dir"/*; do
+  echo "Processing dyld path updates for $binary..."
+  resources/osx_dyld_fix.sh "$binary"
+done
 
 # find out the size of our app
 size_blocks=$(du -s "$app_skel_dir" | cut -f 1)
