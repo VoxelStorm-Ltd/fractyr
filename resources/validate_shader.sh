@@ -4,7 +4,7 @@
 # Validate and build shaders in code::blocks by assigning the following build commands to .glsl files:
 #   bash -c "resources/validate_shader.sh $file_name"
 #   ld -r -b binary -o $object resources/shaders/$file_name.$file_ext
-# or under OS X, instead of ld, use:
+# or under MacOS, instead of ld, use:
 #   resources/compile_blob.sh resources/shaders/$file_name.$file_ext $object
 
 name="$(basename "$1" | sed 's/_vert.glsl$//;s/_frag.glsl$//')"

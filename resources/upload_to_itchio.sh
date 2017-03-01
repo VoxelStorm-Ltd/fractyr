@@ -5,7 +5,7 @@ repodir=$(cd "$scriptdir/.."; pwd)
 repo=${repodir##*/}
 
 if grep -iq "apple" <<< "$MACHTYPE"; then
-  # os x
+  # macos
   platforms=("osx-64")
   platforms_cbx=("Mac64_Release")
   butler=~/Library/Application\ Support/itch/bin/butler
@@ -84,7 +84,7 @@ for i in $(seq 0 $((${#platforms[@]} - 1))); do
   fi
 
   if grep -iq "apple" <<< "$MACHTYPE"; then
-    # on OS X, we upload the packaged disk image
+    # on MacOS, we upload the packaged disk image
     app_skel_dirs=("$repodir/resources/osx_app/"*.app)
     app_skel_dir=${app_skel_dirs[0]}
     binpath=~/Desktop/"$(basename "$app_skel_dir" .app)".dmg

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Automatically create and populate an .app directory structure and package
-# it as a standard OS X .dmg disk image.
+# it as a standard MacOS .dmg disk image.
 
 # use the desktop as our temporary directory
 target=~/Desktop

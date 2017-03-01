@@ -1,6 +1,6 @@
 #!/bin/bash
 # Compile binary resources into linkable object files for loading with blobloader.h
-# for use with VoxelStorm projects primarily on OS X
+# for use with VoxelStorm projects on all platforms
 # Example for use in Code::Blocks: ./compile_blob.sh resources/$file_name.$file_ext $object
 
 infile="$1"
@@ -47,8 +47,8 @@ if grep -iq ".glsl$" <<< "$infile"; then
 fi
 
 if grep -iq "apple" <<< "$MACHTYPE"; then
-  # os x requires special treatment
-  xxd -i "$infile" | sed 's/\(resources[a-zA-Z0-9_]*\)/_binary_\1_x/' | "$compiler" -c -o "$outfile" -x c++ -
+  # MacOS requires special treatment
+  xxd -i "$infile" | sed 's/\(resources[a-zA-Z0-9_]*\)/_binary_\1_x/' | "$compiler" -c -o "$outfile" -x c++ - -mmacosx-version-min=10.9
 elif grep -iq "linux" <<< "$MACHTYPE"; then
   # de-parallelise blob compiles on linux to prevent OOM situations with high parallelism
   process_limit=$(nproc)
