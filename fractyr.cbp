@@ -710,7 +710,6 @@
 			<Add alias="All_Linux32" targets="Linux32_Debug;Linux32_Release;" />
 			<Add alias="All_Linux64" targets="Linux64_Release;Linux64_Debug;" />
 			<Add alias="All_Mac" targets="Mac64_Debug;Mac64_Release;" />
-			<Add alias="All_Mac64" targets="Mac64_Debug;Mac64_Release;" />
 			<Add alias="All_Win" targets="Win32_Debug;Win32_Release;Win64_Release;Win64_Debug;" />
 			<Add alias="All_Win32" targets="Win32_Release;Win32_Debug;" />
 			<Add alias="All_Win64" targets="Win64_Release;Win64_Debug;" />
