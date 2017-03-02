@@ -21,25 +21,33 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-g" />
+					<Add option="-m32" />
 					<Add option="-Og" />
+					<Add option="-g" />
 					<Add option="-ggdb3" />
 					<Add option="-mthreads" />
-					<Add option="-m32" />
 					<Add option="-mmmx" />
 					<Add option="-msse" />
 					<Add option="-msse2" />
 					<Add option="-m3dnow" />
-					<Add option="-fexceptions" />
-					<Add option="-fno-pie" />
 					<Add option="-DLOGGING" />
 					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
 					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
 				</Compiler>
 				<Linker>
-					<Add option="-static" />
-					<Add option="-static-libgcc" />
 					<Add option="-static-libstdc++" />
+					<Add option="-static-libgcc" />
+					<Add option="-static" />
+					<Add option="-m32" />
+					<Add option="-no-pie" />
+					<Add option="-Wl,--stack,8388608" />
+					<Add option="-Og" />
+					<Add option="-ggdb3" />
+					<Add option="-mthreads" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
 					<Add library="lib/win32/libvoro++.a" />
 					<Add library="lib/win32/libboost_filesystem-mgw51-mt-sd-1_58.a" />
 					<Add library="lib/win32/libboost_system-mgw51-mt-sd-1_58.a" />
@@ -72,9 +80,10 @@
 				<Compiler>
 					<Add option="-fomit-frame-pointer" />
 					<Add option="-fexpensive-optimizations" />
+					<Add option="-flto" />
+					<Add option="-m32" />
 					<Add option="-Ofast" />
 					<Add option="-mthreads" />
-					<Add option="-m32" />
 					<Add option="-mmmx" />
 					<Add option="-msse" />
 					<Add option="-msse2" />
@@ -108,7 +117,6 @@
 					<Add option="-freorder-blocks-and-partition" />
 					<Add option="-fbranch-target-load-optimize" />
 					<Add option="-fuse-linker-plugin" />
-					<Add option="-flto" />
 					<Add option="-ffast-math" />
 					<Add option="-fno-math-errno" />
 					<Add option="-funsafe-math-optimizations" />
@@ -128,12 +136,64 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 				</Compiler>
 				<Linker>
-					<Add option="-s" />
-					<Add option="-static" />
-					<Add option="-static-libgcc" />
-					<Add option="-static-libstdc++" />
-					<Add option="-fuse-linker-plugin" />
 					<Add option="-flto" />
+					<Add option="-s" />
+					<Add option="-static-libstdc++" />
+					<Add option="-static-libgcc" />
+					<Add option="-static" />
+					<Add option="-m32" />
+					<Add option="-no-pie" />
+					<Add option="-Wl,--stack,8388608" />
+					<Add option="-fuse-linker-plugin" />
+					<Add option="-Ofast" />
+					<Add option="-mthreads" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
+					<Add option="-maccumulate-outgoing-args" />
+					<Add option="-fgcse-sm" />
+					<Add option="-fgcse-las" />
+					<Add option="-fgcse-after-reload" />
+					<Add option="-fsched-spec-load" />
+					<Add option="-fsched-spec-load-dangerous" />
+					<Add option="-fmerge-all-constants" />
+					<Add option="-fmodulo-sched" />
+					<Add option="-fmodulo-sched-allow-regmoves" />
+					<Add option="-funsafe-loop-optimizations" />
+					<Add option="-fsched-pressure" />
+					<Add option="-fsched-stalled-insns=0" />
+					<Add option="-fsched-stalled-insns-dep=32" />
+					<Add option="-fsched2-use-superblocks" />
+					<Add option="-fipa-pta" />
+					<Add option="-ftracer" />
+					<Add option="-fno-var-tracking-assignments" />
+					<Add option="-fpeel-loops" />
+					<Add option="-funroll-loops" />
+					<Add option="-funswitch-loops" />
+					<Add option="-ftree-loop-if-convert" />
+					<Add option="-ftree-loop-distribution" />
+					<Add option="-ftree-loop-im" />
+					<Add option="-ftree-loop-ivcanon" />
+					<Add option="-fivopts" />
+					<Add option="-fvariable-expansion-in-unroller" />
+					<Add option="-freorder-blocks-and-partition" />
+					<Add option="-fbranch-target-load-optimize" />
+					<Add option="-ffast-math" />
+					<Add option="-fno-math-errno" />
+					<Add option="-funsafe-math-optimizations" />
+					<Add option="-fassociative-math" />
+					<Add option="-freciprocal-math" />
+					<Add option="-fno-signed-zeros" />
+					<Add option="-fno-trapping-math" />
+					<Add option="--param max-gcse-memory=1000000000" />
+					<Add option="--param max-inline-insns-single=10000" />
+					<Add option="--param max-inline-insns-auto=10000" />
+					<Add option="--param inline-min-speedup=20" />
+					<Add option="--param large-function-insns=10000" />
+					<Add option="--param large-function-growth=2000" />
+					<Add option="--param large-unit-insns=20000" />
+					<Add option="--param inline-unit-growth=200" />
 					<Add library="lib/win32/libvoro++.a" />
 					<Add library="lib/win32/libboost_filesystem-mgw51-mt-s-1_58.a" />
 					<Add library="lib/win32/libboost_system-mgw51-mt-s-1_58.a" />
@@ -167,25 +227,33 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-g" />
+					<Add option="-m64" />
 					<Add option="-Og" />
+					<Add option="-g" />
 					<Add option="-ggdb3" />
 					<Add option="-mthreads" />
-					<Add option="-m64" />
 					<Add option="-mmmx" />
 					<Add option="-msse" />
 					<Add option="-msse2" />
 					<Add option="-m3dnow" />
-					<Add option="-fexceptions" />
-					<Add option="-fno-pie" />
 					<Add option="-DLOGGING" />
 					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
 					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
 				</Compiler>
 				<Linker>
-					<Add option="-static" />
-					<Add option="-static-libgcc" />
 					<Add option="-static-libstdc++" />
+					<Add option="-static-libgcc" />
+					<Add option="-static" />
+					<Add option="-m64" />
+					<Add option="-no-pie" />
+					<Add option="-Wl,--stack,8388608" />
+					<Add option="-Og" />
+					<Add option="-ggdb3" />
+					<Add option="-mthreads" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
 				</Linker>
 			</Target>
 			<Target title="Win64_Release">
@@ -195,9 +263,10 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-fexpensive-optimizations" />
+					<Add option="-flto" />
+					<Add option="-m64" />
 					<Add option="-Ofast" />
 					<Add option="-mthreads" />
-					<Add option="-m64" />
 					<Add option="-mmmx" />
 					<Add option="-msse" />
 					<Add option="-msse2" />
@@ -228,10 +297,8 @@
 					<Add option="-ftree-loop-ivcanon" />
 					<Add option="-fivopts" />
 					<Add option="-fvariable-expansion-in-unroller" />
-					<Add option="-freorder-blocks-and-partition" />
 					<Add option="-fbranch-target-load-optimize" />
 					<Add option="-fuse-linker-plugin" />
-					<Add option="-flto" />
 					<Add option="-ffast-math" />
 					<Add option="-fno-math-errno" />
 					<Add option="-funsafe-math-optimizations" />
@@ -251,12 +318,63 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 				</Compiler>
 				<Linker>
-					<Add option="-s" />
-					<Add option="-static" />
-					<Add option="-static-libgcc" />
-					<Add option="-static-libstdc++" />
-					<Add option="-fuse-linker-plugin" />
 					<Add option="-flto" />
+					<Add option="-s" />
+					<Add option="-static-libstdc++" />
+					<Add option="-static-libgcc" />
+					<Add option="-static" />
+					<Add option="-m64" />
+					<Add option="-no-pie" />
+					<Add option="-Wl,--stack,8388608" />
+					<Add option="-fuse-linker-plugin" />
+					<Add option="-Ofast" />
+					<Add option="-mthreads" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
+					<Add option="-maccumulate-outgoing-args" />
+					<Add option="-fgcse-sm" />
+					<Add option="-fgcse-las" />
+					<Add option="-fgcse-after-reload" />
+					<Add option="-fsched-spec-load" />
+					<Add option="-fsched-spec-load-dangerous" />
+					<Add option="-fmerge-all-constants" />
+					<Add option="-fmodulo-sched" />
+					<Add option="-fmodulo-sched-allow-regmoves" />
+					<Add option="-funsafe-loop-optimizations" />
+					<Add option="-fsched-pressure" />
+					<Add option="-fsched-stalled-insns=0" />
+					<Add option="-fsched-stalled-insns-dep=32" />
+					<Add option="-fsched2-use-superblocks" />
+					<Add option="-ftracer" />
+					<Add option="-fno-var-tracking-assignments" />
+					<Add option="-fpeel-loops" />
+					<Add option="-funroll-loops" />
+					<Add option="-funswitch-loops" />
+					<Add option="-ftree-loop-if-convert" />
+					<Add option="-ftree-loop-distribution" />
+					<Add option="-ftree-loop-im" />
+					<Add option="-ftree-loop-ivcanon" />
+					<Add option="-fivopts" />
+					<Add option="-fvariable-expansion-in-unroller" />
+					<Add option="-freorder-blocks-and-partition" />
+					<Add option="-fbranch-target-load-optimize" />
+					<Add option="-ffast-math" />
+					<Add option="-fno-math-errno" />
+					<Add option="-funsafe-math-optimizations" />
+					<Add option="-fassociative-math" />
+					<Add option="-freciprocal-math" />
+					<Add option="-fno-signed-zeros" />
+					<Add option="-fno-trapping-math" />
+					<Add option="--param max-gcse-memory=1000000000" />
+					<Add option="--param max-inline-insns-single=10000" />
+					<Add option="--param max-inline-insns-auto=10000" />
+					<Add option="--param inline-min-speedup=20" />
+					<Add option="--param large-function-insns=10000" />
+					<Add option="--param large-function-growth=2000" />
+					<Add option="--param large-unit-insns=20000" />
+					<Add option="--param inline-unit-growth=200" />
 				</Linker>
 				<ExtraCommands>
 					<Add after='strip -spv &quot;$(TARGET_OUTPUT_FILE)&quot;' />
@@ -268,24 +386,31 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-g" />
-					<Add option="-Og" />
-					<Add option="-ggdb3" />
 					<Add option="-m64" />
+					<Add option="-Og" />
+					<Add option="-g" />
+					<Add option="-ggdb3" />
 					<Add option="-mmmx" />
 					<Add option="-msse" />
 					<Add option="-msse2" />
 					<Add option="-m3dnow" />
-					<Add option="-fexceptions" />
-					<Add option="-fno-pie" />
 					<Add option="-DLOGGING" />
 					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
 					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
 				</Compiler>
 				<Linker>
-					<Add option="-static" />
-					<Add option="-static-libgcc" />
 					<Add option="-static-libstdc++" />
+					<Add option="-static-libgcc" />
+					<Add option="-static" />
+					<Add option="-m64" />
+					<Add option="-no-pie" />
+					<Add option="-pthread" />
+					<Add option="-Og" />
+					<Add option="-ggdb3" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
 					<Add library="lib/linux32/libboost_system-gcc48-mt-sd-1_53.a" />
 					<Add library="lib/linux32/libboost_chrono-gcc48-mt-sd-1_53.a" />
 					<Add library="lib/linux32/libGLEW.a" />
@@ -309,8 +434,9 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-fexpensive-optimizations" />
-					<Add option="-Ofast" />
+					<Add option="-flto" />
 					<Add option="-m64" />
+					<Add option="-Ofast" />
 					<Add option="-mmmx" />
 					<Add option="-msse" />
 					<Add option="-msse2" />
@@ -344,7 +470,6 @@
 					<Add option="-freorder-blocks-and-partition" />
 					<Add option="-fbranch-target-load-optimize" />
 					<Add option="-fuse-linker-plugin" />
-					<Add option="-flto" />
 					<Add option="-ffast-math" />
 					<Add option="-fno-math-errno" />
 					<Add option="-funsafe-math-optimizations" />
@@ -364,12 +489,62 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 				</Compiler>
 				<Linker>
-					<Add option="-s" />
-					<Add option="-static" />
-					<Add option="-static-libgcc" />
-					<Add option="-static-libstdc++" />
-					<Add option="-fuse-linker-plugin" />
 					<Add option="-flto" />
+					<Add option="-s" />
+					<Add option="-static-libstdc++" />
+					<Add option="-static-libgcc" />
+					<Add option="-static" />
+					<Add option="-m64" />
+					<Add option="-no-pie" />
+					<Add option="-pthread" />
+					<Add option="-fuse-linker-plugin" />
+					<Add option="-Ofast" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
+					<Add option="-maccumulate-outgoing-args" />
+					<Add option="-fgcse-sm" />
+					<Add option="-fgcse-las" />
+					<Add option="-fgcse-after-reload" />
+					<Add option="-fsched-spec-load" />
+					<Add option="-fsched-spec-load-dangerous" />
+					<Add option="-fmerge-all-constants" />
+					<Add option="-fmodulo-sched" />
+					<Add option="-fmodulo-sched-allow-regmoves" />
+					<Add option="-funsafe-loop-optimizations" />
+					<Add option="-fsched-pressure" />
+					<Add option="-fsched-stalled-insns=0" />
+					<Add option="-fsched-stalled-insns-dep=32" />
+					<Add option="-fsched2-use-superblocks" />
+					<Add option="-ftracer" />
+					<Add option="-fno-var-tracking-assignments" />
+					<Add option="-fpeel-loops" />
+					<Add option="-funroll-loops" />
+					<Add option="-funswitch-loops" />
+					<Add option="-ftree-loop-if-convert" />
+					<Add option="-ftree-loop-distribution" />
+					<Add option="-ftree-loop-im" />
+					<Add option="-ftree-loop-ivcanon" />
+					<Add option="-fivopts" />
+					<Add option="-fvariable-expansion-in-unroller" />
+					<Add option="-freorder-blocks-and-partition" />
+					<Add option="-fbranch-target-load-optimize" />
+					<Add option="-ffast-math" />
+					<Add option="-fno-math-errno" />
+					<Add option="-funsafe-math-optimizations" />
+					<Add option="-fassociative-math" />
+					<Add option="-freciprocal-math" />
+					<Add option="-fno-signed-zeros" />
+					<Add option="-fno-trapping-math" />
+					<Add option="--param max-gcse-memory=1000000000" />
+					<Add option="--param max-inline-insns-single=10000" />
+					<Add option="--param max-inline-insns-auto=10000" />
+					<Add option="--param inline-min-speedup=20" />
+					<Add option="--param large-function-insns=10000" />
+					<Add option="--param large-function-growth=2000" />
+					<Add option="--param large-unit-insns=20000" />
+					<Add option="--param inline-unit-growth=200" />
 					<Add library="lib/linux32/libboost_system-gcc48-mt-s-1_53.a" />
 					<Add library="lib/linux32/libboost_chrono-gcc48-mt-s-1_53.a" />
 					<Add library="lib/linux32/libGLEW.a" />
@@ -403,8 +578,14 @@
 					<Add option="-msse" />
 					<Add option="-msse2" />
 					<Add option="-m3dnow" />
-					<Add option="-fexceptions" />
-					<Add option="-fno-pie" />
+					<Add option="-fsanitize=undefined" />
+					<Add option="-fsanitize=float-divide-by-zero" />
+					<Add option="-fsanitize=float-cast-overflow" />
+					<Add option="-fsanitize=address" />
+					<Add option="-fno-sanitize-recover" />
+					<Add option="-fstack-protector" />
+					<Add option="-fno-omit-frame-pointer" />
+					<Add option="-fno-optimize-sibling-calls" />
 					<Add option="-DLOGGING" />
 					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
 					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
@@ -413,7 +594,17 @@
 					<Add option="-static-libstdc++" />
 					<Add option="-static-libgcc" />
 					<Add option="-m64" />
+					<Add option="-no-pie" />
 					<Add option="-pthread" />
+					<Add option="-Og" />
+					<Add option="-ggdb3" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
+					<Add option="-fuse-ld=gold" />
+					<Add option="-Wl,--threads" />
+					<Add option="-Wl,--thread-count -Wl,60" />
 					<Add library="lib/linux64/libvoro++.a" />
 					<Add library="lib/linux64/libboost_filesystem-gcc51-mt-sd-1_58.a" />
 					<Add library="lib/linux64/libboost_system-gcc51-mt-sd-1_58.a" />
@@ -514,8 +705,57 @@
 					<Add option="-static-libstdc++" />
 					<Add option="-static-libgcc" />
 					<Add option="-m64" />
+					<Add option="-no-pie" />
 					<Add option="-pthread" />
 					<Add option="-fuse-linker-plugin" />
+					<Add option="-Ofast" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
+					<Add option="-maccumulate-outgoing-args" />
+					<Add option="-fgcse-sm" />
+					<Add option="-fgcse-las" />
+					<Add option="-fgcse-after-reload" />
+					<Add option="-fsched-spec-load" />
+					<Add option="-fsched-spec-load-dangerous" />
+					<Add option="-fmerge-all-constants" />
+					<Add option="-fmodulo-sched" />
+					<Add option="-fmodulo-sched-allow-regmoves" />
+					<Add option="-funsafe-loop-optimizations" />
+					<Add option="-fsched-pressure" />
+					<Add option="-fsched-stalled-insns=0" />
+					<Add option="-fsched-stalled-insns-dep=32" />
+					<Add option="-fsched2-use-superblocks" />
+					<Add option="-fipa-pta" />
+					<Add option="-ftracer" />
+					<Add option="-fno-var-tracking-assignments" />
+					<Add option="-fpeel-loops" />
+					<Add option="-funroll-loops" />
+					<Add option="-funswitch-loops" />
+					<Add option="-ftree-loop-if-convert" />
+					<Add option="-ftree-loop-distribution" />
+					<Add option="-ftree-loop-im" />
+					<Add option="-ftree-loop-ivcanon" />
+					<Add option="-fivopts" />
+					<Add option="-fvariable-expansion-in-unroller" />
+					<Add option="-freorder-blocks-and-partition" />
+					<Add option="-fbranch-target-load-optimize" />
+					<Add option="-ffast-math" />
+					<Add option="-fno-math-errno" />
+					<Add option="-funsafe-math-optimizations" />
+					<Add option="-fassociative-math" />
+					<Add option="-freciprocal-math" />
+					<Add option="-fno-signed-zeros" />
+					<Add option="-fno-trapping-math" />
+					<Add option="--param max-gcse-memory=1000000000" />
+					<Add option="--param max-inline-insns-single=10000" />
+					<Add option="--param max-inline-insns-auto=10000" />
+					<Add option="--param inline-min-speedup=20" />
+					<Add option="--param large-function-insns=10000" />
+					<Add option="--param large-function-growth=2000" />
+					<Add option="--param large-unit-insns=20000" />
+					<Add option="--param inline-unit-growth=200" />
 					<Add library="lib/linux64/libvoro++.a" />
 					<Add library="lib/linux64/libboost_filesystem-gcc51-mt-s-1_58.a" />
 					<Add library="lib/linux64/libboost_system-gcc51-mt-s-1_58.a" />
@@ -558,22 +798,25 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-g" />
-					<Add option="-Og" />
-					<Add option="-ggdb3" />
 					<Add option="-m64" />
+					<Add option="-Og" />
+					<Add option="-g" />
+					<Add option="-mmacosx-version-min=10.12" />
+					<Add option="-ggdb3" />
 					<Add option="-mmmx" />
 					<Add option="-msse" />
 					<Add option="-msse2" />
 					<Add option="-m3dnow" />
-					<Add option="-fexceptions" />
-					<Add option="-fno-pie" />
+					<Add option="-DMACOSX_DEPLOYMENT_TARGET=10.12" />
 					<Add option="-DLOGGING" />
 					<Add option="-DIGNORE_DEBUG_INPUTSTORM" />
 					<Add option="-DIGNORE_DEBUG_SOUNDSTORM" />
 				</Compiler>
 				<Linker>
 					<Add option="-static-libstdc++" />
+					<Add option="-m64" />
+					<Add option="-mmacosx-version-min=10.12" />
+					<Add option="-fno-pie" />
 					<Add option="-framework OpenGL" />
 					<Add option="-framework IOKit" />
 					<Add option="-framework AppKit" />
@@ -583,6 +826,13 @@
 					<Add option="-framework AudioToolbox" />
 					<Add option="-framework AudioUnit" />
 					<Add option="-framework QuartzCore" />
+					<Add option="-framework Carbon" />
+					<Add option="-Og" />
+					<Add option="-ggdb3" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
 					<Add library="lib/mac64/libvoro++.a" />
 					<Add library="lib/mac64/libboost_filesystem-mt.a" />
 					<Add library="lib/mac64/libboost_thread-mt.a" />
@@ -609,8 +859,10 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-fexpensive-optimizations" />
-					<Add option="-Ofast" />
+					<Add option="-flto" />
 					<Add option="-m64" />
+					<Add option="-mmacosx-version-min=10.12" />
+					<Add option="-Ofast" />
 					<Add option="-mmmx" />
 					<Add option="-msse" />
 					<Add option="-msse2" />
@@ -644,7 +896,6 @@
 					<Add option="-freorder-blocks-and-partition" />
 					<Add option="-fbranch-target-load-optimize" />
 					<Add option="-fuse-linker-plugin" />
-					<Add option="-flto" />
 					<Add option="-ffast-math" />
 					<Add option="-fno-math-errno" />
 					<Add option="-funsafe-math-optimizations" />
@@ -660,12 +911,16 @@
 					<Add option="--param large-function-growth=2000" />
 					<Add option="--param large-unit-insns=20000" />
 					<Add option="--param inline-unit-growth=200" />
+					<Add option="-DMACOSX_DEPLOYMENT_TARGET=10.12" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 				</Compiler>
 				<Linker>
-					<Add option="-static-libstdc++" />
 					<Add option="-flto" />
+					<Add option="-static-libstdc++" />
+					<Add option="-m64" />
+					<Add option="-mmacosx-version-min=10.12" />
+					<Add option="-fno-pie" />
 					<Add option="-framework OpenGL" />
 					<Add option="-framework IOKit" />
 					<Add option="-framework AppKit" />
@@ -675,6 +930,55 @@
 					<Add option="-framework AudioToolbox" />
 					<Add option="-framework AudioUnit" />
 					<Add option="-framework QuartzCore" />
+					<Add option="-framework Carbon" />
+					<Add option="-Ofast" />
+					<Add option="-mmmx" />
+					<Add option="-msse" />
+					<Add option="-msse2" />
+					<Add option="-m3dnow" />
+					<Add option="-maccumulate-outgoing-args" />
+					<Add option="-fgcse-sm" />
+					<Add option="-fgcse-las" />
+					<Add option="-fgcse-after-reload" />
+					<Add option="-fsched-spec-load" />
+					<Add option="-fsched-spec-load-dangerous" />
+					<Add option="-fmerge-all-constants" />
+					<Add option="-fmodulo-sched" />
+					<Add option="-fmodulo-sched-allow-regmoves" />
+					<Add option="-funsafe-loop-optimizations" />
+					<Add option="-fsched-pressure" />
+					<Add option="-fsched-stalled-insns=0" />
+					<Add option="-fsched-stalled-insns-dep=32" />
+					<Add option="-fsched2-use-superblocks" />
+					<Add option="-fipa-pta" />
+					<Add option="-ftracer" />
+					<Add option="-fno-var-tracking-assignments" />
+					<Add option="-fpeel-loops" />
+					<Add option="-funroll-loops" />
+					<Add option="-funswitch-loops" />
+					<Add option="-ftree-loop-if-convert" />
+					<Add option="-ftree-loop-distribution" />
+					<Add option="-ftree-loop-im" />
+					<Add option="-ftree-loop-ivcanon" />
+					<Add option="-fivopts" />
+					<Add option="-fvariable-expansion-in-unroller" />
+					<Add option="-freorder-blocks-and-partition" />
+					<Add option="-fbranch-target-load-optimize" />
+					<Add option="-ffast-math" />
+					<Add option="-fno-math-errno" />
+					<Add option="-funsafe-math-optimizations" />
+					<Add option="-fassociative-math" />
+					<Add option="-freciprocal-math" />
+					<Add option="-fno-signed-zeros" />
+					<Add option="-fno-trapping-math" />
+					<Add option="--param max-gcse-memory=1000000000" />
+					<Add option="--param max-inline-insns-single=10000" />
+					<Add option="--param max-inline-insns-auto=10000" />
+					<Add option="--param inline-min-speedup=20" />
+					<Add option="--param large-function-insns=10000" />
+					<Add option="--param large-function-growth=2000" />
+					<Add option="--param large-unit-insns=20000" />
+					<Add option="--param inline-unit-growth=200" />
 					<Add library="lib/mac64/libvoro++.a" />
 					<Add library="lib/mac64/libboost_filesystem-mt.a" />
 					<Add library="lib/mac64/libboost_thread-mt.a" />
@@ -761,9 +1065,6 @@
 			<Add option="-DGLEW_STATIC" />
 			<Add directory="." />
 		</Compiler>
-		<Linker>
-			<Add option="-no-pie" />
-		</Linker>
 		<ExtraCommands>
 			<Add before='bash -c &quot;resources/generate_git_version.sh&quot;' />
 		</ExtraCommands>
