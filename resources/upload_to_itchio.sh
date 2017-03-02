@@ -6,7 +6,7 @@ repo=${repodir##*/}
 
 if grep -iq "apple" <<< "$MACHTYPE"; then
   # macos
-  platforms=("osx-64")
+  platforms=("mac-64")
   platforms_cbx=("Mac64_Release")
   butler=~/Library/Application\ Support/itch/bin/butler
   if ! [ -f "$butler" ]; then
