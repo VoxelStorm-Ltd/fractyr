@@ -625,7 +625,12 @@ void universe::loop_main() {
 
       if(player.current_ship) {
         if(player.current_ship->energy <= 0) {
-          state = gamestate::LOST;
+          #ifdef NDEBUG
+            state = gamestate::LOST;
+          #else
+            player.current_ship->energy = player.current_ship->max_energy;
+            std::cout << "DEBUG: Not dying in debug mode." << std::endl;
+          #endif // NDEBUG
         }
         if(player.current_ship->cores_destroyed >= 5) {
           state = gamestate::WON;
