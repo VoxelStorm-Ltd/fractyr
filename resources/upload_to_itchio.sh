@@ -66,7 +66,7 @@ version=$(grep "FULLVERSION_STRING" "$repodir/version.h" | cut -d '"' -f 2)
 for i in $(seq 0 $((${#platforms[@]} - 1))); do
   platform=${platforms[i]}
   platform_cbx=${platforms_cbx[i]}
-  channel="$repo-for-$platform"
+  channel="$platform"
   oldversion=$(get_online_version "$channel")
 
   if [ "$oldversion" == "invalid channel" ]; then
