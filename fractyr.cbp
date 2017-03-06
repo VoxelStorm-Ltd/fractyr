@@ -1064,6 +1064,7 @@
 		<Unit filename="buffers/buffer_shard.cpp" />
 		<Unit filename="buffers/buffer_shard.h" />
 		<Unit filename="callback_error.cpp" />
+		<Unit filename="callback_error.h" />
 		<Unit filename="cast_if_required.h" />
 		<Unit filename="chunk.cpp" />
 		<Unit filename="chunk.h" />
@@ -1100,6 +1101,7 @@
 		<Unit filename="gameplayer.h" />
 		<Unit filename="get_version.cpp" />
 		<Unit filename="get_version.h" />
+		<Unit filename="git_version.h" />
 		<Unit filename="init_graphics.cpp" />
 		<Unit filename="input/callback_key.cpp" />
 		<Unit filename="input/callback_mouse.cpp" />
@@ -1118,6 +1120,7 @@
 		<Unit filename="platform_defines.h" />
 		<Unit filename="resources/compile_blob.sh" />
 		<Unit filename="resources/generate_git_version.sh" />
+		<Unit filename="resources/merge_highest_version.sh" />
 		<Unit filename="resources/music_main_intro.ogg">
 			<Option compile="1" />
 			<Option link="1" />
@@ -1195,6 +1198,8 @@
 			<Option target="Mac64_Debug" />
 			<Option target="Mac64_Release" />
 		</Unit>
+		<Unit filename="resources/upload_to_itchio.sh" />
+		<Unit filename="resources/validate_shader.sh" />
 		<Unit filename="resources/voxelstorm.ico">
 			<Option target="Win32_Debug" />
 			<Option target="Win32_Release" />
@@ -1207,6 +1212,7 @@
 			<Option target="Mac64_Debug" />
 			<Option target="Mac64_Release" />
 		</Unit>
+		<Unit filename="setup_git_hooks.sh" />
 		<Unit filename="shader_load.cpp" />
 		<Unit filename="shader_load.h" />
 		<Unit filename="soundstorm/soundstorm.cpp" />

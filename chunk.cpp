@@ -1,5 +1,6 @@
 #include "chunk.h"
 #include <iostream>
+#include "cast_if_required.h"
 #include "universe.h"
 #include "entity/enemy/core.h"
 
@@ -8,8 +9,8 @@
   unsigned int chunk::total_chunks_generated = 0;
 #endif
 
-chunk::chunk(vector3i const &chunk_coords, world &parent)
-  : parent(&parent),
+chunk::chunk(vector3i const &chunk_coords, world &this_parent)
+  : parent(&this_parent),
     coords(chunk_coords),
     con(-size * chunk_margin, size + (size * chunk_margin),                     // the minimum and maximum x coordinates
         -size * chunk_margin, size + (size * chunk_margin),                     // the minimum and maximum y coordinates
@@ -47,6 +48,8 @@ unsigned int chunk::get_unique_seed() const {
 
 bool chunk::get_is_solid(vector3i const &chunk_coords, vector3f const &local_coords) {
   /// Test a coordinate for solidity
+  vector3f const coords_composite((local_coords / size) + static_cast<vector3f>(chunk_coords));
+
   /*
     Quintic Mandelbulb world generation.
     The range for a quintic mandelbulb is something like -1.5:1.5 in x, y and z
@@ -55,9 +58,8 @@ bool chunk::get_is_solid(vector3i const &chunk_coords, vector3f const &local_coo
     By only doing a few iterations and having a high cutoff, we intentionally get an imperfect mandelbulb with more tunnels and stuff.
   */
   unsigned int constexpr iters = 5;
-  float constexpr cutoff = 100000.0;
-  float constexpr scale = 1.5 / static_cast<float>(world::size);
-  vector3f const coords_composite((local_coords / size) + static_cast<vector3f>(chunk_coords));
+  float constexpr cutoff = 100000.0f;
+  float constexpr scale = 1.5f / static_cast<float>(world::size);
 
   //std::cout << "DEBUG: " << local_coords << std::endl;
   //std::cout << "DEBUG: " << coords_composite << std::endl;
@@ -74,9 +76,9 @@ bool chunk::get_is_solid(vector3i const &chunk_coords, vector3f const &local_coo
 
   // inverted quintic mandelbulb:
   for(unsigned int i = 0; i != iters; ++i) {
-    x = std::pow(x, 5) - 10.0 * x * x * x * (y * y + z * z) + 5 * x * (std::pow(y, 4) + std::pow(z, 4)) + x0;
-    y = std::pow(y, 5) - 10.0 * y * y * y * (z * z + x * x) + 5 * y * (std::pow(z, 4) + std::pow(x, 4)) + y0;
-    z = std::pow(z, 5) - 10.0 * z * z * z * (x * x + y * y) + 5 * z * (std::pow(x, 4) + std::pow(y, 4)) + z0;
+    x = std::pow(x, 5.0f) - 10.0f * x * x * x * (y * y + z * z) + 5.0f * x * (std::pow(y, 4.0f) + std::pow(z, 4.0f)) + x0;
+    y = std::pow(y, 5.0f) - 10.0f * y * y * y * (z * z + x * x) + 5.0f * y * (std::pow(z, 4.0f) + std::pow(x, 4.0f)) + y0;
+    z = std::pow(z, 5.0f) - 10.0f * z * z * z * (x * x + y * y) + 5.0f * z * (std::pow(x, 4.0f) + std::pow(y, 4.0f)) + z0;
 
     if(std::fabs(x + y + z) > cutoff) {
       //std::cout << "DEBUG: " << x0 << "," << y0 << "," << z0 << std::endl;
@@ -91,11 +93,11 @@ bool chunk::get_is_solid(vector3f const &local_coords) const {
   return get_is_solid(coords, local_coords);
 }
 
-vector3f chunk::get_colour(vector3i const &chunk_coords, vector3f const &local_coords) {
+vector3f chunk::get_colour(vector3i const &chunk_coords __attribute__((__unused__)), vector3f const &local_coords) {
   /// Return the colour at these coordinates
-  vector3f face_colour(0.92, 0.95, 1.00);                                       // 2329 Kid Glove normalised to 1
-  if(fmodf(local_coords.x, 10.0) < 1.0) {
-    face_colour.assign(1.0, 1.0, 0.0);                                          // test gold chunks
+  vector3f face_colour(0.92f, 0.95f, 1.00f);                                    // 2329 Kid Glove normalised to 1
+  if(std::fmod(local_coords.x, 10.0f) < 1.0f) {
+    face_colour.assign(1.0f, 1.0f, 0.0f);                                       // test gold chunks
   }
   return face_colour;
 }
@@ -104,17 +106,17 @@ vector3f chunk::get_colour(vector3f const &local_coords) const {
   return get_colour(coords, local_coords);
 }
 
-vector3f chunk::check_collision(vector3f const &coords, float radius) {
+vector3f chunk::check_collision(vector3f const &this_coords, float radius __attribute__((__unused__))) {
   /// Check if a given point is colliding, and if so, return a normal vector to the collision surface
   // NOTE: coords can be less than 0 or greater than chunk::size by up to chunk_margin
   vector3d result;
   int cell_id;
-  if(__builtin_expect(!con.find_voronoi_cell(coords.x, coords.y, coords.z, result.x, result.y, result.z, cell_id), 0)) { // branch prediction: likely found
-    return vector3f(0.0, 0.0, 0.0);
+  if(__builtin_expect(!con.find_voronoi_cell(this_coords.x, this_coords.y, this_coords.z, result.x, result.y, result.z, cell_id), 0)) { // branch prediction: likely found
+    return {};
   }
   //std::cout << "DEBUG: Checking solidity of: " << result << std::endl;
   if(__builtin_expect(!get_is_solid(vector3f(result)), 1)) {                    // branch prediction: likely not solid
-    return vector3f(0.0, 0.0, 0.0);
+    return {};
   }
   result.normalise();
   return result;
@@ -173,7 +175,7 @@ void chunk::render(vector3i const &view_chunk_coords) const {
   }
   offset *= size;
   glPushMatrix();
-  glTranslatef(offset.x, offset.y, offset.z);
+  glTranslatef(static_cast<float>(offset.x), static_cast<float>(offset.y), static_cast<float>(offset.z));
 
   buf.render();
 
@@ -222,9 +224,9 @@ void chunk::setup() {
         vector3f const chunk_offset(offset * size);
         for(int i = 0; i != max_points; ++i) {
         //for(unsigned int i = 0; i != coords.y * 10; ++i) {
-          vector3f const cell_point((static_cast<float>(rand()) * size / RAND_MAX) + chunk_offset.x,
-                                    (static_cast<float>(rand()) * size / RAND_MAX) + chunk_offset.y,
-                                    (static_cast<float>(rand()) * size / RAND_MAX) + chunk_offset.z);
+          vector3f const cell_point((static_cast<float>(rand()) * size / static_cast<float>(RAND_MAX)) + chunk_offset.x,
+                                    (static_cast<float>(rand()) * size / static_cast<float>(RAND_MAX)) + chunk_offset.y,
+                                    (static_cast<float>(rand()) * size / static_cast<float>(RAND_MAX)) + chunk_offset.z);
           //std::cout << "DEBUG: making point " << static_cast<vector3i>(cell_point) << std::endl;
           if(cell_point.x < -size         * chunk_margin  ||
              cell_point.x >  size + (size * chunk_margin) ||
@@ -329,7 +331,7 @@ void chunk::setup() {
               l = cell.cycle_up(cell.ed[k][cell.nu[k] + l], m);
               k = m;
             } while(k != i);
-            int vn = face_verts.size();
+            int vn = static_cast<int>(face_verts.size());
             face_verts[vp] = vn - vp - 1;
             vp = vn;
           }
@@ -371,7 +373,7 @@ void chunk::setup() {
                                (verts[vert_index0 + 1] - verts[vert_index1 + 1])); // manually expanded cross product
           face_normal.normalise();
           // tesselation: generate a (clockwise) list of the coordinates and normals of each vertex for this face
-          unsigned int offset = vbodata.size();
+          unsigned int this_offset = cast_if_required<unsigned int>(vbodata.size());
           for(int i = 0; i < face_verts[vert_offset]; ++i) {
             unsigned int const vert_index = 3 * face_verts[vert_offset + i + 1];
             vbodata.emplace_back(vector3f(verts[vert_index], verts[vert_index + 1], verts[vert_index + 2]), // vertex coords
@@ -380,9 +382,9 @@ void chunk::setup() {
           }
           // tesselation: add indices in counter-clockwise winding order
           for(int i = 2; i < face_verts[vert_offset]; ++i) {
-            ibodata.emplace_back(offset + 0);
-            ibodata.emplace_back(offset + i);
-            ibodata.emplace_back(offset + i - 1);
+            ibodata.emplace_back(this_offset + 0);
+            ibodata.emplace_back(this_offset + i);
+            ibodata.emplace_back(this_offset + i - 1);
           }
         }
         // Skip to the next entry in the face vertex list

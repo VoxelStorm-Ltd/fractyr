@@ -8,7 +8,7 @@ class weapon;                                                                   
 
 class ship : public entity {
 protected:
-  float acceleration = 0.02;                                                    // engine acceleration, m/frame^2
+  float acceleration = 0.02f;                                                   // engine acceleration, m/frame^2
   std::vector<weapon*> weapons;                                                 // what this ship is currently equipped with
 
 public:
