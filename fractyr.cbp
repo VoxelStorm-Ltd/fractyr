@@ -49,9 +49,6 @@
 					<Add option="-msse2" />
 					<Add option="-m3dnow" />
 					<Add library="lib/win32/libvoro++.a" />
-					<Add library="lib/win32/libboost_filesystem-mgw51-mt-sd-1_58.a" />
-					<Add library="lib/win32/libboost_system-mgw51-mt-sd-1_58.a" />
-					<Add library="lib/win32/libboost_thread-mgw51-mt-sd-1_58.a" />
 					<Add library="lib/win32/libglew32.a" />
 					<Add library="lib/win32/libglfw3.a" />
 					<Add library="lib/win32/libftgl_static_D.a" />
@@ -195,9 +192,6 @@
 					<Add option="--param large-unit-insns=20000" />
 					<Add option="--param inline-unit-growth=200" />
 					<Add library="lib/win32/libvoro++.a" />
-					<Add library="lib/win32/libboost_filesystem-mgw51-mt-s-1_58.a" />
-					<Add library="lib/win32/libboost_system-mgw51-mt-s-1_58.a" />
-					<Add library="lib/win32/libboost_thread-mgw51-mt-s-1_58.a" />
 					<Add library="lib/win32/libglew32.a" />
 					<Add library="lib/win32/libglfw3.a" />
 					<Add library="lib/win32/libftgl_static.a" />
@@ -411,8 +405,6 @@
 					<Add option="-msse" />
 					<Add option="-msse2" />
 					<Add option="-m3dnow" />
-					<Add library="lib/linux32/libboost_system-gcc48-mt-sd-1_53.a" />
-					<Add library="lib/linux32/libboost_chrono-gcc48-mt-sd-1_53.a" />
 					<Add library="lib/linux32/libGLEW.a" />
 					<Add library="lib/linux32/libglfw3.a" />
 					<Add library="Xrandr" />
@@ -545,8 +537,6 @@
 					<Add option="--param large-function-growth=2000" />
 					<Add option="--param large-unit-insns=20000" />
 					<Add option="--param inline-unit-growth=200" />
-					<Add library="lib/linux32/libboost_system-gcc48-mt-s-1_53.a" />
-					<Add library="lib/linux32/libboost_chrono-gcc48-mt-s-1_53.a" />
 					<Add library="lib/linux32/libGLEW.a" />
 					<Add library="lib/linux32/libglfw3.a" />
 					<Add library="Xrandr" />
@@ -608,9 +598,6 @@
 					<Add library="asan" />
 					<Add library="ubsan" />
 					<Add library="lib/linux64/libvoro++.a" />
-					<Add library="lib/linux64/libboost_filesystem-gcc51-mt-sd-1_58.a" />
-					<Add library="lib/linux64/libboost_system-gcc51-mt-sd-1_58.a" />
-					<Add library="lib/linux64/libboost_thread-gcc51-mt-sd-1_58.a" />
 					<Add library="lib/linux64/libGLEW.a" />
 					<Add library="lib/linux64/libglfw3.a" />
 					<Add library="Xrandr" />
@@ -759,9 +746,6 @@
 					<Add option="--param large-unit-insns=20000" />
 					<Add option="--param inline-unit-growth=200" />
 					<Add library="lib/linux64/libvoro++.a" />
-					<Add library="lib/linux64/libboost_filesystem-gcc51-mt-s-1_58.a" />
-					<Add library="lib/linux64/libboost_system-gcc51-mt-s-1_58.a" />
-					<Add library="lib/linux64/libboost_thread-gcc51-mt-s-1_58.a" />
 					<Add library="lib/linux64/libGLEW.a" />
 					<Add library="lib/linux64/libglfw3.a" />
 					<Add library="Xrandr" />
@@ -836,9 +820,6 @@
 					<Add option="-msse2" />
 					<Add option="-m3dnow" />
 					<Add library="lib/mac64/libvoro++.a" />
-					<Add library="lib/mac64/libboost_filesystem-mt.a" />
-					<Add library="lib/mac64/libboost_thread-mt.a" />
-					<Add library="lib/mac64/libboost_system-mt.a" />
 					<Add library="lib/mac64/libOVR_MinGW_Mac64_d.a" />
 					<Add library="lib/mac64/libportaudio.a" />
 					<Add library="lib/mac64/libportaudiocpp.a" />
@@ -982,9 +963,6 @@
 					<Add option="--param large-unit-insns=20000" />
 					<Add option="--param inline-unit-growth=200" />
 					<Add library="lib/mac64/libvoro++.a" />
-					<Add library="lib/mac64/libboost_filesystem-mt.a" />
-					<Add library="lib/mac64/libboost_thread-mt.a" />
-					<Add library="lib/mac64/libboost_system-mt.a" />
 					<Add library="lib/mac64/libOVR_MinGW_Mac64.a" />
 					<Add library="lib/mac64/libportaudio.a" />
 					<Add library="lib/mac64/libportaudiocpp.a" />
@@ -1056,7 +1034,6 @@
 			<Add option="-Wlogical-op" />
 			<Add option="-Wnormalized" />
 			<Add option="-Wpacked" />
-			<Add option="-Wpadded" />
 			<Add option="-Winvalid-pch" />
 			<Add option="-Wlong-long" />
 			<Add option="-Wvector-operation-performance" />
@@ -1067,6 +1044,9 @@
 			<Add option="-DGLEW_STATIC" />
 			<Add directory="." />
 		</Compiler>
+		<Linker>
+			<Add library="stdc++fs" />
+		</Linker>
 		<ExtraCommands>
 			<Add before='bash -c &quot;resources/generate_git_version.sh&quot;' />
 		</ExtraCommands>
