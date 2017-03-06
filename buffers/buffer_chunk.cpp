@@ -1,5 +1,6 @@
 #include "buffer_chunk.h"
 #include <iostream>
+#include "cast_if_required.h"
 #include "blob_loader.h"
 #include "shader_load.h"
 
@@ -63,7 +64,12 @@ void buffer_chunk::setup(std::vector<vertex> const &vbodata, std::vector<GLuint>
     //          << (vbodata.size() * sizeof(vertex)) / 1024 << "KB, "
     //          << (ibodata.size() * sizeof(vertex)) / 1024 << "KB)" << std::endl;
   #endif
-  numverts = ibodata.size();
+  numverts = cast_if_required<GLuint>(ibodata.size());
+  if(numverts == 0) {
+    //std::cout << "DEBUG: " << __PRETTY_FUNCTION__ << ": not uploading empty buffer." << std::endl;
+    initialised = true;
+    return;
+  }
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, vbodata.size() * sizeof(vertex), &vbodata[0], GL_STATIC_DRAW);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
