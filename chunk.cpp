@@ -50,6 +50,12 @@ bool chunk::get_is_solid(vector3i const &chunk_coords, vector3f const &local_coo
   /// Test a coordinate for solidity
   vector3f const coords_composite((local_coords / size) + static_cast<vector3f>(chunk_coords));
 
+  // add predictable corridors to allow traversal of layers
+  if(static_cast<int>(coords_composite.x * 2.0f) % 5 == 0 &&
+     static_cast<int>(coords_composite.y * 2.0f) % 5 == 0) {
+    return false;
+  }
+
   /*
     Quintic Mandelbulb world generation.
     The range for a quintic mandelbulb is something like -1.5:1.5 in x, y and z
