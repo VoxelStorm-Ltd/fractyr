@@ -106,7 +106,7 @@ for i in $(seq 0 $((${#platforms[@]} - 1))); do
 
   echo "Pushing temporary directory $tempdir"
   ls -alh "$tempdir"
-  "$butler" push "$tempdir" "voxelstorm/$repo:$repo-for-$platform" --userversion "$version"
+  "$butler" push "$tempdir" "voxelstorm/$repo:$channel" --userversion "$version"
 
   rm -r "$tempdir"&
 
