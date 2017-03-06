@@ -605,6 +605,8 @@
 					<Add option="-fuse-ld=gold" />
 					<Add option="-Wl,--threads" />
 					<Add option="-Wl,--thread-count -Wl,60" />
+					<Add library="asan" />
+					<Add library="ubsan" />
 					<Add library="lib/linux64/libvoro++.a" />
 					<Add library="lib/linux64/libboost_filesystem-gcc51-mt-sd-1_58.a" />
 					<Add library="lib/linux64/libboost_system-gcc51-mt-sd-1_58.a" />
