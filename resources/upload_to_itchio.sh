@@ -46,8 +46,7 @@ fi
 "$butler" upgrade --head --assume-yes && \
 if grep -q "^resources/" <<< "$butler"; then
   # remove cached butler versions from the repository if they're saved here
-  rm "$butler.new.gz"
-  rm "$butler.old"
+  rm -f "$butler.new.gz" "$butler.old"
 fi
 
 function get_online_version {
@@ -108,7 +107,7 @@ for i in $(seq 0 $((${#platforms[@]} - 1))); do
   ls -alh "$tempdir"
   "$butler" push "$tempdir" "voxelstorm/$repo:$channel" --userversion "$version"
 
-  rm -r "$tempdir"&
+  rm -rf "$tempdir"
 
   echo -n "Verifying uploaded version..."
   newversion=$(get_online_version "$channel")
