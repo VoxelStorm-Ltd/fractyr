@@ -21,8 +21,10 @@ if grep -iq "apple" <<< "$MACHTYPE"; then
   fi
 elif grep -iq "linux" <<< "$MACHTYPE"; then
   # linux
-  platforms=("linux-64" "linux-32")
-  platforms_cbx=("Linux64_Release" "Linux32_Release")
+  #platforms=("linux-64" "linux-32")
+  #platforms_cbx=("Linux64_Release" "Linux32_Release")
+  platforms=("linux-64" "linux-32" "windows-64" "windows-32")
+  platforms_cbx=("Linux64_Release" "Linux32_Release" "Win64_Release" "Win32_Release")
   butler=~/.config/itch/bin/butler
   if ! [ -f "$butler" ]; then
     butler="resources/itchio_butler_linux64.exe"
@@ -60,7 +62,9 @@ function get_online_version {
     | cut -d '"' -f 4
 }
 
-version=$(grep "FULLVERSION_STRING" "$repodir/version.h" | cut -d '"' -f 2)
+version_repo=$(grep "FULLVERSION_STRING" "$repodir/version.h" | cut -d '"' -f 2)
+
+platforms_updated=""
 
 for i in $(seq 0 $((${#platforms[@]} - 1))); do
   platform=${platforms[i]}
@@ -93,11 +97,39 @@ for i in $(seq 0 $((${#platforms[@]} - 1))); do
       continue
     fi
     binpath="$repodir/$(grep -F '<Target title="'"$platform_cbx"'">' "$repodir/"*.cbp -A5 | grep -F 'Option output=' | head -1 | cut -d '"' -f 2)"
+    if grep -q "windows" <<< "$platform"; then
+      binpath="$binpath.exe"
+    fi
   fi
   if [ ! -f "$binpath" ]; then
     echo "Binary $binpath has not been built!  Skipping."
     continue
   fi
+  if grep -q "windows" <<< "$platform"; then
+    version=$(
+      timeout 5
+       wine "$binpath" --version 2>/dev/null \
+        | head -1 \
+        | grep -o "version [^ ]* [^ ]*"
+    )
+  else
+    version=$(
+      timeout 1 "$binpath" --version \
+        | head -1 \
+        | grep -o "version [^ ]* [^ ]*"
+    )
+  fi
+  version=${version##* }
+  if [ -z "$version" ]; then
+    version="$version_repo"
+    echo "Binary $binpath does not report version information, falling back to repo version $version"
+  fi
+  if [ "$version" != "$version_repo" ]; then
+    echo "Warning: $binpath reports a different version from the repo!"
+    echo "  Binary version: $version"
+    echo "  Repo version:   $version_repo"
+  fi
+
   echo "Copying $binpath to temporary location..."
   mkdir -p "$tempdir" || exit 1
   cp "$binpath" "$tempdir/" || exit 1
@@ -120,7 +152,29 @@ for i in $(seq 0 $((${#platforms[@]} - 1))); do
 
   if [ "$newversion" == "$version" ]; then
     echo "Uploaded version of $repo verified as $newversion."
+    if [ "$oldversion" != "$version" ]; then
+      platforms_updated="$platforms_updated$platform, "
+    else
+      echo "Not announcing updated build with the same version as the last."
+    fi
   else
     echo "Uploaded version of $repo NOT CORRECT!  Version $newversion is online, while it should be $version."
   fi
 done
+# last ditch attempt to clean up the windows remnants regardless of what platform we're running on
+rm resources/itchio_butler_win32.exe.* 2>/dev/null
+
+sendtotelegram=""
+if [ -f "../scripts/send_to_telegram.sh" ]; then
+  sendtotelegram="../scripts/send_to_telegram.sh"
+elif [ -f ~"/scripts/send_to_telegram.sh" ]; then
+  sendtotelegram=~"/scripts/send_to_telegram.sh"
+fi
+if [ -f "$sendtotelegram" ]; then
+  if [ ! -z "$platforms_updated" ]; then
+    echo "Announcing updated platforms on Telegram..."
+    # strip the trailing comma, and replace the last remainig separator comma of the list with an "and"
+    platforms_updated=$(sed 's/, $//;s/\(.*\), /\1 and /' <<< "$platforms_updated")
+    "$sendtotelegram" "Uploaded $repo for $platforms_updated version $version_repo to http://voxelstorm.itch.io/$repo" >/dev/null
+  fi
+fi
