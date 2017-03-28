@@ -72,20 +72,6 @@ for i in $(seq 0 $((${#platforms[@]} - 1))); do
   channel="$platform"
   oldversion=$(get_online_version "$channel")
 
-  if [ "$oldversion" == "invalid channel" ]; then
-    echo "No previous uploads for channel $channel, this will be our first."
-  else
-    echo "Existing version of $repo is $oldversion in $channel."
-    if [ "$oldversion" == "$version" ]; then
-      if [ "$1" = "--force" ]; then
-        echo "Versions are the same, but forcing an update anyway."
-      else
-        echo "Nothing to do for this channel - our version is the latest."
-        continue
-      fi
-    fi
-  fi
-
   if grep -iq "apple" <<< "$MACHTYPE"; then
     # on MacOS, we upload the packaged disk image
     app_skel_dirs=("$repodir/resources/osx_app/"*.app)
@@ -101,24 +87,37 @@ for i in $(seq 0 $((${#platforms[@]} - 1))); do
       binpath="$binpath.exe"
     fi
   fi
-  if [ ! -f "$binpath" ]; then
+  if [ ! -f "$binpath" ] || [ ! -s "$binpath" ]; then
     echo "Binary $binpath has not been built!  Skipping."
     continue
   fi
   if grep -q "windows" <<< "$platform"; then
     version=$(
-      timeout 5
-       wine "$binpath" --version 2>/dev/null \
+      timeout 5 \
+        wine "$binpath" --version 2>/dev/null \
+        | head -1 \
+        | grep -o "version [^ ]* [^ ]*"
+    )
+  elif grep -iq "apple" <<< "$MACHTYPE"; then
+    test_binpath="$repodir/$(grep -F '<Target title="'"$platform_cbx"'">' "$repodir/"*.cbp -A5 | grep -F 'Option output=' | head -1 | cut -d '"' -f 2)"
+    version=$(
+      "$test_binpath" --version \
         | head -1 \
         | grep -o "version [^ ]* [^ ]*"
     )
   else
     version=$(
-      timeout 1 "$binpath" --version \
+      timeout 1 \
+        "$binpath" --version \
         | head -1 \
         | grep -o "version [^ ]* [^ ]*"
     )
   fi
+  if grep ':' <<< "${version%%* }"; then
+    # remove the last field, as it's the git version
+    version=${version% *}
+  fi
+  # remove all but the last field of the remaining version
   version=${version##* }
   if [ -z "$version" ]; then
     version="$version_repo"
@@ -128,6 +127,20 @@ for i in $(seq 0 $((${#platforms[@]} - 1))); do
     echo "Warning: $binpath reports a different version from the repo!"
     echo "  Binary version: $version"
     echo "  Repo version:   $version_repo"
+  fi
+
+  if [ "$oldversion" == "invalid channel" ]; then
+    echo "No previous uploads for channel $channel, this will be our first."
+  else
+    echo "Existing version of $repo is $oldversion in $channel."
+    if [ "$oldversion" == "$version" ]; then
+      if [ "$1" = "--force" ]; then
+        echo "Versions are the same, but forcing an update anyway."
+      else
+        echo "Nothing to do for this channel - our version is the latest."
+        continue
+      fi
+    fi
   fi
 
   echo "Copying $binpath to temporary location..."
