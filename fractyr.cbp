@@ -1152,6 +1152,8 @@
 			<Option target="Mac64_Release" />
 		</Unit>
 		<Unit filename="resources/osx_app/Fractyr.app/Contents/Info.plist" />
+		<Unit filename="resources/osx_dyld_fix.sh" />
+		<Unit filename="resources/osx_makeicon.sh" />
 		<Unit filename="resources/osx_package.sh" />
 		<Unit filename="resources/shaders/chunk_frag.glsl">
 			<Option compile="1" />
