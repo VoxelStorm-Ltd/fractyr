@@ -93,7 +93,7 @@ for i in $(seq 0 $((${#platforms[@]} - 1))); do
   fi
   if grep -q "windows" <<< "$platform"; then
     version=$(
-      timeout 5 \
+      timeout 10 \
         wine "$binpath" --version 2>/dev/null \
         | head -1 \
         | grep -o "version [^ ]* [^ ]*"
@@ -107,7 +107,7 @@ for i in $(seq 0 $((${#platforms[@]} - 1))); do
     )
   else
     version=$(
-      timeout 1 \
+      timeout 5 \
         "$binpath" --version \
         | head -1 \
         | grep -o "version [^ ]* [^ ]*"
