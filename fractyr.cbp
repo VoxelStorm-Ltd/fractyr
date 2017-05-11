@@ -16,7 +16,7 @@
 		</MakeCommands>
 		<Build>
 			<Target title="Win32_Debug">
-				<Option output="bin/Win32Debug/Fractyr_debug" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Win32/Debug/Fractyr_debug" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Win32/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -1152,6 +1152,8 @@
 			<Option target="Mac64_Release" />
 		</Unit>
 		<Unit filename="resources/osx_app/Fractyr.app/Contents/Info.plist" />
+		<Unit filename="resources/osx_dyld_fix.sh" />
+		<Unit filename="resources/osx_makeicon.sh" />
 		<Unit filename="resources/osx_package.sh" />
 		<Unit filename="resources/shaders/chunk_frag.glsl">
 			<Option compile="1" />

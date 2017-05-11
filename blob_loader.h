@@ -19,7 +19,7 @@
 
 #include "platform_defines.h"
 
-// loader
+/// Loader
 #ifdef PLATFORM_WINDOWS
   #define BLOB_LOAD(name) extern unsigned char const binary_resources_##name##_start[]; \
                           extern unsigned char const binary_resources_##name##_end[]; \
@@ -39,7 +39,7 @@
   #endif // PLATFORM_MACOS
 #endif // PLATFORM_WINDOWS
 
-// full symbol expansion
+/// Full symbol expansion
 #ifdef PLATFORM_WINDOWS
   #define BLOB(name) binary_resources_##name##_start
 #else // PLATFORM_WINDOWS
@@ -51,7 +51,7 @@
   #endif // PLATFORM_MACOS
 #endif // PLATFORM_WINDOWS
 
-// size pointer int converter
+/// Size pointer int converter
 #ifdef PLATFORM_WINDOWS
   #define BLOB_SIZE(name) reinterpret_cast<uintptr_t>(&binary_resources_##name##_size)
 #else // PLATFORM_WINDOWS
@@ -63,3 +63,6 @@
   #endif // PLATFORM_MACOS
 #endif // PLATFORM_WINDOWS
 #endif // BLOB_LOADER_H_INCLUDED
+
+/// Convenience function to load as a string
+#define STRING_BLOB(name) std::string(reinterpret_cast<char const*>(BLOB(name)), BLOB_SIZE(name))

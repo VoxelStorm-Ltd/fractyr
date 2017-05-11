@@ -58,6 +58,7 @@ hdiutil detach "$device"
 for binfile in $binfiles; do
   rm "$binary_dir/$(basename "$binfile")"
 done
+rm -f "$binary_dir/../Frameworks/*"
 
 if [ "$cp_success" != "0" ]; then
   echo "Copying failed!"
