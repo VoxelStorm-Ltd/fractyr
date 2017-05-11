@@ -16,6 +16,7 @@ echo "Copying release files into $app_skel_dir (chosen from ${#app_skel_dirs[@]}
 binary_dir="$app_skel_dir/Contents/MacOS"
 framework_dir="$app_skel_dir/Contents/Frameworks"
 mkdir -p "$binary_dir"
+rm -rf "$framework_dir"
 mkdir -p "$framework_dir"
 binfiles=$(ls bin/Mac64/Release/*)
 cp "$binfiles" "$binary_dir"/
