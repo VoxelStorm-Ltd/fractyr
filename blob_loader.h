@@ -62,7 +62,8 @@
     #define BLOB_SIZE(name) _binary_resources_##name##_len_x
   #endif // PLATFORM_MACOS
 #endif // PLATFORM_WINDOWS
-#endif // BLOB_LOADER_H_INCLUDED
 
 /// Convenience function to load as a string
 #define STRING_BLOB(name) std::string(reinterpret_cast<char const*>(BLOB(name)), BLOB_SIZE(name))
+
+#endif // BLOB_LOADER_H_INCLUDED
