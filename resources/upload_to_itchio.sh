@@ -77,15 +77,20 @@ for i in $(seq 0 $((${#platforms[@]} - 1))); do
     app_skel_dirs=("$repodir/resources/osx_app/"*.app)
     app_skel_dir=${app_skel_dirs[0]}
     binpath=~/Desktop/"$(basename "$app_skel_dir" .app)".dmg
+    binpath_alt="$binpath"
   else
     if ! grep -q '<Target title="'"$platform_cbx"'">' "$repodir/"*.cbp; then
       echo "Could not find a target $platform_cbx in any project!  Skipping."
       continue
     fi
     binpath="$repodir/$(grep -F '<Target title="'"$platform_cbx"'">' "$repodir/"*.cbp -A5 | grep -F 'Option output=' | head -1 | cut -d '"' -f 2)"
+    binpath_alt="$binpath"
     if grep -q "windows" <<< "$platform"; then
-      binpath="$binpath.exe"
+      binpath_alt="$binpath.exe"
     fi
+  fi
+  if [ ! -f "$binpath" ] || [ ! -s "$binpath" ]; then
+    binpath="$binpath_alt"
   fi
   if [ ! -f "$binpath" ] || [ ! -s "$binpath" ]; then
     echo "Binary $binpath has not been built!  Skipping."
