@@ -1021,7 +1021,6 @@
 			<Add option="-Warray-bounds" />
 			<Add option="-Woverloaded-virtual" />
 			<Add option="-Wdouble-promotion" />
-			<Add option="-Wabi" />
 			<Add option="-Wsuggest-attribute=pure" />
 			<Add option="-Wsuggest-attribute=const" />
 			<Add option="-Wsuggest-attribute=noreturn" />
