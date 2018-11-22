@@ -64,8 +64,8 @@ universe::universe()
   // initialise sound effects
   // TODO
   // initialise music
-  sound.music_load(BLOB(music_main_intro_ogg), BLOB_SIZE(music_main_intro_ogg)); // id 0
-  sound.music_load(BLOB(music_main_loop_ogg),  BLOB_SIZE(music_main_loop_ogg)); // id 1
+  sound.music_load(STRING_VIEW_BLOB(music_main_intro_ogg));                     // id 0
+  sound.music_load(STRING_VIEW_BLOB(music_main_loop_ogg));                      // id 1
   sound.start_streamer();                                                       // only do this after all music has been loaded
 }
 
