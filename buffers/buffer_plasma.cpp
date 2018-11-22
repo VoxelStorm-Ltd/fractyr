@@ -2,6 +2,7 @@
 #include <iostream>
 #include "blob_loader.h"
 #include "shader_load.h"
+#include "cast_if_required.h"
 
 // linked binary resource blob symbols using blob_loader.h
 BLOB_LOAD(shaders_plasma_vert_glsl);
@@ -65,10 +66,10 @@ void buffer_plasma::setup() {
   ibodata.reserve(12);
 
   unsigned int offset = vbodata.size();
-  vbodata.emplace_back(vector3f( 0.2, 0.0,  0.0), vector4f(1.0, 1.0, 0.0, 0.8));
-  vbodata.emplace_back(vector3f( 0.0, 0.0, -0.5), vector4f(1.0, 1.0, 0.0, 1.0));
-  vbodata.emplace_back(vector3f(-0.2, 0.0,  0.0), vector4f(1.0, 1.0, 0.0, 0.8));
-  vbodata.emplace_back(vector3f( 0.0, 0.0,  4.0), vector4f(1.0, 1.0, 0.0, 0.2));
+  vbodata.emplace_back(vector3f( 0.2f, 0.0f,  0.0f), vector4f(1.0f, 1.0f, 0.0f, 0.8f));
+  vbodata.emplace_back(vector3f( 0.0f, 0.0f, -0.5f), vector4f(1.0f, 1.0f, 0.0f, 1.0f));
+  vbodata.emplace_back(vector3f(-0.2f, 0.0f,  0.0f), vector4f(1.0f, 1.0f, 0.0f, 0.8f));
+  vbodata.emplace_back(vector3f( 0.0f, 0.0f,  4.0f), vector4f(1.0f, 1.0f, 0.0f, 0.2f));
   ibodata.emplace_back(offset + 0);                                             // front face
   ibodata.emplace_back(offset + 1);
   ibodata.emplace_back(offset + 2);
@@ -91,7 +92,7 @@ void buffer_plasma::setup() {
               << (ibodata.size() * sizeof(vertex)) / 1024 << "KB)" << std::endl;
   #endif
 
-  numverts = ibodata.size();
+  numverts = cast_if_required<unsigned int>(ibodata.size());
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, vbodata.size() * sizeof(vertex), &vbodata[0], GL_STATIC_DRAW);
   glBindBuffer(GL_ARRAY_BUFFER, 0);

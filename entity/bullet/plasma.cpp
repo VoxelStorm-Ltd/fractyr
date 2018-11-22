@@ -11,9 +11,9 @@ plasma::plasma(world &this_parent_world,
                float shot_speed)
   : bullet(this_parent_world, parent_chunk, this_position, this_orientation) {
   /// Default constructor
-  radius = 0.2;
+  radius = 0.2f;
 
-  velocity = vector3f(0.0, 0.0, -shot_speed);
+  velocity = vector3f(0.0f, 0.0f, -shot_speed);
   velocity.rotate(orientation_conjugate);
   velocity += ship_velocity;
 }

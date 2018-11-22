@@ -66,16 +66,16 @@ void buffer_shard::setup() {
   vbodata.reserve(3);
   ibodata.reserve(6);
 
-  float angle_1 = (static_cast<float>(rand()) / RAND_MAX) * 360.0;
-  float angle_2 = (static_cast<float>(rand()) / RAND_MAX) * 360.0;
-  float angle_3 = (static_cast<float>(rand()) / RAND_MAX) * 360.0;
+  float angle_1 = (static_cast<float>(rand()) / RAND_MAX) * 360.0f;
+  float angle_2 = (static_cast<float>(rand()) / RAND_MAX) * 360.0f;
+  float angle_3 = (static_cast<float>(rand()) / RAND_MAX) * 360.0f;
 
-  vbodata.emplace_back(vector3f(0.0, 0.0, 0.0), vector3f(0.0, 1.0, 0.0), vector4f(0.9, 0.0, 0.0, 1.0));
+  vbodata.emplace_back(vector3f(0.0f, 0.0f, 0.0f), vector3f(0.0f, 1.0f, 0.0f), vector4f(0.9f, 0.0f, 0.0f, 1.0f));
   vbodata.back().normal.rotate(angle_1, angle_2, angle_3);
-  vbodata.emplace_back(vector3f(0.6, 0.0, 0.0), vector3f(0.0, 1.0, 0.0), vector4f(0.9, 0.0, 0.0, 1.0));
+  vbodata.emplace_back(vector3f(0.6f, 0.0f, 0.0f), vector3f(0.0f, 1.0f, 0.0f), vector4f(0.9f, 0.0f, 0.0f, 1.0f));
   vbodata.back().coords.rotate(angle_1, angle_2, angle_3);
   vbodata.back().normal.rotate(angle_1, angle_2, angle_3);
-  vbodata.emplace_back(vector3f(0.0, 0.0, 0.6), vector3f(0.0, 1.0, 0.0), vector4f(0.9, 0.0, 0.0, 1.0));
+  vbodata.emplace_back(vector3f(0.0f, 0.0f, 0.6f), vector3f(0.0f, 1.0f, 0.0f), vector4f(0.9f, 0.0f, 0.0f, 1.0f));
   vbodata.back().coords.rotate(angle_1, angle_2, angle_3);
   vbodata.back().normal.rotate(angle_1, angle_2, angle_3);
   ibodata.emplace_back(0);

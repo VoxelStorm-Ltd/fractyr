@@ -241,7 +241,7 @@ void universe::delete_shaders() {
 
 void universe::render() {
   /// Draw everything
-  glClearColor(0.92, 0.95, 1.00, 1.0);                                          // 2329 Kid Glove normalised to 1
+  glClearColor(0.92f, 0.95f, 1.00f, 1.0f);                                          // 2329 Kid Glove normalised to 1
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   // TODO: don't bother clearing colour buffer
 
@@ -288,10 +288,10 @@ void universe::render_progressscreen_hud(float progress, std::string const &mess
   float const font_loading_advance = font_loading->Advance(message.c_str(), message.length());
   vector2i const titlepos(  (windowsize.x - font_title_advance)   / 2.0, (windowsize.y * 0.60));
   vector2i const messagepos((windowsize.x - font_loading_advance) / 2.0, (windowsize.y * 0.25) + 10.0);
-  glColor4f(0.0, 0.0, 0.0, 1.0);
+  glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
   font_loading->Render(message.c_str(), message.length(), FTPoint(messagepos.x, messagepos.y), FTPoint(), FTGL::RENDER_FRONT);
   font_title->Render("Fractyr", 7, FTPoint(titlepos.x, titlepos.y - 2), FTPoint(), FTGL::RENDER_FRONT);
-  glColor4f(0.9, 0.9, 0.0, 1.0);
+  glColor4f(0.9f, 0.9f, 0.0f, 1.0f);
   font_title->Render("Fractyr", 7, FTPoint(titlepos.x, titlepos.y),     FTPoint(), FTGL::RENDER_FRONT);
   glBegin(GL_LINES);
   glVertex2i(windowsize.x * 0.25,                      (windowsize.y * 0.25) - 11.0);
@@ -490,7 +490,7 @@ void universe::loop_fade_in() {
     glLoadIdentity();
     glDisable(GL_DEPTH_TEST);
 
-    glColor4f(0.92, 0.95, 1.00, 1.0-f/static_cast<float>(fadetime));
+    glColor4f(0.92f, 0.95f, 1.00f, 1.0 - static_cast<float>(f) / static_cast<float>(fadetime));
     glBegin(GL_QUADS);
     glVertex2i(0.0,          0.0);
     glVertex2i(windowsize.x, 0.0);
@@ -539,7 +539,7 @@ void universe::loop_fade_out() {
     glLoadIdentity();
     glDisable(GL_DEPTH_TEST);
 
-    glColor4f(0.92, 0.95, 1.00, f/static_cast<float>(fadetime));
+    glColor4f(0.92f, 0.95f, 1.00f, static_cast<float>(f) / static_cast<float>(fadetime));
     glBegin(GL_QUADS);
     glVertex2i(0,            0);
     glVertex2i(windowsize.x, 0);
@@ -588,7 +588,7 @@ void universe::loop_fade_out_won() {
     glLoadIdentity();
     glDisable(GL_DEPTH_TEST);
 
-    glColor4f(1.0, 1.0, 0.0, f/static_cast<float>(fadetimewon));
+    glColor4f(1.0f, 1.0f, 0.0f, static_cast<float>(f) / static_cast<float>(fadetimewon));
     glBegin(GL_QUADS);
     glVertex2i(0,            0);
     glVertex2i(windowsize.x, 0);

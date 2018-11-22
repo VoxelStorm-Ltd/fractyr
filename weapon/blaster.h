@@ -13,8 +13,8 @@ public:
   ~blaster();
 
   bool fire() override final;
-  unsigned int get_cost_per_shot() const;
-  float get_shot_speed() const;
+  unsigned int get_cost_per_shot() const override final  __attribute__((__const__));
+  float get_shot_speed() const override final __attribute__((__const__));
 };
 
 #endif // BLASTER_H_INCLUDED

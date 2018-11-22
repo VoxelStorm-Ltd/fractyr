@@ -17,7 +17,7 @@ extern universe root;
 //extern FTFont *font_label;
 
 gameplayer::gameplayer()
-  : mouse_sensitivity(0.005, 0.005),
+  : mouse_sensitivity(0.005f, 0.005f),
     windowsize(800, 600) {
   /// Default constructor
   std::cout << "Initialising player..." << std::endl;
@@ -39,14 +39,14 @@ void gameplayer::cache_matrix(double nearplane, double farplane) {
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
 
-  double top    = std::tan(fov_angle_rad * 0.5) * nearplane;
+  double top    = std::tan(static_cast<double>(fov_angle_rad) * 0.5) * nearplane;
   double bottom = -top;
-  double left   = bottom * aspect_ratio;
-  double right  = top    * aspect_ratio;
+  double left   = bottom * static_cast<double>(aspect_ratio);
+  double right  = top    * static_cast<double>(aspect_ratio);
   glFrustum(left, right, bottom, top, nearplane, farplane);
   float temp_matrix[16];
   glGetFloatv(GL_PROJECTION_MATRIX, temp_matrix);
-  projection = Matrix4f::fromColumnMajorArray(temp_matrix);
+  projection = Matrix4f::from_column_major_array(temp_matrix);
 }
 
 void gameplayer::setup_render_perspective() {
@@ -59,41 +59,41 @@ void gameplayer::setup_render_perspective() {
 
   // dimension source: http://cdn.kk.org.s3.amazonaws.com/cooltools/2013/01/human-dimensions-6.jpeg
   // tweaked based on own measurements & tests:
-  glTranslatef(0.0, -0.25, 0.13);                                               // neck model
-  glRotatef(rotation_pitch, 1.0, 0.0, 0.0);                                     // head rotation
-  glRotatef(rotation_yaw + pre_rotation, 0.0, 1.0, 0.0);
+  glTranslatef(0.0f, -0.25f, 0.13f);                                               // neck model
+  glRotatef(rotation_pitch, 1.0f, 0.0f, 0.0f);                                     // head rotation
+  glRotatef(rotation_yaw + pre_rotation, 0.0f, 1.0f, 0.0f);
   //sound.set_listener_rotation(quatf::from_axis_rot(vector3f(0.0, -1.0, 0.0), rotation_yaw + pre_rotation)); // we don't care about pitch here
 }
 
 void gameplayer::setup_render_oculus_left() {
   /// Oculus Rift perspective rendering, left eye
   oculus->setup_left();
-  glTranslatef(0.0, -0.25, 0.13);                                               // neck model (see above)
+  glTranslatef(0.0f, -0.25f, 0.13f);                                               // neck model (see above)
   glMultMatrixf(oculus->getmatrix().inverse());
-  glRotated(pre_rotation, 0.0, 1.0, 0.0);
+  glRotated(pre_rotation, 0.0f, 1.0f, 0.0f);
   //sound.set_listener_rotation(oculus->getquat());                               // only do this in one eye's setup to avoid duplication
 }
 
 void gameplayer::setup_render_oculus_right() {
   /// Oculus Rift perspective rendering, right eye
   oculus->setup_right();
-  glTranslatef(0.0, -0.25, 0.13);                                               // neck model (see above)
+  glTranslatef(0.0f, -0.25f, 0.13f);                                               // neck model (see above)
   glMultMatrixf(oculus->getmatrix().inverse());
-  glRotated(pre_rotation, 0.0, 1.0, 0.0);
+  glRotated(pre_rotation, 0.0f, 1.0f, 0.0f);
 }
 
 void gameplayer::setup_render_oculus_left_locked() {
   /// Oculus Rift perspective rendering, left eye, ignoring tracker data
   oculus->setup_left();
-  glTranslatef(0.0, -0.25, 0.13);                                               // neck model (see above)
-  glRotated(pre_rotation, 0.0, 1.0, 0.0);
+  glTranslatef(0.0f, -0.25f, 0.13f);                                               // neck model (see above)
+  glRotated(pre_rotation, 0.0f, 1.0f, 0.0f);
 }
 
 void gameplayer::setup_render_oculus_right_locked() {
   /// Oculus Rift perspective rendering, right eye, ignoring tracker data
   oculus->setup_right();
-  glTranslatef(0.0, -0.25, 0.13);                                               // neck model (see above)
-  glRotated(pre_rotation, 0.0, 1.0, 0.0);
+  glTranslatef(0.0f, -0.25f, 0.13f);                                               // neck model (see above)
+  glRotated(pre_rotation, 0.0f, 1.0f, 0.0f);
 }
 
 void gameplayer::setup_render_ortho() {

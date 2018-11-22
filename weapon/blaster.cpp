@@ -2,8 +2,8 @@
 #include "entity/bullet/plasma.h"
 #include "entity/ship.h"
 
-blaster::blaster(ship *parent)
-  : weapon(parent) {
+blaster::blaster(ship *this_parent)
+  : weapon(this_parent) {
   /// Default constructor
 }
 
@@ -20,11 +20,11 @@ bool blaster::fire() {
   vector3f const &barrel_coords(parent->get_weapon_position());
   quatf const &barrel_orientation(parent->get_orientation());
   quatf const &barrel_orientation_conjugate(parent->get_orientation_conjugate());
-  vector3f barrel_coords_left(1.0, 0.0, -parent->radius - 0.3);
+  vector3f barrel_coords_left(1.0f, 0.0f, -parent->radius - 0.3f);
   barrel_coords_left.rotate(barrel_orientation_conjugate);
   barrel_coords_left += barrel_coords;
 
-  vector3f barrel_coords_right(-1.0, 0.0, -parent->radius - 0.3);
+  vector3f barrel_coords_right(-1.0f, 0.0f, -parent->radius - 0.3f);
   barrel_coords_right.rotate(barrel_orientation_conjugate);
   barrel_coords_right += barrel_coords;
 
@@ -45,5 +45,5 @@ unsigned int blaster::get_cost_per_shot() const {
 }
 
 float blaster::get_shot_speed() const {
-  return 1.5;
+  return 1.5f;
 }

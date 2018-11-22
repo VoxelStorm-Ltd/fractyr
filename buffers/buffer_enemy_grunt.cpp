@@ -67,21 +67,21 @@ void buffer_enemy_grunt::setup() {
   vbodata.reserve(4 * 6 * numcubes);
   ibodata.reserve(6 * 6 * numcubes);
 
-  vector4f const bodycolour(     0.3, 0.3, 0.3, 1.0);
-  vector4f const guncolour(      0.9, 0.0, 0.0, 1.0);
-  vector4f const thrustercolour( 0.8, 0.4, 0.0, 1.0);
+  vector4f const bodycolour(     0.3f, 0.3f, 0.3f, 1.0f);
+  vector4f const guncolour(      0.9f, 0.0f, 0.0f, 1.0f);
+  vector4f const thrustercolour( 0.8f, 0.4f, 0.0f, 1.0f);
 
-  //Body
-  cuboid(vector3f(0.0, 0.0, 0.0), vector3f(3.0, 0.5, 0.5), bodycolour, vbodata, ibodata);
-  cuboid(vector3f(0.0, 0.0, 0.0), vector3f(0.5, 3.0, 0.5), bodycolour, vbodata, ibodata);
+  // Body
+  cuboid(vector3f(0.0f, 0.0f, 0.0f), vector3f(3.0f, 0.5f, 0.5f), bodycolour, vbodata, ibodata);
+  cuboid(vector3f(0.0f, 0.0f, 0.0f), vector3f(0.5f, 3.0f, 0.5f), bodycolour, vbodata, ibodata);
 
-  //Guns
-  cuboid(vector3f(-1.0, 0.0, -1.0), vector3f(0.5, 0.5, 1.5), guncolour, vbodata, ibodata);
-  cuboid(vector3f( 1.0, 0.0, -1.0), vector3f(0.5, 0.5, 1.5), guncolour, vbodata, ibodata);
+  // Guns
+  cuboid(vector3f(-1.0f, 0.0f, -1.0f), vector3f(0.5f, 0.5f, 1.5f), guncolour, vbodata, ibodata);
+  cuboid(vector3f( 1.0f, 0.0f, -1.0f), vector3f(0.5f, 0.5f, 1.5f), guncolour, vbodata, ibodata);
 
-  //Thrusters
-  cuboid(vector3f(0.0, -1.0, 0.5), vector3f(0.5, 0.5, 0.5), thrustercolour, vbodata, ibodata);
-  cuboid(vector3f(0.0,  1.0, 0.5), vector3f(0.5, 0.5, 0.5), thrustercolour, vbodata, ibodata);
+  // Thrusters
+  cuboid(vector3f(0.0f, -1.0f, 0.5f), vector3f(0.5f, 0.5f, 0.5f), thrustercolour, vbodata, ibodata);
+  cuboid(vector3f(0.0f,  1.0f, 0.5f), vector3f(0.5f, 0.5f, 0.5f), thrustercolour, vbodata, ibodata);
 
   vbodata.shrink_to_fit();
   ibodata.shrink_to_fit();

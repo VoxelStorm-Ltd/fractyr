@@ -13,7 +13,7 @@ protected:
 public:
   virtual ~bullet();
   virtual void collided_with(entity *other) override;
-  virtual entity::entity_type get_entity_type() const override;
+  virtual entity::entity_type get_entity_type() const override __attribute__((__const__));
 };
 
 #endif // BULLET_H_INCLUDED

@@ -15,15 +15,15 @@ public:
   plasma(world &parent_world,
          chunk *parent_chunk,
          vector3f const &position,
-         quatf const &orientation = quatf::from_euler_angles(0.0, 0.0, 0.0),
-         vector3f const &ship_velocity = vector3f(0.0, 0.0, 0.0),
-         float shot_speed = 1.5);
+         quatf const &orientation = quatf::from_euler_angles(0.0f, 0.0f, 0.0f),
+         vector3f const &ship_velocity = vector3f(0.0f, 0.0f, 0.0f),
+         float shot_speed = 1.5f);
   ~plasma();
 
   void update() override final;
   void render() const override final;
 
-  float get_collision_damage() const override;
+  float get_collision_damage() const override __attribute__((__const__));
 };
 
 #endif // PLASMA_H_INCLUDED

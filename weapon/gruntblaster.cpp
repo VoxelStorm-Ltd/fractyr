@@ -2,8 +2,8 @@
 #include "entity/bullet/plasma.h"
 #include "entity/ship.h"
 
-gruntblaster::gruntblaster(ship *parent)
-  : weapon(parent) {
+gruntblaster::gruntblaster(ship *this_parent)
+  : weapon(this_parent) {
   /// Default constructor
 }
 
@@ -21,11 +21,11 @@ bool gruntblaster::fire() {
   quatf const &barrel_orientation(parent->get_orientation());
   quatf const &barrel_orientation_conjugate(parent->get_orientation_conjugate());
   chunk *thischunk(parent->get_parent());
-  vector3f barrel_coords_left(1.0, 0.0, -parent->radius - 0.3);
+  vector3f barrel_coords_left(1.0f, 0.0f, -parent->radius - 0.3f);
   barrel_coords_left.rotate(barrel_orientation_conjugate);
   barrel_coords_left += barrel_coords;
 
-  vector3f barrel_coords_right(-1.0, 0.0, -parent->radius - 0.3);
+  vector3f barrel_coords_right(-1.0f, 0.0f, -parent->radius - 0.3f);
   barrel_coords_right.rotate(barrel_orientation_conjugate);
   barrel_coords_right += barrel_coords;
 
@@ -43,5 +43,5 @@ unsigned int gruntblaster::get_cost_per_shot() const {
 }
 
 float gruntblaster::get_shot_speed() const {
-  return 0.9;
+  return 0.9f;
 }
