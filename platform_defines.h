@@ -11,7 +11,7 @@
   #define PLATFORM_LINUX
 #endif
 
-#if __x86_64__
+#if defined(__x86_64__) || defined(_M_X64)
   #define PLATFORM_64BIT
 #else
   #define PLATFORM_32BIT
