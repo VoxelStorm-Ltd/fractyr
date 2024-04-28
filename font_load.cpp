@@ -1,11 +1,11 @@
 #include "font_load.h"
-#include <experimental/filesystem>
+#include <filesystem>
 #include <iostream>
 
 FTFont *font_load(std::string const &filename, unsigned int size) {
   /// Try to load a font from the specified filename, running all checks first
-  if(!(std::experimental::filesystem::exists(filename) &&
-       std::experimental::filesystem::is_regular_file(filename))) {
+  if(!(std::filesystem::exists(filename) &&
+       std::filesystem::is_regular_file(filename))) {
     std::cout << "ERROR: font_load: no such file as " << filename << std::endl;
     return nullptr;
   }
@@ -39,8 +39,8 @@ FTFont *font_load(unsigned char const *buffer, size_t buffersize, unsigned int s
 
 FTFont *font_load3d(std::string const &filename, unsigned int size) {
   /// Try to load a font from the specified filename as a font for 3D display, running all checks first
-  if(!(std::experimental::filesystem::exists(filename) &&
-       std::experimental::filesystem::is_regular_file(filename))) {
+  if(!(std::filesystem::exists(filename) &&
+       std::filesystem::is_regular_file(filename))) {
     std::cout << "ERROR: font_load: no such file as " << filename << std::endl;
     return nullptr;
   }
