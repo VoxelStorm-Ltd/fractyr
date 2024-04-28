@@ -1,5 +1,4 @@
-#ifndef CAST_IF_REQUIRED_H_INCLUDED
-#define CAST_IF_REQUIRED_H_INCLUDED
+#pragma once
 
 /// Functions to selectively cast only if the given types are not of identical
 /// size, for casting platform-specific ints only in cases where they're not
@@ -36,5 +35,3 @@ template<typename Tdest, typename Tsrc> __attribute__((__always_inline__))
 inline typename std::enable_if_t<sizeof(Tsrc) != sizeof(Tdest), bool> constexpr is_same_size() {
   return false;
 }
-
-#endif // CAST_IF_REQUIRED_H_INCLUDED
