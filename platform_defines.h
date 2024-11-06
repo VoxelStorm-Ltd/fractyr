@@ -1,5 +1,4 @@
-#ifndef PLATFORM_DEFINES_H_INCLUDED
-#define PLATFORM_DEFINES_H_INCLUDED
+#pragma once
 
 /// A preprocessor-only header file to simplify platform-dependent defines
 
@@ -22,5 +21,3 @@
 #else
   #define PLATFORM_LITTLEENDIAN
 #endif
-
-#endif // PLATFORM_DEFINES_H_INCLUDED
