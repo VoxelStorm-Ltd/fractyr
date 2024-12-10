@@ -1,5 +1,4 @@
-#ifndef BLOB_LOADER_H_INCLUDED
-#define BLOB_LOADER_H_INCLUDED
+#pragma once
 
 /// Macro based binary blob loader, for use with ld linking trick
 ///
@@ -66,5 +65,3 @@
 /// Convenience function to load as a string or string view
 #define STRING_BLOB(name) std::string(reinterpret_cast<char const*>(BLOB(name)), BLOB_SIZE(name))
 #define STRING_VIEW_BLOB(name) std::string_view(reinterpret_cast<char const*>(BLOB(name)), BLOB_SIZE(name))
-
-#endif // BLOB_LOADER_H_INCLUDED
