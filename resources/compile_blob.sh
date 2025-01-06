@@ -14,8 +14,8 @@ link_options="$5"
 #echo "Options: $options (eol)"
 #echo "Link options: $link_options (eol)"
 
-if [ -z "$infile" ]; then
-  echo "Usage: $0 infile outfile compiler options link_options" >&2
+if [ -z "$compiler" ]; then
+  echo "Usage: $0 infile outfile compiler [compiler_options] [link_options]" >&2
   exit 1
 fi
 
