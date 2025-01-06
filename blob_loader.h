@@ -7,6 +7,11 @@
 ///
 /// To link:
 ///   ld -r -b binary -o $object resources/$file_name.$file_ext
+/// or
+///   xxd -i resources/$file_name.$file_ext | sed 's/\[\] = {/\[\] __attribute__((__aligned__(16))) = {/;s/\(resources[a-zA-Z0-9_]*\)/_binary_\1_x/' | $compiler -m32 -c -o $object -x c++ -
+///
+///   ld is assumed on windows, xxd everywhere else.  To override the assumption, set
+///   BLOB_LOADER_LINK_MODE=1 for ld or BLOB_LOADER_LINK_MODE=2 for xxd
 ///
 /// To load (in every translation unit it's referred to):
 ///   BLOB_LOAD(chintzy_ttf);
@@ -18,49 +23,44 @@
 
 #include "platform_defines.h"
 
-/// Loader
-#ifdef PLATFORM_WINDOWS
+#ifndef BLOB_LOADER_LINK_MODE
+  #ifdef PLATFORM_WINDOWS
+    // default mode to ld
+    #define BLOB_LOADER_LINK_MODE 1
+  #else
+    // default mode to xxd
+    #define BLOB_LOADER_LINK_MODE 2
+  #endif
+#endif // BLOB_LOADER_LINK_MODE
+
+#if BLOB_LOADER_LINK_MODE == 1
+  // ld mode
+  /// Loader
   #define BLOB_LOAD(name) extern unsigned char const binary_resources_##name##_start[]; \
                           extern unsigned char const binary_resources_##name##_end[]; \
                           extern unsigned char const binary_resources_##name##_size[]
-#else // PLATFORM_WINDOWS
-  #ifdef PLATFORM_MACOS
-    #define BLOB_LOAD(name) extern unsigned char _binary_resources_##name##_x[]; \
-                            extern unsigned int  _binary_resources_##name##_len_x
-  #else // PLATFORM_MACOS
-    /*
-    #define BLOB_LOAD(name) extern unsigned char const _binary_resources_##name##_start[]; \
-                            extern unsigned char const _binary_resources_##name##_end[]; \
-                            extern unsigned char const _binary_resources_##name##_size[]
-    */
-    #define BLOB_LOAD(name) extern unsigned char _binary_resources_##name##_x[]; \
-                            extern unsigned int  _binary_resources_##name##_len_x
-  #endif // PLATFORM_MACOS
-#endif // PLATFORM_WINDOWS
 
-/// Full symbol expansion
-#ifdef PLATFORM_WINDOWS
+  /// Full symbol expansion
   #define BLOB(name) binary_resources_##name##_start
-#else // PLATFORM_WINDOWS
-  #ifdef PLATFORM_MACOS
-    #define BLOB(name) _binary_resources_##name##_x
-  #else // PLATFORM_MACOS
-    //#define BLOB(name) _binary_resources_##name##_start
-    #define BLOB(name) _binary_resources_##name##_x
-  #endif // PLATFORM_MACOS
-#endif // PLATFORM_WINDOWS
 
-/// Size pointer int converter
-#ifdef PLATFORM_WINDOWS
+  /// Size pointer int converter
   #define BLOB_SIZE(name) reinterpret_cast<uintptr_t>(&binary_resources_##name##_size)
-#else // PLATFORM_WINDOWS
-  #ifdef PLATFORM_MACOS
-    #define BLOB_SIZE(name) _binary_resources_##name##_len_x
-  #else // PLATFORM_MACOS
-    //#define BLOB_SIZE(name) reinterpret_cast<uintptr_t>(&_binary_resources_##name##_size)
-    #define BLOB_SIZE(name) _binary_resources_##name##_len_x
-  #endif // PLATFORM_MACOS
-#endif // PLATFORM_WINDOWS
+
+#elif BLOB_LOADER_LINK_MODE == 2
+  // xxd mode
+  /// Loader
+  #define BLOB_LOAD(name) extern unsigned char _binary_resources_##name##_x[]; \
+                          extern unsigned int  _binary_resources_##name##_len_x
+
+  /// Full symbol expansion
+  #define BLOB(name) _binary_resources_##name##_x
+
+  /// Size pointer int converter
+  #define BLOB_SIZE(name) _binary_resources_##name##_len_x
+
+#else // BLOB_LOADER_LINK_MODE
+  #error "Invalid BLOB_LOADER_LINK_MODE"
+#endif // BLOB_LOADER_LINK_MODE
 
 /// Convenience function to load as a string or string view
 #define STRING_BLOB(name) std::string(reinterpret_cast<char const*>(BLOB(name)), BLOB_SIZE(name))
