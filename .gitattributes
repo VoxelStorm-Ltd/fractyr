@@ -30,3 +30,7 @@ version.h text eol=lf
 
 # Make sure version.h is always merged smoothly
 version.h merge=highest_version_merge
+
+# overrides for better parsing by github-linguist
+include/** linguist-vendored
+**/*.h linguist-language=C++
