@@ -1,6 +1,6 @@
 #include "get_version.h"
-#include "version.h"
 #include "git_version.h"
+#include "version.h"
 
 std::string const get_version() {
   /// Return a string describing the current version.
