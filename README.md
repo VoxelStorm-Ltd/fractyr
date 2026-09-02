@@ -1,5 +1,9 @@
 # Building and running
 
+[![Linux build](https://github.com/VoxelStorm-Ltd/fractyr/actions/workflows/build-linux.yml/badge.svg)](https://github.com/VoxelStorm-Ltd/fractyr/actions/workflows/build-linux.yml)
+[![Windows build](https://github.com/VoxelStorm-Ltd/fractyr/actions/workflows/build-win.yml/badge.svg)](https://github.com/VoxelStorm-Ltd/fractyr/actions/workflows/build-win.yml)
+[![macOS build](https://github.com/VoxelStorm-Ltd/fractyr/actions/workflows/build-mac.yml/badge.svg)](https://github.com/VoxelStorm-Ltd/fractyr/actions/workflows/build-mac.yml)
+
 Run the commands from the repository root. CMake defaults to `Release`, but specifying the build mode explicitly and using separate build directories makes switching between `Debug` and `Release` straightforward.
 
 For a 64-bit Linux Release build:
