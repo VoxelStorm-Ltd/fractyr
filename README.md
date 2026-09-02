@@ -9,7 +9,7 @@ cmake -S . -B build/linux64-release \
   -DCMAKE_BUILD_TYPE=Release \
   -DBUILD_32BIT=OFF
 cmake --build build/linux64-release --parallel
-./bin/Linux64/Release/Fractyr
+./build/linux64-release/Fractyr
 ```
 
 For a 64-bit Linux Debug build:
@@ -19,7 +19,7 @@ cmake -S . -B build/linux64-debug \
   -DCMAKE_BUILD_TYPE=Debug \
   -DBUILD_32BIT=OFF
 cmake --build build/linux64-debug --parallel
-./bin/Linux64/Debug/Fractyr_debug
+./build/linux64-debug/Fractyr
 ```
 
 For a 32-bit Windows Release build cross-compiled with MinGW on Linux:
@@ -31,7 +31,7 @@ cmake -S . -B build/win32-release \
   -DCMAKE_BUILD_TYPE=Release \
   -DBUILD_32BIT=ON
 cmake --build build/win32-release --parallel
-wine bin/Win32/Release/Fractyr.exe
+wine build/win32-release/Fractyr.exe
 ```
 
 For its Debug equivalent, change `CMAKE_BUILD_TYPE` and use a separate directory:
@@ -43,7 +43,7 @@ cmake -S . -B build/win32-debug \
   -DCMAKE_BUILD_TYPE=Debug \
   -DBUILD_32BIT=ON
 cmake --build build/win32-debug --parallel
-wine bin/Win32/Debug/Fractyr_debug.exe
+wine build/win32-debug/Fractyr.exe
 ```
 
 For a 64-bit macOS Release build:
@@ -53,7 +53,7 @@ cmake -S . -B build/mac64-release \
   -DCMAKE_BUILD_TYPE=Release \
   -DBUILD_32BIT=OFF
 cmake --build build/mac64-release --parallel
-./bin/Mac64/Release/Fractyr
+./build/mac64-release/Fractyr
 ```
 
 `CMAKE_BUILD_TYPE` accepts `Debug` or `Release`. Debug builds use `-Og` with full debugging information, enable general logging, and suppress the especially verbose input and sound debug streams. Linux64 Debug builds additionally enable AddressSanitizer and UndefinedBehaviorSanitizer. Release builds use the original optimized, LTO-enabled configuration and disable standard and Boost assertions.
