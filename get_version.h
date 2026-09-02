@@ -2,5 +2,5 @@
 
 #include <string>
 
-std::string const get_version();
-std::string const get_git_version();
+std::string get_version();
+std::string get_git_version();
