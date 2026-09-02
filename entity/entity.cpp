@@ -131,7 +131,7 @@ void entity::move(vector3f const &direction) {
         //std::cout << "DEBUG: " << test_points_collided << ": " << test_dir_sum << " collision!  Normal " << collision_normal << std::endl;
       }
     #endif // NDEBUG
-      velocity = direction - (collision_normal  * ((direction.dotProduct(collision_normal) * 2)));
+      velocity = direction - (collision_normal  * ((direction.dot(collision_normal) * 2)));
       velocity *= 0.5;
       //velocity = vector3f(0.0, 0.0, 0.0);
     #ifndef NDEBUG

@@ -46,7 +46,7 @@ void gameplayer::cache_matrix(double nearplane, double farplane) {
   glFrustum(left, right, bottom, top, nearplane, farplane);
   float temp_matrix[16];
   glGetFloatv(GL_PROJECTION_MATRIX, temp_matrix);
-  projection = Matrix4f::from_column_major_array(temp_matrix);
+  projection = matrix4f::from_column_major_array(temp_matrix);
 }
 
 void gameplayer::setup_render_perspective() {
