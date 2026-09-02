@@ -1,0 +1,36 @@
+name: Build macOS
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: macOS x86-64 (${{ matrix.build_type }})
+    runs-on: macos-15-intel
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Debug, Release]
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install system dependencies
+        run: brew install gcc boost
+
+      - name: Configure
+        run: |
+          gcc_cxx=$(find /usr/local/bin -maxdepth 1 -name 'g++-*' | sort -V | tail -1)
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DCMAKE_CXX_COMPILER="$gcc_cxx" \
+            -DBUILD_32BIT=OFF
+
+      - name: Build
+        run: cmake --build build --parallel "$(sysctl -n hw.logicalcpu)"

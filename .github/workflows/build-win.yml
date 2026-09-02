@@ -1,0 +1,48 @@
+name: Build Windows
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Windows x86 (${{ matrix.build_type }})
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Debug, Release]
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW32
+          update: true
+          install: >-
+            mingw-w64-i686-toolchain
+            mingw-w64-i686-cmake
+            mingw-w64-x86_64-boost
+            make
+            vim
+
+      - name: Configure
+        run: |
+          boost_cmake_dir=$(dirname "$(find /mingw64/lib/cmake -name BoostConfig.cmake -print -quit)")
+          cmake -S . -B build \
+            -G "Unix Makefiles" \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DBUILD_32BIT=ON \
+            -DBoost_DIR="$boost_cmake_dir"
+
+      - name: Build
+        run: cmake --build build --parallel "$(nproc)"
