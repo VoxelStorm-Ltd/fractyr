@@ -1,5 +1,6 @@
 #include "universe.h"
 #include <iostream>
+#include "get_version.h"
 #include "platform_defines.h"
 #include "oculusstorm/oculusstorm.h"
 
@@ -17,8 +18,6 @@ void callback_windowrefresh_minimal(GLFWwindow *thiswindow);
 void callback_windowclose(          GLFWwindow *thiswindow);
 void callback_windowfocus(          GLFWwindow *thiswindow, int focused);
 void callback_windowminimise(       GLFWwindow *thiswindow, int minimised);
-
-std::string get_version();
 
 // globals
 extern GLFWwindow *window_main;
