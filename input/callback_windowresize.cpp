@@ -3,6 +3,7 @@
 //#include "vectorstorm/vectorstorm.h"
 #include "gameplayer.h"
 #include "universe.h"
+#include "input/callbacks.h"
 
 extern gameplayer player;
 extern universe root;

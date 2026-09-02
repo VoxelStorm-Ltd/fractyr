@@ -3,6 +3,7 @@
 //#include <GLFW/glfw3.h>
 #include "universe.h"
 #include "gameplayer.h"
+#include "input/callbacks.h"
 
 extern universe root;
 extern gameplayer player;
