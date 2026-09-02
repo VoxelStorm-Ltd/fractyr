@@ -412,20 +412,20 @@ elseif(APPLE)
     -framework Carbon
   )
 else()
+  include(CheckLinkerFlag)
+  check_linker_flag(CXX "-fuse-ld=mold" FRACTYR_CAN_USE_MOLD)
+
   target_link_options(Fractyr PRIVATE
     -static-libstdc++
     -static-libgcc
     -no-pie
     -pthread
+    "-Wl,--defsym=__pow_finite=pow"
   )
   if(BUILD_32BIT)
     target_link_options(Fractyr PRIVATE -static)
-  else()
-    target_link_options(Fractyr PRIVATE
-      $<$<CONFIG:Debug>:-fuse-ld=gold>
-      $<$<CONFIG:Debug>:-Wl,--threads>
-      $<$<CONFIG:Debug>:-Wl,--thread-count=60>
-    )
+  elseif(FRACTYR_CAN_USE_MOLD)
+    target_link_options(Fractyr PRIVATE -fuse-ld=mold)
   endif()
 endif()
 
