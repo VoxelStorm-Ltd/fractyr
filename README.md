@@ -1,4 +1,28 @@
-# Building and running
+# Fractyr
+
+A vaguely Descent-inspired abstract 6-degree-of-freedom indoor flight sim / tunnel shooter.
+
+3D engine and all gameplay written from scratch in five days by a two-man team.
+
+The world is procedurally generated at runtime using 3D Voronoi cells, dynamically triangulated, mapping the interior of a Mandelbulb 3D fractal.
+
+## Downloading
+
+Automated builds produce binaries downloadable from the [releases](https://github.com/VoxelStorm-Ltd/fractyr/releases) page.
+
+Original releases available to download at https://fractyr.com or https://voxelstorm.itch.io/fractyr.
+
+## Controls
+Best played with a joystick.
+
+- WSAD, Space & ctrl or joystick throttle and hat switch to fly the ship
+- Mouse, joystick or arrow keys to steer
+- Mouse buttons or joystick buttons to fire weapons
+- F11: toggle between full-screen and windowed view
+- Pause: pause the game.
+- Escape: quit
+
+## Building and running
 
 [![Linux build](https://github.com/VoxelStorm-Ltd/fractyr/actions/workflows/build-linux.yml/badge.svg)](https://github.com/VoxelStorm-Ltd/fractyr/actions/workflows/build-linux.yml)
 [![Windows build](https://github.com/VoxelStorm-Ltd/fractyr/actions/workflows/build-win.yml/badge.svg)](https://github.com/VoxelStorm-Ltd/fractyr/actions/workflows/build-win.yml)
