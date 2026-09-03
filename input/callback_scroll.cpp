@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 //#include <GLFW/glfw3.h>
 #include "gameplayer.h"
+#include "input/callbacks.h"
 
 extern gameplayer player;
 

@@ -2,6 +2,7 @@
 #include <GL/glew.h>
 #include "gameplayer.h"
 #include "universe.h"
+#include "input/callbacks.h"
 
 extern GLFWwindow *window_main;
 extern gameplayer player;

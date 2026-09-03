@@ -2,12 +2,10 @@
 //#include <GLFW/glfw3.h>
 #include "universe.h"
 #include "gameplayer.h"
+#include "input/callbacks.h"
 
 extern universe root;
 extern gameplayer player;
-
-void callback_mousepos(      GLFWwindow *thiswindow, double x, double y);
-void callback_mousepos_pause(GLFWwindow *thiswindow, double x, double y);
 
 void callback_windowminimise(GLFWwindow *thiswindow __attribute__((__unused__)), int minimised) {
   /// Callback for handling window minimise events

@@ -2,6 +2,7 @@
 #include <GL/glew.h>
 //#include <GLFW/glfw3.h>
 #include "universe.h"
+#include "input/callbacks.h"
 
 extern universe root;
 

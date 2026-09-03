@@ -4,6 +4,7 @@
 #include "gameplayer.h"
 #include "universe.h"
 #include "oculusstorm/oculusstorm.h"
+#include "input/callbacks.h"
 
 extern gameplayer player;
 extern universe root;

@@ -16,26 +16,13 @@
 #include "entity/enemy/grunt.h"
 #include "entity/enemy/core.h"
 #include "entity/particle/particle.h"
+#include "input/callbacks.h"
 
 // loaders
 FTFont *font_load(  std::string const &filename, unsigned int size = 16);
 FTFont *font_load3d(std::string const &filename, unsigned int size = 16);
 FTFont *font_load(  unsigned char const *buffer, size_t buffersize, unsigned int size = 16);
 FTFont *font_load3d(unsigned char const *buffer, size_t buffersize, unsigned int size = 16);
-
-// callbacks
-void callback_mousepos(             GLFWwindow *thiswindow, double x, double y);
-void callback_mousepos_pause(       GLFWwindow *thiswindow, double x, double y);
-void callback_mousebutton(          GLFWwindow *thiswindow, int button, int action, int mods);
-void callback_key(                  GLFWwindow *thiswindow, int key, int scancode, int action, int mods);
-void callback_key_pause(            GLFWwindow *thiswindow, int key, int scancode, int action, int mods);
-void callback_scroll(               GLFWwindow *thiswindow, double xoffset, double yoffset);
-void callback_windowresize(         GLFWwindow *thiswindow, int newwidth, int newheight);
-void callback_windowrefresh(        GLFWwindow *thiswindow);
-void callback_windowrefresh_minimal(GLFWwindow *thiswindow);
-void callback_windowclose(          GLFWwindow *thiswindow);
-void callback_windowfocus(          GLFWwindow *thiswindow, int focused);
-void callback_windowminimise(       GLFWwindow *thiswindow, int minimised);
 
 // globals
 extern gameplayer player;
