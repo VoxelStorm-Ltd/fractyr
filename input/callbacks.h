@@ -1,5 +1,4 @@
-#ifndef FRACTYR_INPUT_CALLBACKS_H
-#define FRACTYR_INPUT_CALLBACKS_H
+#pragma once
 
 struct GLFWwindow;
 
@@ -16,5 +15,3 @@ void callback_windowclose(GLFWwindow *thiswindow);
 void callback_windowfocus(GLFWwindow *thiswindow, int focused);
 void callback_windowminimise(GLFWwindow *thiswindow, int minimised);
 void callback_textinput(GLFWwindow *thiswindow, unsigned int thischar);
-
-#endif
