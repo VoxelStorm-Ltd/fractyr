@@ -400,16 +400,17 @@ elseif(APPLE)
     -static-libstdc++
     -fno-pie
     -mmacosx-version-min=10.12
-    -framework OpenGL
-    -framework IOKit
-    -framework AppKit
-    -framework CoreFoundation
-    -framework ApplicationServices
-    -framework CoreAudio
-    -framework AudioToolbox
-    -framework AudioUnit
-    -framework QuartzCore
-    -framework Carbon
+    # Keep each framework paired with its flag during option de-duplication.
+    "SHELL:-framework OpenGL"
+    "SHELL:-framework IOKit"
+    "SHELL:-framework AppKit"
+    "SHELL:-framework CoreFoundation"
+    "SHELL:-framework ApplicationServices"
+    "SHELL:-framework CoreAudio"
+    "SHELL:-framework AudioToolbox"
+    "SHELL:-framework AudioUnit"
+    "SHELL:-framework QuartzCore"
+    "SHELL:-framework Carbon"
   )
 else()
   include(CheckLinkerFlag)
