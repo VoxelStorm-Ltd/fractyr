@@ -24,8 +24,8 @@ shader_frag="resources/shaders/$name""_frag.glsl"
 #echo "DEBUG: shader_frag $shader_frag"
 
 if echo "$MACHTYPE" | grep -iq "apple"; then
-  platform="Mac"
-  extension=""
+  # macOS is a build target only; shader validation runs on development platforms.
+  exit 0
 elif echo "$MACHTYPE" | grep -iq "linux"; then
   platform="Linux"
   extension=""
