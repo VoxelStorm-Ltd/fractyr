@@ -52,7 +52,7 @@ jobs:
 
       - name: Configure
         run: |
-          gcc_cxx=$(find /usr/local/bin -maxdepth 1 -name 'g++-*' | sort -V | tail -1)
+          gcc_cxx=$(find "$(brew --prefix)/bin" -maxdepth 1 -name 'g++-*' | sort -V | tail -1)
           cmake -S . -B build \
             -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
             -DCMAKE_CXX_COMPILER="$gcc_cxx" \
