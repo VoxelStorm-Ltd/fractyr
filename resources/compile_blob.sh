@@ -30,8 +30,7 @@ if [ -z "$(which "$compiler" 2>/dev/null)" ]; then
 fi
 
 # convert absolute path to relative if it's a subdirectory
-pwd="$(pwd | sed 's/\//\\\//g')\/"
-infile="$(sed "s/$pwd//" <<< "$infile")"
+infile="${infile#"$PWD"/}"
 #echo "Relative path $infile"
 
 if grep -iq ".glsl$" <<< "$infile"; then
@@ -48,7 +47,8 @@ fi
 
 if grep -iq "apple" <<< "$MACHTYPE"; then
   # MacOS requires special treatment
-  xxd -i "$infile" | sed 's/\(resources[a-zA-Z0-9_]*\)/_binary_\1_x/' | "$compiler" -c -o "$outfile" -x c++ - -mmacosx-version-min=10.9
+  macos_version_min="${MACOSX_DEPLOYMENT_TARGET:-10.9}"
+  xxd -i "$infile" | sed 's/\(resources[a-zA-Z0-9_]*\)/_binary_\1_x/' | "$compiler" -c -o "$outfile" -x c++ - "-mmacosx-version-min=$macos_version_min"
 elif grep -iq "linux" <<< "$MACHTYPE"; then
   # de-parallelise blob compiles on linux to prevent OOM situations with high parallelism
   process_limit=$(nproc)
