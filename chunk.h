@@ -34,7 +34,16 @@ private:
                                                   (max_points * 4 * chunk_margin) + // cardinal neighbours
                                                   (max_points * 8 * chunk_margin * chunk_margin) + // cardinal corners
                                                   (max_points * 8 * chunk_margin * chunk_margin * chunk_margin); // remote corners
-  static unsigned int constexpr num_cells = static_cast<unsigned int>(std::cbrt(expected_points / ideal_points_per_block));
+  static constexpr unsigned int integer_cbrt(unsigned int value) {
+    unsigned int result = 0;
+    unsigned int next = 1;
+    while (next <= value / next / next) {
+      ++result;
+      ++next;
+    }
+    return result;
+  }
+  static unsigned int constexpr num_cells = integer_cbrt(expected_points / ideal_points_per_block);
   voro::container con;
 
 
