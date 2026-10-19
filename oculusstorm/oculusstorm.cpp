@@ -1,6 +1,34 @@
 #include "oculusstorm.h"
 #include <iostream>
 
+#ifdef FRACTYR_DISABLE_OVR
+oculusstorm::oculusstorm(float new_farplane, float new_nearplane)
+  : nearplane(new_nearplane == 0.0f ? 0.2f : new_nearplane),
+    farplane(new_farplane) {
+}
+
+oculusstorm::~oculusstorm() = default;
+
+void oculusstorm::dumpinfo() {
+}
+
+quatf oculusstorm::getquat() {
+  return quatf{};
+}
+
+matrix4f oculusstorm::getmatrix() {
+  return matrix4f{};
+}
+
+void oculusstorm::cachematrices() {
+}
+
+void oculusstorm::setup_left() {
+}
+
+void oculusstorm::setup_right() {
+}
+#else
 oculusstorm::oculusstorm(float new_farplane, float new_nearplane)
   : nearplane(new_nearplane == 0.0f ? 0.2f : new_nearplane),                    // 20cm default clip plane
     farplane(new_farplane) {
@@ -215,3 +243,4 @@ void oculusstorm::setup_right() {
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();                                                             // reset view matrix
 }
+#endif

@@ -27,6 +27,11 @@ else()
 endif()
 option(BUILD_32BIT "Build the 32-bit target (-m32)" ${_build_32bit_default})
 
+set(FRACTYR_MACOS_ARM64 FALSE)
+if(APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm64|aarch64)$")
+  set(FRACTYR_MACOS_ARM64 TRUE)
+endif()
+
 if(APPLE AND BUILD_32BIT)
   message(FATAL_ERROR "Fractyr only has a 64-bit macOS target")
 endif()
@@ -34,6 +39,9 @@ endif()
 if(BUILD_32BIT)
   set(FRACTYR_ARCH_FLAG -m32)
   set(FRACTYR_ARCH_BITS 32)
+elseif(FRACTYR_MACOS_ARM64)
+  set(FRACTYR_ARCH_FLAG "")
+  set(FRACTYR_ARCH_BITS 64)
 else()
   set(FRACTYR_ARCH_FLAG -m64)
   set(FRACTYR_ARCH_BITS 64)
@@ -233,6 +241,44 @@ target_include_directories(Fractyr SYSTEM PRIVATE
   ${FRACTYR_BOOST_INCLUDE_DIRS}
 )
 
+if(FRACTYR_MACOS_ARM64)
+  if(NOT FRACTYR_BREW_PREFIX)
+    message(FATAL_ERROR "Set FRACTYR_BREW_PREFIX to the Homebrew prefix for Apple Silicon builds")
+  endif()
+  target_include_directories(Fractyr SYSTEM BEFORE PRIVATE
+    "${FRACTYR_BREW_PREFIX}/include"
+    "${FRACTYR_BREW_PREFIX}/include/freetype2"
+    "${FRACTYR_BREW_PREFIX}/include/voro++"
+  )
+  target_compile_definitions(Fractyr PRIVATE
+    FRACTYR_DISABLE_OVR
+    SOUNDSTORM_NO_SSE
+  )
+  find_library(FRACTYR_VORO_LIBRARY NAMES "voro++"
+    PATHS "${FRACTYR_BREW_PREFIX}/lib" NO_DEFAULT_PATH REQUIRED)
+  find_library(FRACTYR_PORTAUDIO_LIBRARY NAMES portaudio
+    PATHS "${FRACTYR_BREW_PREFIX}/lib" NO_DEFAULT_PATH REQUIRED)
+  find_library(FRACTYR_PORTAUDIOCPP_LIBRARY NAMES portaudiocpp
+    PATHS "${FRACTYR_BREW_PREFIX}/lib" NO_DEFAULT_PATH REQUIRED)
+  find_library(FRACTYR_FTGL_LIBRARY NAMES ftgl
+    PATHS "${FRACTYR_BREW_PREFIX}/lib" NO_DEFAULT_PATH REQUIRED)
+  find_library(FRACTYR_VORBIS_LIBRARY NAMES vorbis
+    PATHS "${FRACTYR_BREW_PREFIX}/lib" NO_DEFAULT_PATH REQUIRED)
+  find_library(FRACTYR_VORBISFILE_LIBRARY NAMES vorbisfile
+    PATHS "${FRACTYR_BREW_PREFIX}/lib" NO_DEFAULT_PATH REQUIRED)
+  find_library(FRACTYR_OGG_LIBRARY NAMES ogg
+    PATHS "${FRACTYR_BREW_PREFIX}/lib" NO_DEFAULT_PATH REQUIRED)
+  find_library(FRACTYR_GLFW_LIBRARY NAMES glfw
+    PATHS "${FRACTYR_BREW_PREFIX}/lib" NO_DEFAULT_PATH REQUIRED)
+  find_library(FRACTYR_FREETYPE_LIBRARY NAMES freetype
+    PATHS "${FRACTYR_BREW_PREFIX}/lib" NO_DEFAULT_PATH REQUIRED)
+  find_library(FRACTYR_GLEW_LIBRARY NAMES GLEW
+    PATHS "${FRACTYR_BREW_PREFIX}/lib" NO_DEFAULT_PATH REQUIRED)
+  find_library(FRACTYR_PNG_LIBRARY NAMES png16 png
+    PATHS "${FRACTYR_BREW_PREFIX}/lib" NO_DEFAULT_PATH REQUIRED)
+  find_library(FRACTYR_BZIP2_LIBRARY NAMES bz2 REQUIRED)
+endif()
+
 target_compile_definitions(Fractyr PRIVATE
   BOOST_THREAD_VERSION=3
   BOOST_THREAD_USE_LIB
@@ -249,55 +295,66 @@ if(WIN32 AND CMAKE_HOST_UNIX)
   target_compile_definitions(Fractyr PRIVATE BLOB_LOADER_LINK_MODE=2)
 endif()
 
-target_compile_options(Fractyr PRIVATE
-  ${FRACTYR_ARCH_FLAG}
-  -mmmx
-  -msse
-  -msse2
-  -m3dnow
-  -Wnon-virtual-dtor
-  -Wshadow
-  -Winit-self
-  -Wredundant-decls
-  -Wcast-align
-  -Winline
-  -Wmissing-declarations
-  -Wmissing-include-dirs
-  -Wfatal-errors
-  -Wextra
-  -Wall
-  -Wunused
-  -Wuninitialized
-  -Wmaybe-uninitialized
-  -Wconversion
-  -Wuseless-cast
-  -Warray-bounds
-  -Woverloaded-virtual
-  -Wdouble-promotion
-  -Wsuggest-attribute=pure
-  -Wsuggest-attribute=const
-  -Wsuggest-attribute=noreturn
-  -Wsuggest-final-types
-  -Wsuggest-final-methods
-  -Wsuggest-override
-  -Wstack-usage=2097152
-  -Wunsafe-loop-optimizations
-  -Wpointer-arith
-  -Wlogical-op
-  -Wnormalized
-  -Wpacked
-  -Winvalid-pch
-  -Wlong-long
-  -Wvector-operation-performance
-  -Wdisabled-optimization
-  $<$<CONFIG:Debug>:-Og>
-  $<$<CONFIG:Debug>:-g>
-  $<$<CONFIG:Debug>:-ggdb3>
-)
+if(FRACTYR_MACOS_ARM64)
+  target_compile_options(Fractyr PRIVATE
+    -Wall
+    -Wextra
+    -Wshadow
+    -Wconversion
+    $<$<CONFIG:Debug>:-Og>
+    $<$<CONFIG:Debug>:-g>
+  )
+else()
+  target_compile_options(Fractyr PRIVATE
+    ${FRACTYR_ARCH_FLAG}
+    -mmmx
+    -msse
+    -msse2
+    -m3dnow
+    -Wnon-virtual-dtor
+    -Wshadow
+    -Winit-self
+    -Wredundant-decls
+    -Wcast-align
+    -Winline
+    -Wmissing-declarations
+    -Wmissing-include-dirs
+    -Wfatal-errors
+    -Wextra
+    -Wall
+    -Wunused
+    -Wuninitialized
+    -Wmaybe-uninitialized
+    -Wconversion
+    -Wuseless-cast
+    -Warray-bounds
+    -Woverloaded-virtual
+    -Wdouble-promotion
+    -Wsuggest-attribute=pure
+    -Wsuggest-attribute=const
+    -Wsuggest-attribute=noreturn
+    -Wsuggest-final-types
+    -Wsuggest-final-methods
+    -Wsuggest-override
+    -Wstack-usage=2097152
+    -Wunsafe-loop-optimizations
+    -Wpointer-arith
+    -Wlogical-op
+    -Wnormalized
+    -Wpacked
+    -Winvalid-pch
+    -Wlong-long
+    -Wvector-operation-performance
+    -Wdisabled-optimization
+    $<$<CONFIG:Debug>:-Og>
+    $<$<CONFIG:Debug>:-g>
+    $<$<CONFIG:Debug>:-ggdb3>
+  )
+endif()
 
 if(WIN32)
   target_compile_options(Fractyr PRIVATE -mthreads)
-elseif(APPLE)
+elseif(APPLE AND NOT FRACTYR_MACOS_ARM64)
   target_compile_options(Fractyr PRIVATE -mmacosx-version-min=10.12)
 endif()
 
@@ -314,77 +371,83 @@ if(UNIX AND NOT APPLE AND NOT BUILD_32BIT)
   )
 endif()
 
-set(FRACTYR_RELEASE_OPTIONS
-  -Ofast
-  -fexpensive-optimizations
-  -flto
-  -maccumulate-outgoing-args
-  -fgcse-sm
-  -fgcse-las
-  -fgcse-after-reload
-  -fsched-spec-load
-  -fsched-spec-load-dangerous
-  -fmerge-all-constants
-  -fmodulo-sched
-  -fmodulo-sched-allow-regmoves
-  -funsafe-loop-optimizations
-  -fsched-pressure
-  -fsched-stalled-insns=0
-  -fsched-stalled-insns-dep=32
-  -fsched2-use-superblocks
-  -fipa-pta
-  -ftracer
-  -fno-var-tracking-assignments
-  -fpeel-loops
-  -funroll-loops
-  -funswitch-loops
-  -ftree-loop-if-convert
-  -ftree-loop-distribution
-  -ftree-loop-im
-  -ftree-loop-ivcanon
-  -fivopts
-  -fvariable-expansion-in-unroller
-  -freorder-blocks-and-partition
-  -fbranch-target-load-optimize
-  -ffast-math
-  -fno-math-errno
-  -funsafe-math-optimizations
-  -fassociative-math
-  -freciprocal-math
-  -fno-signed-zeros
-  -fno-trapping-math
-  --param=max-gcse-memory=1000000000
-  --param=max-inline-insns-single=10000
-  --param=max-inline-insns-auto=10000
-  --param=inline-min-speedup=20
-  --param=large-function-insns=10000
-  --param=large-function-growth=2000
-  --param=large-unit-insns=20000
-  --param=inline-unit-growth=200
-)
-if(NOT APPLE)
-  list(APPEND FRACTYR_RELEASE_OPTIONS -fuse-linker-plugin)
+if(NOT FRACTYR_MACOS_ARM64)
+  set(FRACTYR_RELEASE_OPTIONS
+    -Ofast
+    -fexpensive-optimizations
+    -flto
+    -maccumulate-outgoing-args
+    -fgcse-sm
+    -fgcse-las
+    -fgcse-after-reload
+    -fsched-spec-load
+    -fsched-spec-load-dangerous
+    -fmerge-all-constants
+    -fmodulo-sched
+    -fmodulo-sched-allow-regmoves
+    -funsafe-loop-optimizations
+    -fsched-pressure
+    -fsched-stalled-insns=0
+    -fsched-stalled-insns-dep=32
+    -fsched2-use-superblocks
+    -fipa-pta
+    -ftracer
+    -fno-var-tracking-assignments
+    -fpeel-loops
+    -funroll-loops
+    -funswitch-loops
+    -ftree-loop-if-convert
+    -ftree-loop-distribution
+    -ftree-loop-im
+    -ftree-loop-ivcanon
+    -fivopts
+    -fvariable-expansion-in-unroller
+    -freorder-blocks-and-partition
+    -fbranch-target-load-optimize
+    -ffast-math
+    -fno-math-errno
+    -funsafe-math-optimizations
+    -fassociative-math
+    -freciprocal-math
+    -fno-signed-zeros
+    -fno-trapping-math
+    --param=max-gcse-memory=1000000000
+    --param=max-inline-insns-single=10000
+    --param=max-inline-insns-auto=10000
+    --param=inline-min-speedup=20
+    --param=large-function-insns=10000
+    --param=large-function-growth=2000
+    --param=large-unit-insns=20000
+    --param=inline-unit-growth=200
+  )
+  if(NOT APPLE)
+    list(APPEND FRACTYR_RELEASE_OPTIONS -fuse-linker-plugin)
+  endif()
 endif()
-target_compile_options(Fractyr PRIVATE
-  "$<$<CONFIG:Release>:${FRACTYR_RELEASE_OPTIONS}>"
-)
+if(FRACTYR_RELEASE_OPTIONS)
+  target_compile_options(Fractyr PRIVATE
+    "$<$<CONFIG:Release>:${FRACTYR_RELEASE_OPTIONS}>"
+  )
+endif()
 if(WIN32 AND BUILD_32BIT)
   target_compile_options(Fractyr PRIVATE
     $<$<CONFIG:Release>:-fomit-frame-pointer>
   )
 endif()
 
-target_link_options(Fractyr PRIVATE
-  ${FRACTYR_ARCH_FLAG}
-  -mmmx
-  -msse
-  -msse2
-  -m3dnow
-  $<$<CONFIG:Debug>:-Og>
-  $<$<CONFIG:Debug>:-ggdb3>
-  $<$<CONFIG:Release>:-s>
-  "$<$<CONFIG:Release>:${FRACTYR_RELEASE_OPTIONS}>"
-)
+if(NOT FRACTYR_MACOS_ARM64)
+  target_link_options(Fractyr PRIVATE
+    ${FRACTYR_ARCH_FLAG}
+    -mmmx
+    -msse
+    -msse2
+    -m3dnow
+    $<$<CONFIG:Debug>:-Og>
+    $<$<CONFIG:Debug>:-ggdb3>
+    $<$<CONFIG:Release>:-s>
+    "$<$<CONFIG:Release>:${FRACTYR_RELEASE_OPTIONS}>"
+  )
+endif()
 
 if(WIN32)
   target_link_options(Fractyr PRIVATE
@@ -394,6 +457,19 @@ if(WIN32)
     -no-pie
     -Wl,--stack,8388608
     -mthreads
+  )
+elseif(APPLE AND FRACTYR_MACOS_ARM64)
+  target_link_options(Fractyr PRIVATE
+    "SHELL:-framework OpenGL"
+    "SHELL:-framework IOKit"
+    "SHELL:-framework AppKit"
+    "SHELL:-framework CoreFoundation"
+    "SHELL:-framework ApplicationServices"
+    "SHELL:-framework CoreAudio"
+    "SHELL:-framework AudioToolbox"
+    "SHELL:-framework AudioUnit"
+    "SHELL:-framework QuartzCore"
+    "SHELL:-framework Carbon"
   )
 elseif(APPLE)
   target_link_options(Fractyr PRIVATE
@@ -451,6 +527,22 @@ if(WIN32 AND BUILD_32BIT)
     "${FRACTYR_LIB_DIR}/libole32.a"
     "${FRACTYR_LIB_DIR}/libsetupapi.a"
     "${FRACTYR_LIB_DIR}/libz.a"
+  )
+elseif(APPLE AND FRACTYR_MACOS_ARM64)
+  target_link_libraries(Fractyr PRIVATE
+    "${FRACTYR_VORO_LIBRARY}"
+    "${FRACTYR_PORTAUDIOCPP_LIBRARY}"
+    "${FRACTYR_PORTAUDIO_LIBRARY}"
+    "${FRACTYR_FTGL_LIBRARY}"
+    "${FRACTYR_FREETYPE_LIBRARY}"
+    "${FRACTYR_VORBISFILE_LIBRARY}"
+    "${FRACTYR_VORBIS_LIBRARY}"
+    "${FRACTYR_OGG_LIBRARY}"
+    "${FRACTYR_GLFW_LIBRARY}"
+    "${FRACTYR_GLEW_LIBRARY}"
+    "${FRACTYR_BZIP2_LIBRARY}"
+    "${FRACTYR_PNG_LIBRARY}"
+    z
   )
 elseif(APPLE)
   target_link_libraries(Fractyr PRIVATE

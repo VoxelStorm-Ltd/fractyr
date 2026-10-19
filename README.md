@@ -74,18 +74,22 @@ cmake --build build/win32-debug --parallel
 wine build/win32-debug/Fractyr.exe
 ```
 
-For a 64-bit macOS Release build:
+For a native Apple Silicon macOS Release build:
 
 ```sh
-cmake -S . -B build/mac64-release \
+brew install boost ftgl freetype glew glfw libpng libvorbis portaudio voro++
+cmake -S . -B build/mac-arm64-release \
   -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 \
+  -DCMAKE_PREFIX_PATH="$(brew --prefix)" \
+  -DFRACTYR_BREW_PREFIX="$(brew --prefix)" \
   -DBUILD_32BIT=OFF
-cmake --build build/mac64-release --parallel
-./build/mac64-release/Fractyr
+cmake --build build/mac-arm64-release --parallel
+./build/mac-arm64-release/Fractyr
 ```
 
-`CMAKE_BUILD_TYPE` accepts `Debug` or `Release`. Debug builds use `-Og` with full debugging information, enable general logging, and suppress the especially verbose input and sound debug streams. Linux64 Debug builds additionally enable AddressSanitizer and UndefinedBehaviorSanitizer. Release builds use the original optimized, LTO-enabled configuration and disable standard and Boost assertions.
+`CMAKE_BUILD_TYPE` accepts `Debug` or `Release`. Debug builds use `-Og` with debugging information, enable general logging, and suppress the especially verbose input and sound debug streams. Linux64 Debug builds additionally enable AddressSanitizer and UndefinedBehaviorSanitizer. Release builds disable standard and Boost assertions; the bundled x86 targets use the original optimized, LTO-enabled configuration.
 
-`BUILD_32BIT` selects the target architecture and defaults to the compiler's architecture. `ON` selects `-m32` and `lib/<platform>32`; `OFF` selects `-m64` and `lib/<platform>64`. macOS supports only the 64-bit setting. The repository currently contains complete bundled library sets for Win32, Linux64, and Mac64; Linux32 and Win64 cannot link until corresponding `lib/linux32` and `lib/win64` dependencies are supplied.
+`BUILD_32BIT` defaults to the compiler's architecture. On x86, `ON` selects `-m32` and `lib/<platform>32`; `OFF` selects `-m64` and `lib/<platform>64`. On Apple Silicon, `OFF` selects native arm64 and Homebrew libraries rather than the bundled Intel-only `lib/mac64` archives. Oculus Rift support is disabled on Apple Silicon because the repository only includes an Intel Oculus SDK library. The repository currently contains bundled library sets for Win32, Linux64, and Intel Mac64; Linux32 and Win64 cannot link until corresponding `lib/linux32` and `lib/win64` dependencies are supplied.
 
-All builds require CMake, a matching GCC-compatible C++ toolchain, Bash, `xxd`, and Boost headers. Shader, font, and music resources are compiled into the executable automatically. `GLEW_STATIC` is always enabled for the bundled GLEW libraries, and MinGW cross-builds automatically select the resource-embedding mode compatible with the Linux build host.
+All builds require CMake, a matching C++ toolchain, Bash, `xxd`, and Boost headers. Shader, font, and music resources are compiled into the executable automatically. Linux, Windows, and Intel macOS use the bundled GLEW library; Apple Silicon uses the Homebrew GLEW library. MinGW cross-builds automatically select the resource-embedding mode compatible with the Linux build host.

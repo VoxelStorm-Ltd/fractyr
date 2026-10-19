@@ -5,6 +5,7 @@
 
 #include <GL/glew.h>
 #include <GL/gl.h>
+#ifndef FRACTYR_DISABLE_OVR
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdouble-promotion"
 #pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
@@ -13,6 +14,7 @@
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 #include <OVR.h>
 #pragma GCC diagnostic pop
+#endif
 #include "vectorstorm/matrix/matrix4.h"
 #include "vectorstorm/quat/quat.h"
 
@@ -36,12 +38,19 @@ public:
   matrix4<GLfloat> viewadjust_left;
   matrix4<GLfloat> viewadjust_right;
 
+#ifndef FRACTYR_DISABLE_OVR
   OVR::Ptr<OVR::DeviceManager>    manager{nullptr};
   OVR::Ptr<OVR::HMDDevice>        device{nullptr};
   OVR::Ptr<OVR::SensorDevice>     sensor{nullptr};
   OVR::SensorFusion               *sensorfusion{nullptr};
   OVR::HMDInfo                    hmdinfo;
   OVR::Util::Render::StereoConfig stereoconfig;
+#else
+  struct {
+    unsigned int HResolution{1280};
+    unsigned int VResolution{800};
+  } hmdinfo;
+#endif
 
   bool                            infoloaded{false};
   bool                            enabled{false};
@@ -52,7 +61,9 @@ public:
   void dumpinfo();
   quatf getquat();
   matrix4f getmatrix();
+#ifndef FRACTYR_DISABLE_OVR
   matrix4f convertmatrix(OVR::Matrix4f ovrmatrix);
+#endif
   void cachematrices();
   void setup_left();
   void setup_right();

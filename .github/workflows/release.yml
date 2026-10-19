@@ -58,22 +58,25 @@ jobs:
           if-no-files-found: error
 
   build-macos:
-    name: macOS x86-64
+    name: macOS arm64
     runs-on: macos-latest
     continue-on-error: true
+    env:
+      MACOSX_DEPLOYMENT_TARGET: "11.0"
 
     steps:
       - uses: actions/checkout@v6
 
       - name: Install system dependencies
-        run: brew install gcc boost
+        run: brew install boost ftgl freetype glew glfw libpng libvorbis portaudio voro++
 
       - name: Configure
         run: |
-          gcc_cxx=$(find /usr/local/bin -maxdepth 1 -name 'g++-*' | sort -V | tail -1)
           cmake -S . -B build \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_CXX_COMPILER="$gcc_cxx" \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET="$MACOSX_DEPLOYMENT_TARGET" \
+            -DCMAKE_PREFIX_PATH="$(brew --prefix)" \
+            -DFRACTYR_BREW_PREFIX="$(brew --prefix)" \
             -DBUILD_32BIT=OFF
 
       - name: Build
@@ -84,13 +87,13 @@ jobs:
           cmake -E make_directory package/Fractyr
           cmake -E copy build/Fractyr package/Fractyr/Fractyr
           chmod +x package/Fractyr/Fractyr
-          cmake -E chdir package cmake -E tar czf ../Fractyr-macos-x86_64.tar.gz Fractyr
+          cmake -E chdir package cmake -E tar czf ../Fractyr-macos-arm64.tar.gz Fractyr
 
       - name: Upload release package
         uses: actions/upload-artifact@v7
         with:
-          name: release-macos
-          path: Fractyr-macos-x86_64.tar.gz
+          name: release-macos-arm64
+          path: Fractyr-macos-arm64.tar.gz
           if-no-files-found: error
 
   build-windows:
