@@ -38,7 +38,7 @@ jobs:
     needs: skip-duplicate
     if: needs.skip-duplicate.outputs.should_skip != 'true'
     name: macOS x86-64 (${{ matrix.build_type }})
-    runs-on: macos-latest
+    runs-on: macos-15-intel
     strategy:
       fail-fast: false
       matrix:
