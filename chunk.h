@@ -7,6 +7,18 @@
 #include "buffers/buffer_chunk.h"
 #include "world.h"
 
+namespace chunk_detail {
+inline constexpr unsigned int integer_cbrt(unsigned int value) {
+  unsigned int result = 0;
+  unsigned int next = 1;
+  while (next <= value / next / next) {
+    ++result;
+    ++next;
+  }
+  return result;
+}
+}
+
 class world;                                                                    // forward dec
 class entity;
 
@@ -34,16 +46,7 @@ private:
                                                   (max_points * 4 * chunk_margin) + // cardinal neighbours
                                                   (max_points * 8 * chunk_margin * chunk_margin) + // cardinal corners
                                                   (max_points * 8 * chunk_margin * chunk_margin * chunk_margin); // remote corners
-  static constexpr unsigned int integer_cbrt(unsigned int value) {
-    unsigned int result = 0;
-    unsigned int next = 1;
-    while (next <= value / next / next) {
-      ++result;
-      ++next;
-    }
-    return result;
-  }
-  static unsigned int constexpr num_cells = integer_cbrt(expected_points / ideal_points_per_block);
+  static unsigned int constexpr num_cells = chunk_detail::integer_cbrt(expected_points / ideal_points_per_block);
   voro::container con;
 
 
